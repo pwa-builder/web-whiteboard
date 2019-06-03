@@ -1,0 +1,137 @@
+#controlsBlock {
+  animation-name: slideUp;
+  animation-duration: 250ms;
+  
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+#controlsBlock #buttonBlock {
+  box-shadow: 0px -3px 14px 0px rgba(173,173,173,1);
+  background: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  width: 14em;
+  border-radius: 5px 5px 0 0;
+}
+
+#controlsBlock #buttonBlock button {
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  outline: none;
+}
+
+#colorsBlock {
+  animation-name: slideUp;
+  animation-duration: 250ms;
+
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+#colorsBlock #colorInternalBlock {
+  box-shadow: 0px -3px 14px 0px rgba(173,173,173,1);
+  background: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  width: 14em;
+  align-items: center;
+  border-radius: 5px 5px 0 0;
+}
+
+#colorInternalBlock #redButton {
+  background: red;
+}
+
+#colorInternalBlock #blueButton {
+  background: blue;
+}
+
+#colorInternalBlock #blackButton {
+  background: black;
+}
+
+#colorInternalBlock #greenButton {
+  background: green;
+}
+
+#colorInternalBlock #closeButton {
+  background: none;
+  border: none;
+  font-size: 1.4em;
+}
+
+#colorInternalBlock button {
+  border-radius: 50%;
+  height: 2em;
+  width: 2em;
+  border: solid 2px black;
+  outline: none;
+}
+
+#saveButtonDiv {
+  position: fixed;
+  top: 82px;
+  left: 16px;
+}
+
+#saveButton {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  font-size: 1.4em;
+  width: 2.4em;
+  height: 2.4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#allImagesButton {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  font-size: 1.4em;
+  width: 2.4em;
+  height: 2.4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media( max-width: 600px) {
+  #controlsBlock #buttonBlock {
+    width: 18em;
+  }
+
+  #colorsBlock #colorInternalBlock {
+    width: 18em;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}

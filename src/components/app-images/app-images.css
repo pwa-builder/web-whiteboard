@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  overflow-y: scroll;
+  height: 100%;
+}
+
+#mainDiv {
+  overflow-y: scroll;
+}
+
+h2 {
+  text-align: center;
+}
+
+#imageList {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 20px;
+  margin: 2em;
+}
+
+#imageBlock {
+  padding: 1em;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  min-height: 14em;
+}
+
+#imageBlock img {
+  width: 100%;
+  height: 100%;
+}
+
+#imageBlock #titleBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 20px;
+}
+
+#imageBlock #titleBlock h4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#imageBlock #titleBlock ion-button {
+  font-size: 20px;
+}
+
+#buttonBlock {
+  padding-top: 16px;
+  padding-left: 16px;
+}
+
+#buttonBlock button {
+  background: none;
+  border: none;
+  font-size: 1.4em;
+}

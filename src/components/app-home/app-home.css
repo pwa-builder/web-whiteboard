@@ -1,0 +1,12 @@
+#settingsButton {
+  font-size: 18px;
+}
+
+#settingsBlock {
+  position: fixed;
+  top: 12px;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
