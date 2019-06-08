@@ -1,14 +1,14 @@
-import { Component, Event, EventEmitter, State, Prop, h } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, State, Prop, h } from '@stencil/core';
 
 
 @Component({
   tag: 'app-controls',
-  styleUrl: 'app-controls.css',
-  shadow: true
+  styleUrl: 'app-controls.css'
 })
 export class AppControls {
 
   @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
+  @Prop({ connect: 'ion-popover-controller' }) popoverCtrl: HTMLIonPopoverControllerElement | null = null;
 
   @State() openColors: boolean = false;
   @State() erasing: boolean = false;
@@ -20,6 +20,9 @@ export class AppControls {
   @Event() saveCanvas: EventEmitter;
   @Event() allImages: EventEmitter;
   @Event() doGrid: EventEmitter;
+  @Event() addImage: EventEmitter;
+
+  @Element() el: HTMLElement;
 
   changeColor() {
     this.penMode.emit();
@@ -77,15 +80,40 @@ export class AppControls {
     this.doGrid.emit();
   }
 
+  async openSettings(ev: Event) {
+    const popover = await this.popoverCtrl.create({
+      component: 'app-settings',
+      event: ev
+    });
+    await popover.present();
+  }
+
+  handleFileInput(ev: Event) {
+    console.log((ev.target as any).files);
+
+    if (FileReader && (ev.target as any).files && (ev.target as any).files.length) {
+      var fr = new FileReader();
+      fr.onload = () => {
+        this.addImage.emit(fr.result);
+      }
+      fr.readAsDataURL((ev.target as any).files[0]);
+    }
+  }
+
   render() {
-    return (
-      <div>
+    return [
+      <div id="main">
         <div id='saveButtonDiv'>
           <button id='allImagesButton' onClick={() => this.openAllImages()}>
             <ion-icon name='images'></ion-icon>
           </button>
+
           <button onClick={() => this.save()} id='saveButton'>
             <ion-icon name='save'></ion-icon>
+          </button>
+
+          <button onClick={(event) => this.openSettings(event)} id="tasksButton">
+            <ion-icon name="today"></ion-icon>
           </button>
         </div>
         {!this.openColors ? <div id='controlsBlock'>
@@ -101,6 +129,11 @@ export class AppControls {
             <button onClick={() => this.openGrid()}>
               <ion-icon name="grid"></ion-icon>
             </button>
+
+            <input onChange={(ev) => this.handleFileInput(ev)} accept="image/png, image/jpeg" type="file" name="file" id="file" class="inputfile" />
+            <label id="fileLabel" htmlFor="file">
+              <ion-icon name="images"></ion-icon>
+            </label>
 
             <button onClick={() => this.clear()}>
               <ion-icon name="trash"></ion-icon>
@@ -120,6 +153,6 @@ export class AppControls {
           </div>
         </div> : null}
       </div>
-    );
+    ];
   }
 }

@@ -12,6 +12,8 @@ export class AppCanvas {
   @Prop() mode: string = 'pen';
   @Prop() savedDrawing: string | null = null;
 
+  @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
+
   @State() drawing: boolean = false;
 
   canvasElement: HTMLCanvasElement;
@@ -189,12 +191,19 @@ export class AppCanvas {
   }
 
   setupTouchEvents() {
+    /*const offsetX = this.canvasElement.getBoundingClientRect().left;
+    const offsetY = this.canvasElement.getBoundingClientRect().top;
+    const pageXOffset = window.pageXOffset;
+    const pageYOffset = window.pageYOffset;*/
+
     this.canvasElement.addEventListener("touchstart", (e) => {
       this.mousePos = this.getTouchPos(this.canvasElement, e);
+
+
       const touch = e.touches[0];
 
       console.log(e.touches);
-     
+
 
       const mouseEvent = new MouseEvent("mousedown", {
         clientX: touch.clientX,
@@ -232,7 +241,7 @@ export class AppCanvas {
 
   getTouchPos(canvasDom, touchEvent) {
     const rect = canvasDom.getBoundingClientRect();
-    
+
     return {
       x: touchEvent.touches[0].clientX - rect.left,
       y: touchEvent.touches[0].clientY - rect.top
@@ -260,6 +269,35 @@ export class AppCanvas {
     }
 
     requestAnimationFrame(() => this.renderCanvas());
+  }
+
+  @Method()
+  addImageToCanvas(imageString: string) {
+    return new Promise(() => {
+      let base_image = new Image();
+
+      base_image.src = imageString;
+
+      base_image.onload = async () => {
+        const toast = await this.toastCtrl.create({
+          message: "Tap where you would like the image"
+        })
+        await toast.present();
+
+        const canvasElement = this.canvasElement;
+        const context = this.context;
+
+        this.canvasElement.addEventListener('click', async function handler(ev) {
+          console.log(ev.clientY);
+
+          context.drawImage(base_image, ev.clientX, ev.clientY, 400, 400);
+          await toast.dismiss();
+
+          canvasElement.removeEventListener('click', handler);
+
+        });
+      }
+    })
   }
 
   render() {

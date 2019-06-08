@@ -104,6 +104,12 @@ export class AppHome {
     }
   }
 
+  async doImage(ev) {
+    console.log(ev);
+    const appCanvas = this.el.querySelector('app-canvas');
+    await appCanvas.addImageToCanvas(ev.detail);
+  }
+
   async openSettings(ev: Event) {
     const popover = await this.popoverCtrl.create({
       component: 'app-settings',
@@ -113,25 +119,27 @@ export class AppHome {
   }
 
   render() {
-    return (
+    return [
       <div class='app-home'>
         <app-canvas savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
 
-        <app-controls onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
+        <app-controls onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
 
         <div id="settingsBlock">
           <mgt-msal-provider client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
           <mgt-login></mgt-login>
 
-          <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(ev) => this.openSettings(ev)} fill="clear">
+          {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
+
+          {/*<ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(ev) => this.openSettings(ev)} fill="clear">
             <ion-icon color="primary" name="settings"></ion-icon>
-          </ion-button>
+    </ion-button>*/}
         </div>
 
         {/*<ion-button onClick={() => this.openSettings()} id="settingsButton" fill="clear">
           <ion-icon name="settings"></ion-icon>
     </ion-button>*/}
       </div>
-    );
+    ];
   }
 }

@@ -10,6 +10,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 export namespace Components {
   interface AppCanvas {
+    'addImageToCanvas': (imageString: string) => Promise<{}>;
     'clearCanvas': () => Promise<void>;
     'clearGrid': () => Promise<{}>;
     'color': string;
@@ -35,6 +36,7 @@ declare namespace LocalJSX {
     'savedDrawing'?: string | null;
   }
   interface AppControls extends JSXBase.HTMLAttributes {
+    'onAddImage'?: (event: CustomEvent<any>) => void;
     'onAllImages'?: (event: CustomEvent<any>) => void;
     'onClearCanvas'?: (event: CustomEvent<any>) => void;
     'onColorSelected'?: (event: CustomEvent<any>) => void;

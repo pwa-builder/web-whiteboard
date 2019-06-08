@@ -1,3 +1,5 @@
-app-settings {
-    /* Component styles go here */
+#settingsDiv {
+  padding-top: 2em;
+  padding-left: 10px;
+  padding-right: 10px;
 }

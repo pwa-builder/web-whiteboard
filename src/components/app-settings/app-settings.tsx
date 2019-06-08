@@ -11,12 +11,8 @@ export class AppSettings {
 
   render() {
     return (
-      <div>
-        <ion-item>
-          <ion-label>
-            Test
-          </ion-label>
-        </ion-item>
+      <div id="settingsDiv">
+        <mgt-tasks data-source="todo"></mgt-tasks>
       </div>
     );
   }

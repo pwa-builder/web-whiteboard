@@ -16,7 +16,7 @@
   padding: 10px;
   display: flex;
   justify-content: space-around;
-  width: 14em;
+  width: 20em;
   border-radius: 5px 5px 0 0;
 }
 
@@ -25,6 +25,22 @@
   border: none;
   font-size: 1.8em;
   outline: none;
+}
+
+#file {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+#fileLabel {
+  font-size: 1.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #colorsBlock {
@@ -97,6 +113,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#tasksButton {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  font-size: 1.4em;
+  width: 2.4em;
+  height: 2.4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: fixed;
+  top: 152px;
 }
 
 #allImagesButton {
