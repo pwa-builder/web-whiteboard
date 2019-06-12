@@ -158,7 +158,7 @@ export class AppImages {
                         }
                       </div>
 
-                      <img onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
+                      <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
                     </div>
                   )
                 })

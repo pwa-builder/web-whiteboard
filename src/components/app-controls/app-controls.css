@@ -44,9 +44,6 @@
 }
 
 #colorsBlock {
-  animation-name: slideUp;
-  animation-duration: 250ms;
-
   position: fixed;
   bottom: 0;
   left: 0;
@@ -61,9 +58,12 @@
   padding: 10px;
   display: flex;
   justify-content: space-around;
-  width: 14em;
+  width: 20em;
   align-items: center;
   border-radius: 5px 5px 0 0;
+  
+  animation-name: slideUp;
+  animation-duration: 250ms;
 }
 
 #colorInternalBlock #redButton {
@@ -86,6 +86,7 @@
   background: none;
   border: none;
   font-size: 1.4em;
+  height: 1.6em;
 }
 
 #colorInternalBlock button {
