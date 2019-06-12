@@ -85,6 +85,9 @@ export class AppCanvas {
 
   @Method()
   async saveCanvas(name: string) {
+    this.context.fillStyle = 'white';
+    this.context.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+    
     const canvasImage = this.canvasElement.toDataURL();
 
     const images: any[] = await get('images');
@@ -104,9 +107,6 @@ export class AppCanvas {
     this.context = (this.canvasElement.getContext('2d', {
       desynchronized: true
     }) as CanvasRenderingContext2D);
-
-    this.context.fillStyle = 'white';
-    this.context.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
     this.context.lineCap = 'round';
     this.context.lineJoin = 'round';
