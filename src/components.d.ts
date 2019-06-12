@@ -10,11 +10,11 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 export namespace Components {
   interface AppCanvas {
-    'addImageToCanvas': (imageString: string) => Promise<{}>;
+    'addImageToCanvas': (imageString: string) => Promise<unknown>;
     'clearCanvas': () => Promise<void>;
-    'clearGrid': () => Promise<{}>;
+    'clearGrid': () => Promise<unknown>;
     'color': string;
-    'drawGrid': () => Promise<{}>;
+    'drawGrid': () => Promise<unknown>;
     'mode': string;
     'saveCanvas': (name: string) => Promise<void>;
     'savedDrawing': string | null;
@@ -29,58 +29,7 @@ export namespace Components {
   interface AppSettings {}
 }
 
-declare namespace LocalJSX {
-  interface AppCanvas extends JSXBase.HTMLAttributes {
-    'color'?: string;
-    'mode'?: string;
-    'savedDrawing'?: string | null;
-  }
-  interface AppControls extends JSXBase.HTMLAttributes {
-    'onAddImage'?: (event: CustomEvent<any>) => void;
-    'onAllImages'?: (event: CustomEvent<any>) => void;
-    'onClearCanvas'?: (event: CustomEvent<any>) => void;
-    'onColorSelected'?: (event: CustomEvent<any>) => void;
-    'onDoGrid'?: (event: CustomEvent<any>) => void;
-    'onEraserMode'?: (event: CustomEvent<any>) => void;
-    'onPenMode'?: (event: CustomEvent<any>) => void;
-    'onSaveCanvas'?: (event: CustomEvent<any>) => void;
-  }
-  interface AppHome extends JSXBase.HTMLAttributes {}
-  interface AppImages extends JSXBase.HTMLAttributes {}
-  interface AppProfile extends JSXBase.HTMLAttributes {
-    'name'?: string;
-  }
-  interface AppRoot extends JSXBase.HTMLAttributes {}
-  interface AppSettings extends JSXBase.HTMLAttributes {}
-
-  interface IntrinsicElements {
-    'app-canvas': AppCanvas;
-    'app-controls': AppControls;
-    'app-home': AppHome;
-    'app-images': AppImages;
-    'app-profile': AppProfile;
-    'app-root': AppRoot;
-    'app-settings': AppSettings;
-  }
-}
-
-export { LocalJSX as JSX };
-
-
-declare module "@stencil/core" {
-  export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
-  }
-}
-
-
 declare global {
-
-  // Adding a global JSX for backcompatibility with legacy dependencies
-  export namespace JSX {
-    export interface Element {}
-  }
-
 
 
   interface HTMLAppCanvasElement extends Components.AppCanvas, HTMLStencilElement {}
@@ -124,7 +73,6 @@ declare global {
     prototype: HTMLAppSettingsElement;
     new (): HTMLAppSettingsElement;
   };
-
   interface HTMLElementTagNameMap {
     'app-canvas': HTMLAppCanvasElement;
     'app-controls': HTMLAppControlsElement;
@@ -134,7 +82,50 @@ declare global {
     'app-root': HTMLAppRootElement;
     'app-settings': HTMLAppSettingsElement;
   }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
+
+declare namespace LocalJSX {
+  interface AppCanvas extends JSXBase.HTMLAttributes<HTMLAppCanvasElement> {
+    'color'?: string;
+    'mode'?: string;
+    'savedDrawing'?: string | null;
+  }
+  interface AppControls extends JSXBase.HTMLAttributes<HTMLAppControlsElement> {
+    'onAddImage'?: (event: CustomEvent<any>) => void;
+    'onAllImages'?: (event: CustomEvent<any>) => void;
+    'onClearCanvas'?: (event: CustomEvent<any>) => void;
+    'onColorSelected'?: (event: CustomEvent<any>) => void;
+    'onDoGrid'?: (event: CustomEvent<any>) => void;
+    'onEraserMode'?: (event: CustomEvent<any>) => void;
+    'onPenMode'?: (event: CustomEvent<any>) => void;
+    'onSaveCanvas'?: (event: CustomEvent<any>) => void;
+  }
+  interface AppHome extends JSXBase.HTMLAttributes<HTMLAppHomeElement> {}
+  interface AppImages extends JSXBase.HTMLAttributes<HTMLAppImagesElement> {}
+  interface AppProfile extends JSXBase.HTMLAttributes<HTMLAppProfileElement> {
+    'name'?: string;
+  }
+  interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
+  interface AppSettings extends JSXBase.HTMLAttributes<HTMLAppSettingsElement> {}
+
+  interface IntrinsicElements {
+    'app-canvas': AppCanvas;
+    'app-controls': AppControls;
+    'app-home': AppHome;
+    'app-images': AppImages;
+    'app-profile': AppProfile;
+    'app-root': AppRoot;
+    'app-settings': AppSettings;
+  }
+}
+
+export { LocalJSX as JSX };
+
+
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
 

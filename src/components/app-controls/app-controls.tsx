@@ -39,6 +39,7 @@ export class AppControls {
 
   selectColor(color: string) {
     this.penMode.emit();
+    this.erasing = false;
     this.colorSelected.emit(color);
     this.close();
   }
@@ -53,7 +54,7 @@ export class AppControls {
       this.erasing = true;
 
       const eraseToast = await this.toastCtrl.create({
-        message: 'erasing mode',
+        message: 'erase mode',
         duration: 1300,
         position: 'top'
       });
