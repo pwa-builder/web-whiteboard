@@ -194,19 +194,10 @@ export class AppCanvas {
   }
 
   setupTouchEvents() {
-    /*const offsetX = this.canvasElement.getBoundingClientRect().left;
-    const offsetY = this.canvasElement.getBoundingClientRect().top;
-    const pageXOffset = window.pageXOffset;
-    const pageYOffset = window.pageYOffset;*/
-
     this.canvasElement.addEventListener("touchstart", (e) => {
       this.mousePos = this.getTouchPos(this.canvasElement, e);
 
-
       const touch = e.touches[0];
-
-      console.log(e.touches);
-
 
       const mouseEvent = new MouseEvent("mousedown", {
         clientX: touch.clientX,
@@ -297,7 +288,6 @@ export class AppCanvas {
           await toast.dismiss();
 
           canvasElement.removeEventListener('click', handler);
-
         });
       }
     })

@@ -9,6 +9,7 @@ export class AppControls {
 
   @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
   @Prop({ connect: 'ion-popover-controller' }) popoverCtrl: HTMLIonPopoverControllerElement | null = null;
+  @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
 
   @State() openColors: boolean = false;
   @State() erasing: boolean = false;
@@ -101,6 +102,18 @@ export class AppControls {
     }
   }
 
+  async addImagePop() {
+    /*const popover = await this.popoverCtrl.create({
+      component: 'image-popover',
+      event: ev
+    });
+    await popover.present();*/
+    const modal = await this.modalCtrl.create({
+      component: 'image-popover'
+    });
+    await modal.present();
+  }
+
   render() {
     return [
       <div id="main">
@@ -124,17 +137,21 @@ export class AppControls {
             </button>
 
             <button onClick={() => this.erase()}>
-              {!this.erasing ? <ion-icon name="brush"></ion-icon> : <ion-icon name="contrast"></ion-icon>}
+              {!this.erasing ? <ion-icon name="remove-circle-outline"></ion-icon> : <ion-icon name="brush"></ion-icon>}
             </button>
 
             <button onClick={() => this.openGrid()}>
               <ion-icon name="grid"></ion-icon>
             </button>
 
-            <input onChange={(ev) => this.handleFileInput(ev)} accept="image/png, image/jpeg" type="file" name="file" id="file" class="inputfile" />
+            {/*<input onChange={(ev) => this.handleFileInput(ev)} accept="image/png, image/jpeg" type="file" name="file" id="file" class="inputfile" />
             <label id="fileLabel" htmlFor="file">
               <ion-icon name="images"></ion-icon>
-            </label>
+    </label>*/}
+
+            <button onClick={() => this.addImagePop()}>
+              <ion-icon name="images"></ion-icon>
+            </button>
 
             <button onClick={() => this.clear()}>
               <ion-icon name="trash"></ion-icon>

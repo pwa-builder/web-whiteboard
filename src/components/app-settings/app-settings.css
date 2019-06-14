@@ -3,3 +3,14 @@
   padding-left: 10px;
   padding-right: 10px;
 }
+
+ion-popover {
+  --max-height: 300px !important;
+}
+
+@media (min-width: 1200px) {
+  ion-popover {
+    --width: 450px !important;
+    --max-height: 490px !important;
+  }
+}

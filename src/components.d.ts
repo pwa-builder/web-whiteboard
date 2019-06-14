@@ -27,6 +27,7 @@ export namespace Components {
   }
   interface AppRoot {}
   interface AppSettings {}
+  interface ImagePopover {}
 }
 
 declare global {
@@ -73,6 +74,12 @@ declare global {
     prototype: HTMLAppSettingsElement;
     new (): HTMLAppSettingsElement;
   };
+
+  interface HTMLImagePopoverElement extends Components.ImagePopover, HTMLStencilElement {}
+  var HTMLImagePopoverElement: {
+    prototype: HTMLImagePopoverElement;
+    new (): HTMLImagePopoverElement;
+  };
   interface HTMLElementTagNameMap {
     'app-canvas': HTMLAppCanvasElement;
     'app-controls': HTMLAppControlsElement;
@@ -81,6 +88,7 @@ declare global {
     'app-profile': HTMLAppProfileElement;
     'app-root': HTMLAppRootElement;
     'app-settings': HTMLAppSettingsElement;
+    'image-popover': HTMLImagePopoverElement;
   }
 }
 
@@ -107,6 +115,7 @@ declare namespace LocalJSX {
   }
   interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
   interface AppSettings extends JSXBase.HTMLAttributes<HTMLAppSettingsElement> {}
+  interface ImagePopover extends JSXBase.HTMLAttributes<HTMLImagePopoverElement> {}
 
   interface IntrinsicElements {
     'app-canvas': AppCanvas;
@@ -116,6 +125,7 @@ declare namespace LocalJSX {
     'app-profile': AppProfile;
     'app-root': AppRoot;
     'app-settings': AppSettings;
+    'image-popover': ImagePopover;
   }
 }
 
