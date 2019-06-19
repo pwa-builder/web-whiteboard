@@ -10,3 +10,7 @@
   align-items: center;
   justify-content: space-around;
 }
+
+app-home {
+  background: white;
+}

@@ -28,6 +28,10 @@ export namespace Components {
   interface AppRoot {}
   interface AppSettings {}
   interface ImagePopover {}
+  interface InstallModal {
+    'installEvent': any;
+  }
+  interface PwaInstall {}
 }
 
 declare global {
@@ -80,6 +84,18 @@ declare global {
     prototype: HTMLImagePopoverElement;
     new (): HTMLImagePopoverElement;
   };
+
+  interface HTMLInstallModalElement extends Components.InstallModal, HTMLStencilElement {}
+  var HTMLInstallModalElement: {
+    prototype: HTMLInstallModalElement;
+    new (): HTMLInstallModalElement;
+  };
+
+  interface HTMLPwaInstallElement extends Components.PwaInstall, HTMLStencilElement {}
+  var HTMLPwaInstallElement: {
+    prototype: HTMLPwaInstallElement;
+    new (): HTMLPwaInstallElement;
+  };
   interface HTMLElementTagNameMap {
     'app-canvas': HTMLAppCanvasElement;
     'app-controls': HTMLAppControlsElement;
@@ -89,6 +105,8 @@ declare global {
     'app-root': HTMLAppRootElement;
     'app-settings': HTMLAppSettingsElement;
     'image-popover': HTMLImagePopoverElement;
+    'install-modal': HTMLInstallModalElement;
+    'pwa-install': HTMLPwaInstallElement;
   }
 }
 
@@ -116,6 +134,10 @@ declare namespace LocalJSX {
   interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
   interface AppSettings extends JSXBase.HTMLAttributes<HTMLAppSettingsElement> {}
   interface ImagePopover extends JSXBase.HTMLAttributes<HTMLImagePopoverElement> {}
+  interface InstallModal extends JSXBase.HTMLAttributes<HTMLInstallModalElement> {
+    'installEvent'?: any;
+  }
+  interface PwaInstall extends JSXBase.HTMLAttributes<HTMLPwaInstallElement> {}
 
   interface IntrinsicElements {
     'app-canvas': AppCanvas;
@@ -126,6 +148,8 @@ declare namespace LocalJSX {
     'app-root': AppRoot;
     'app-settings': AppSettings;
     'image-popover': ImagePopover;
+    'install-modal': InstallModal;
+    'pwa-install': PwaInstall;
   }
 }
 

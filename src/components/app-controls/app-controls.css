@@ -82,6 +82,13 @@
   background: green;
 }
 
+#customColor {
+  background: none;
+  border: none;
+  height: 2em;
+  width: 2em;
+}
+
 #colorInternalBlock #closeButton {
   background: none;
   border: none;
@@ -148,6 +155,8 @@
   justify-content: center;
   align-items: center;
 }
+
+
 
 @media( max-width: 600px) {
   #controlsBlock #buttonBlock {

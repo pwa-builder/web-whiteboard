@@ -39,6 +39,7 @@ export class AppControls {
   }
 
   selectColor(color: string) {
+    console.log(color);
     this.penMode.emit();
     this.erasing = false;
     this.colorSelected.emit(color);
@@ -168,9 +169,11 @@ export class AppControls {
             <button onClick={() => this.selectColor('red')} id='redButton'></button>
             <button onClick={() => this.selectColor('blue')} id='blueButton'></button>
             <button onClick={() => this.selectColor('green')} id='greenButton'></button>
+            <input onChange={(event: any) => this.selectColor(event.target.value)} id="customColor" type="color" name="head"
+              value="#e66465"></input>
           </div>
-        </div> : null}
+          </div> : null}
       </div>
     ];
-  }
-}
+      }
+    }
