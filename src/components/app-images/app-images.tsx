@@ -15,6 +15,7 @@ export class AppImages {
   @State() showUpload: boolean = false;
 
   @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
+  @Prop({ connect: 'ion-action-sheet-controller' }) actionSheetCtrl: HTMLIonActionSheetControllerElement | null = null;
 
   @Element() el: HTMLElement;
 
@@ -47,7 +48,86 @@ export class AppImages {
   async uploadToDrive(image, ev) {
     ev.preventDefault();
 
-    const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+    const sheet = await this.actionSheetCtrl.create({
+      header: "Share",
+      buttons: [
+        {
+          text: "Upload to OneDrive",
+          icon: 'cloud',
+          handler: async (): Promise<any> => {
+            const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+
+            console.log(imageBlob);
+
+            let provider = (window as any).mgt.Providers.globalProvider;
+            if (provider) {
+              let graphClient = provider.graph.client;
+              console.log(graphClient);
+
+              try {
+                const driveItem = await graphClient.api('/me/drive/root/children').middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).post({
+                  "name": "webboard",
+                  "folder": {}
+                });
+                console.log(driveItem);
+
+                const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${image.name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
+                console.log(fileUpload);
+
+                const localImage = this.images.find((imageEntry) => { return imageEntry.name === image.name });
+                console.log(localImage);
+                localImage.id = fileUpload.id;
+
+                await set('images', this.images);
+
+                this.images = await get('images');
+
+                const toast = await this.toastCtrl.create({
+                  message: "Board uploaded to OneDrive",
+                  duration: 1800
+                });
+                await toast.present();
+              }
+              catch (err) {
+                console.error(err);
+
+                const toast = await this.toastCtrl.create({
+                  message: "Upload failed, try again later",
+                  duration: 1800
+                });
+                await toast.present();
+              }
+            }
+          }
+        },
+        {
+          text: "Share",
+          icon: "share",
+          handler: async (): Promise<any> => {
+            console.log('hello');
+
+            const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+            const file = new File([imageBlob], "default.jpg");
+
+            if ((navigator as any).canShare && (navigator as any).canShare(file)) {
+              (navigator as any).share({
+                files: [file],
+                title: 'Whiteboard',
+                text: 'Check out this whiteboard from WebBoard https://webboard-app.web.app',
+              })
+                .then(() => console.log('Share was successful.'))
+                .catch((error) => console.log('Sharing failed', error));
+            } else {
+              console.log('Your system doesn\'t support sharing files.');
+            }
+          }
+        }
+      ]
+    });
+
+    await sheet.present();
+
+    /*const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
 
     console.log(imageBlob);
 
@@ -89,7 +169,7 @@ export class AppImages {
         });
         await toast.present();
       }
-    }
+    }*/
   }
 
   async share(id: number) {
