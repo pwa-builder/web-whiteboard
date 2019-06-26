@@ -1,5 +1,8 @@
 import { Component, Element, Prop, State, h } from '@stencil/core';
 
+/*import '@microsoft/mgt/dist/es6/components/mgt-login/mgt-login.js';
+import '@microsoft/mgt/dist/es6/components/providers/mgt-msal-provider.js';*/
+
 @Component({
   tag: 'app-home',
   styleUrl: 'app-home.css'

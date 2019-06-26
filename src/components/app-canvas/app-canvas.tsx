@@ -124,7 +124,7 @@ export class AppCanvas {
     console.log(this.color);
 
     this.setupMouseEvents();
-    this.setupTouchEvents();
+    // this.setupTouchEvents();
 
     this.renderCanvas();
   }
@@ -173,55 +173,32 @@ export class AppCanvas {
     this.lastPos = this.mousePos;
 
     // handle mouse events
-    this.canvasElement.addEventListener("mousedown", (e) => {
-      this.drawing = true;
-      console.log('here');
-      this.lastPos = this.getMousePos(this.canvasElement, e);
-    }, { passive: true });
+    this.canvasElement.addEventListener("pointerdown", (e) => {
 
-    this.canvasElement.addEventListener("mouseup", () => {
+      this.lastPos = this.getMousePos(this.canvasElement, e);
+
+      if (e.pointerType === 'touch') {
+        setTimeout(() => {
+          this.drawing = true;
+        }, 10)
+      }
+      else {
+        this.drawing = true;
+      }
+    }, { passive: false });
+
+    this.canvasElement.addEventListener("pointerup", () => {
       this.drawing = false;
 
       (window as any).requestIdleCallback(async () => {
         let canvasState = this.canvasElement.toDataURL();
         await set('canvasState', canvasState);
       })
-    }, { passive: true });
+    }, { passive: false });
 
-    this.canvasElement.addEventListener("mousemove", (e) => {
+    this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
       this.mousePos = this.getMousePos(this.canvasElement, e);
-    }, { passive: true });
-  }
-
-  setupTouchEvents() {
-    this.canvasElement.addEventListener("touchstart", (e) => {
-      this.mousePos = this.getTouchPos(this.canvasElement, e);
-
-      const touch = e.touches[0];
-
-      const mouseEvent = new MouseEvent("mousedown", {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      });
-
-      this.canvasElement.dispatchEvent(mouseEvent);
-    }, { passive: true });
-
-    this.canvasElement.addEventListener("touchend", () => {
-      const mouseEvent = new MouseEvent("mouseup", {});
-      this.canvasElement.dispatchEvent(mouseEvent);
-    }, { passive: true });
-
-    this.canvasElement.addEventListener("touchmove", (e) => {
-      const touch = e.touches[0];
-
-      const mouseEvent = new MouseEvent("mousemove", {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-      });
-
-      this.canvasElement.dispatchEvent(mouseEvent);
-    }, { passive: true });
+    }, { passive: false });
   }
 
   getMousePos(canvasDom, mouseEvent) {
@@ -229,16 +206,9 @@ export class AppCanvas {
 
     return {
       x: mouseEvent.clientX - rect.left,
-      y: mouseEvent.clientY - rect.top
-    };
-  }
-
-  getTouchPos(canvasDom, touchEvent) {
-    const rect = canvasDom.getBoundingClientRect();
-
-    return {
-      x: touchEvent.touches[0].clientX - rect.left,
-      y: touchEvent.touches[0].clientY - rect.top
+      y: mouseEvent.clientY - rect.top,
+      width: mouseEvent.width,
+      type: mouseEvent.pointerType
     };
   }
 
@@ -248,8 +218,17 @@ export class AppCanvas {
       this.context.beginPath();
       this.context.moveTo(this.lastPos.x, this.lastPos.y);
       this.context.lineTo(this.mousePos.x, this.mousePos.y);
+
+      if (this.mousePos.type !== 'mouse') {
+        this.context.lineWidth = this.mousePos.width - 40;
+      }
+      else {
+        this.context.lineWidth = 10;
+      }
+
       this.context.stroke();
       this.context.closePath();
+
       this.lastPos = this.mousePos;
     }
     else if (this.drawing && this.mode === 'erase') {

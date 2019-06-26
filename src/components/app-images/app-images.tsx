@@ -126,54 +126,10 @@ export class AppImages {
     });
 
     await sheet.present();
-
-    /*const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
-
-    console.log(imageBlob);
-
-    let provider = (window as any).mgt.Providers.globalProvider;
-    if (provider) {
-      let graphClient = provider.graph.client;
-      console.log(graphClient);
-
-      try {
-        const driveItem = await graphClient.api('/me/drive/root/children').middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).post({
-          "name": "webboard",
-          "folder": {}
-        });
-        console.log(driveItem);
-
-        const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${image.name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
-        console.log(fileUpload);
-
-        const localImage = this.images.find((imageEntry) => { return imageEntry.name === image.name });
-        console.log(localImage);
-        localImage.id = fileUpload.id;
-
-        await set('images', this.images);
-
-        this.images = await get('images');
-
-        const toast = await this.toastCtrl.create({
-          message: "Board uploaded to OneDrive",
-          duration: 1800
-        });
-        await toast.present();
-      }
-      catch (err) {
-        console.error(err);
-
-        const toast = await this.toastCtrl.create({
-          message: "Upload failed, try again later",
-          duration: 1800
-        });
-        await toast.present();
-      }
-    }*/
   }
 
-  async share(id: number) {
-    let provider = (window as any).mgt.Providers.globalProvider;
+  async share(id: number, image) {
+    /*let provider = (window as any).mgt.Providers.globalProvider;
     let graphClient = provider.graph.client;
 
     try {
@@ -202,7 +158,62 @@ export class AppImages {
     }
     catch (err) {
       console.error(err);
-    }
+    }*/
+
+    const sheet = await this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: "Share",
+          icon: "share",
+          handler: async (): Promise<any> => {
+            let provider = (window as any).mgt.Providers.globalProvider;
+            let graphClient = provider.graph.client;
+
+            try {
+              const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
+                "type": "view",
+                "scope": "anonymous"
+              });
+              console.log(shareURL);
+
+              if ((navigator as any).share) {
+                await (navigator as any).share({
+                  title: 'webboard',
+                  text: 'You have been shared a board, click the link to view!',
+                  url: shareURL.link.webUrl,
+                })
+              }
+              else {
+                await navigator.clipboard.writeText(shareURL.link.webUrl);
+
+                const toast = await this.toastCtrl.create({
+                  message: "Sharing URL saved to clipboard",
+                  duration: 1800
+                });
+                await toast.present();
+              }
+            }
+            catch (err) {
+              console.error(err);
+            }
+          }
+        },
+        {
+          text: "Download",
+          icon: "download",
+          handler: () => {
+            console.log('download');
+
+            const anchor = document.createElement('a');
+            anchor.href = image.url;
+            anchor.download = 'default.jpg';
+            anchor.click();
+            window.URL.revokeObjectURL(image.url);
+          }
+        }
+      ]
+    });
+    await sheet.present();
   }
 
   async close() {
@@ -232,7 +243,7 @@ export class AppImages {
                         {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear" size="small">
                           <ion-icon name="cloud-upload"></ion-icon>
                         </ion-button> :
-                          <ion-button onClick={() => this.share(image.id)} icon-only fill="clear" size="small">
+                          <ion-button onClick={() => this.share(image.id, image)} icon-only fill="clear" size="small">
                             <ion-icon name="share"></ion-icon>
                           </ion-button>
                         }
