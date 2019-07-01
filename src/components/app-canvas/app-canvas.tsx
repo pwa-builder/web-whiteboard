@@ -1,12 +1,15 @@
-import { Component, Prop, State, Watch, Method, h } from '@stencil/core';
+import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
 
 import { set, get, del } from 'idb-keyval';
+import 'pinch-zoom-element';
 
 @Component({
   tag: 'app-canvas',
   styleUrl: 'app-canvas.css'
 })
 export class AppCanvas {
+
+  @Element() el: HTMLElement;
 
   @Prop() color: string = 'red';
   @Prop() mode: string = 'pen';
@@ -15,11 +18,14 @@ export class AppCanvas {
   @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
 
   @State() drawing: boolean = false;
+  @Prop({ mutable: true }) dragMode: boolean = false;
 
   canvasElement: HTMLCanvasElement;
   gridCanvas: HTMLCanvasElement;
   gridContext: CanvasRenderingContext2D;
   context: CanvasRenderingContext2D;
+  dragCanvasElement: HTMLCanvasElement;
+  dragContext: CanvasRenderingContext2D;
   lastPos: any;
   mousePos: any;
 
@@ -72,6 +78,57 @@ export class AppCanvas {
     console.log(this.mode);
   }
 
+  @Watch('dragMode')
+  checkDrag() {
+    if (this.dragMode === true) {
+      console.log(this.dragMode);
+
+      console.log('inside drag');
+      const drawImage = this.canvasElement.toDataURL();
+
+      setTimeout(() => {
+        this.dragCanvasElement.width = window.innerWidth;
+        this.dragCanvasElement.height = window.innerHeight;
+
+        this.dragContext = this.dragCanvasElement.getContext("2d");
+
+        console.log(drawImage);
+
+        let tempImage = new Image();
+        tempImage.onload = async () => {
+          console.log('image loaded');
+          this.dragContext.drawImage(tempImage, 0, 0);
+
+          tempImage = null
+        }
+        tempImage.src = drawImage;
+
+        console.log(this.dragContext);
+        return;
+      }, 50);
+    }
+    else {
+      const drawImage = this.dragCanvasElement.toDataURL();
+
+
+      setTimeout(() => {
+        this.setupCanvas();
+
+        // this.canvasElement.style.display = 'none';
+        console.log(this.canvasElement);
+
+        let tempImage = new Image();
+        tempImage.onload = async () => {
+          console.log('image loaded');
+          this.context.drawImage(tempImage, 0, 0);
+  
+          tempImage = null
+        }
+        tempImage.src = drawImage;
+      }, 50);
+    }
+  }
+
   @Method()
   async clearCanvas() {
     this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
@@ -86,15 +143,50 @@ export class AppCanvas {
   @Method()
   async saveCanvas(name: string) {
     const canvasImage = this.canvasElement.toDataURL();
-
     const images: any[] = await get('images');
-    if (images) {
-      images.push({ name, url: canvasImage });
-      await set('images', images);
+
+    // AI
+    const aiToken = localStorage.getItem('ai');
+    if (aiToken) {
+      const splitData = canvasImage.split(',')[1];
+
+      const bytes = window.atob(splitData);
+      const buf = new ArrayBuffer(bytes.length);
+      let byteArr = new Uint8Array(buf);
+
+      for (var i = 0; i < bytes.length; i++) {
+        byteArr[i] = bytes.charCodeAt(i);
+      }
+
+      const response = await fetch(`https://westus2.api.cognitive.microsoft.com/vision/v2.0/analyze?visualFeatures=Tags,Color`, {
+        headers: {
+          "Ocp-Apim-Subscription-Key": "d930861b5bba49e5939b843f9c4e5846",
+          "Content-Type": "application/octet-stream"
+        },
+        method: "POST",
+        body: byteArr
+      });
+      const data = await response.json();
+      
+
+      if (images) {
+        images.push({ name, color: data.color, tags: data.tags, url: canvasImage });
+        await set('images', images);
+      }
+      else {
+        await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage }]);
+      }
     }
     else {
-      await set('images', [{ name, url: canvasImage }]);
+      if (images) {
+        images.push({ name, url: canvasImage });
+        await set('images', images);
+      }
+      else {
+        await set('images', [{ name, url: canvasImage }]);
+      }
     }
+
   }
 
   setupCanvas() {
@@ -102,7 +194,7 @@ export class AppCanvas {
     this.canvasElement.width = window.innerWidth;
 
     this.context = (this.canvasElement.getContext('2d', {
-      desynchronized: true
+      // desynchronized: true
     }) as CanvasRenderingContext2D);
 
     this.context.fillStyle = 'white';
@@ -178,6 +270,7 @@ export class AppCanvas {
       this.lastPos = this.getMousePos(this.canvasElement, e);
 
       if (e.pointerType === 'touch') {
+
         setTimeout(() => {
           this.drawing = true;
         }, 10)
@@ -208,12 +301,14 @@ export class AppCanvas {
       x: mouseEvent.clientX - rect.left,
       y: mouseEvent.clientY - rect.top,
       width: mouseEvent.width,
-      type: mouseEvent.pointerType
+      type: mouseEvent.pointerType,
+      ctrlKey: mouseEvent.ctrlKey
     };
   }
 
   renderCanvas() {
     if (this.drawing && this.mode === 'pen') {
+
       this.context.globalCompositeOperation = 'source-over';
       this.context.beginPath();
       this.context.moveTo(this.lastPos.x, this.lastPos.y);
@@ -261,7 +356,6 @@ export class AppCanvas {
         const context = this.context;
 
         this.canvasElement.addEventListener('click', async function handler(ev) {
-          console.log(ev.clientY);
 
           context.drawImage(base_image, ev.clientX, ev.clientY, 400, 400);
           await toast.dismiss();
@@ -276,8 +370,14 @@ export class AppCanvas {
     return (
       <div>
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
-        <canvas ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>
-      </div>
+
+        {this.dragMode ?
+          <pinch-zoom>
+            <canvas id="dragCanvas" ref={(el) => this.dragCanvasElement = el as HTMLCanvasElement}></canvas>
+          </pinch-zoom>
+
+          : <canvas id="regCanvas" ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>}
+      </div >
     );
   }
 }

@@ -22,6 +22,7 @@ export class AppControls {
   @Event() allImages: EventEmitter;
   @Event() doGrid: EventEmitter;
   @Event() addImage: EventEmitter;
+  @Event() dragMode: EventEmitter;
 
   @Element() el: HTMLElement;
 
@@ -81,6 +82,11 @@ export class AppControls {
 
   openGrid() {
     this.doGrid.emit();
+    // this.dragMode.emit();
+  }
+
+  openDrag() {
+    this.dragMode.emit();
   }
 
   async openSettings(ev: Event) {
@@ -115,9 +121,46 @@ export class AppControls {
     await modal.present();
   }
 
+  async turnAI(ev) {
+    const popover = await this.popoverCtrl.create({
+      component: 'ai-popover',
+      event: ev
+    });
+
+    await popover.present();
+  }
+
+  async openColorVision() {
+    const modal = await this.modalCtrl.create({
+      component: 'color-modal'
+    });
+    await modal.present();
+
+    const colorData = await modal.onDidDismiss();
+
+    console.log(colorData.data);
+
+    if (colorData.data && colorData.data.length > 0) {
+      this.selectColor(`#${colorData.data}`);
+
+      const toast = await this.toastCtrl.create({
+        message: `Found this color: #${colorData.data}`,
+        duration: 1200,
+        position: "top",
+      });
+      await toast.present();
+    }
+  }
+
   render() {
     return [
       <div id="main">
+        <button id="aiButton" onClick={(event) => this.turnAI(event)}>
+          <ion-icon name="eye"></ion-icon>
+
+          <span id="aiSpan">AI</span>
+        </button>
+
         <div id='saveButtonDiv'>
           <button id='allImagesButton' onClick={() => this.openAllImages()}>
             <ion-icon name='images'></ion-icon>
@@ -145,6 +188,10 @@ export class AppControls {
               <ion-icon name="grid"></ion-icon>
             </button>
 
+            {/*<button onClick={() => this.openDrag()}>
+              <ion-icon name="expand"></ion-icon>
+    </button>*/}
+
             {/*<input onChange={(ev) => this.handleFileInput(ev)} accept="image/png, image/jpeg" type="file" name="file" id="file" class="inputfile" />
             <label id="fileLabel" htmlFor="file">
               <ion-icon name="images"></ion-icon>
@@ -171,6 +218,9 @@ export class AppControls {
             <button onClick={() => this.selectColor('green')} id='greenButton'></button>
             <input onChange={(event: any) => this.selectColor(event.target.value)} id="customColor" type="color" name="head"
               value="#e66465"></input>
+            <button id="visionColorButton" onClick={() => this.openColorVision()}>
+              <ion-icon name="color-filter"></ion-icon>
+            </button>
           </div>
           </div> : null}
       </div>

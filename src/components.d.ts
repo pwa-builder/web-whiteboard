@@ -9,11 +9,13 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
+  interface AiPopover {}
   interface AppCanvas {
     'addImageToCanvas': (imageString: string) => Promise<unknown>;
     'clearCanvas': () => Promise<void>;
     'clearGrid': () => Promise<unknown>;
     'color': string;
+    'dragMode': boolean;
     'drawGrid': () => Promise<unknown>;
     'mode': string;
     'saveCanvas': (name: string) => Promise<void>;
@@ -27,6 +29,7 @@ export namespace Components {
   }
   interface AppRoot {}
   interface AppSettings {}
+  interface ColorModal {}
   interface ImagePopover {}
   interface InstallModal {
     'installEvent': any;
@@ -36,6 +39,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLAiPopoverElement extends Components.AiPopover, HTMLStencilElement {}
+  var HTMLAiPopoverElement: {
+    prototype: HTMLAiPopoverElement;
+    new (): HTMLAiPopoverElement;
+  };
 
   interface HTMLAppCanvasElement extends Components.AppCanvas, HTMLStencilElement {}
   var HTMLAppCanvasElement: {
@@ -79,6 +88,12 @@ declare global {
     new (): HTMLAppSettingsElement;
   };
 
+  interface HTMLColorModalElement extends Components.ColorModal, HTMLStencilElement {}
+  var HTMLColorModalElement: {
+    prototype: HTMLColorModalElement;
+    new (): HTMLColorModalElement;
+  };
+
   interface HTMLImagePopoverElement extends Components.ImagePopover, HTMLStencilElement {}
   var HTMLImagePopoverElement: {
     prototype: HTMLImagePopoverElement;
@@ -97,6 +112,7 @@ declare global {
     new (): HTMLPwaInstallElement;
   };
   interface HTMLElementTagNameMap {
+    'ai-popover': HTMLAiPopoverElement;
     'app-canvas': HTMLAppCanvasElement;
     'app-controls': HTMLAppControlsElement;
     'app-home': HTMLAppHomeElement;
@@ -104,6 +120,7 @@ declare global {
     'app-profile': HTMLAppProfileElement;
     'app-root': HTMLAppRootElement;
     'app-settings': HTMLAppSettingsElement;
+    'color-modal': HTMLColorModalElement;
     'image-popover': HTMLImagePopoverElement;
     'install-modal': HTMLInstallModalElement;
     'pwa-install': HTMLPwaInstallElement;
@@ -111,8 +128,10 @@ declare global {
 }
 
 declare namespace LocalJSX {
+  interface AiPopover extends JSXBase.HTMLAttributes<HTMLAiPopoverElement> {}
   interface AppCanvas extends JSXBase.HTMLAttributes<HTMLAppCanvasElement> {
     'color'?: string;
+    'dragMode'?: boolean;
     'mode'?: string;
     'savedDrawing'?: string | null;
   }
@@ -122,6 +141,7 @@ declare namespace LocalJSX {
     'onClearCanvas'?: (event: CustomEvent<any>) => void;
     'onColorSelected'?: (event: CustomEvent<any>) => void;
     'onDoGrid'?: (event: CustomEvent<any>) => void;
+    'onDragMode'?: (event: CustomEvent<any>) => void;
     'onEraserMode'?: (event: CustomEvent<any>) => void;
     'onPenMode'?: (event: CustomEvent<any>) => void;
     'onSaveCanvas'?: (event: CustomEvent<any>) => void;
@@ -133,6 +153,7 @@ declare namespace LocalJSX {
   }
   interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
   interface AppSettings extends JSXBase.HTMLAttributes<HTMLAppSettingsElement> {}
+  interface ColorModal extends JSXBase.HTMLAttributes<HTMLColorModalElement> {}
   interface ImagePopover extends JSXBase.HTMLAttributes<HTMLImagePopoverElement> {}
   interface InstallModal extends JSXBase.HTMLAttributes<HTMLInstallModalElement> {
     'installEvent'?: any;
@@ -140,6 +161,7 @@ declare namespace LocalJSX {
   interface PwaInstall extends JSXBase.HTMLAttributes<HTMLPwaInstallElement> {}
 
   interface IntrinsicElements {
+    'ai-popover': AiPopover;
     'app-canvas': AppCanvas;
     'app-controls': AppControls;
     'app-home': AppHome;
@@ -147,6 +169,7 @@ declare namespace LocalJSX {
     'app-profile': AppProfile;
     'app-root': AppRoot;
     'app-settings': AppSettings;
+    'color-modal': ColorModal;
     'image-popover': ImagePopover;
     'install-modal': InstallModal;
     'pwa-install': PwaInstall;

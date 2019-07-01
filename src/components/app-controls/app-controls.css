@@ -1,7 +1,7 @@
 #controlsBlock {
   animation-name: slideUp;
   animation-duration: 250ms;
-  
+
   position: fixed;
   bottom: 0;
   left: 0;
@@ -10,8 +10,65 @@
   justify-content: center;
 }
 
+#aiButton {
+  z-index: 9999;
+  position: fixed;
+  background: #1976d2;
+  left: 20px;
+  bottom: 8px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 19px;
+  width: 4.1em;
+  text-transform: lowercase;
+  border-radius: 24px;
+  color: white;
+  padding-left: 0.8em;
+  padding-right: 0.9em;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  box-shadow: 0px -3px 14px 0px rgba(173, 173, 173, 1);
+}
+
+ion-popover {
+  --width: 400px !important;
+  --height: 400px !important;
+}
+
+@media (max-width: 600px) {
+  #aiButton {
+    top: 9.8em;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    font-size: 1.4em;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 50%;
+    left: 16px;
+  }
+
+  #aiButton ion-icon {
+    display: none;
+  }
+
+  ion-popover {
+    --width: 326px !important;
+    --height: 341px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #controlsBlock {
+    margin-left: 4em;
+  }
+
+  #aiButton {
+    width: 2.4em;
+  }
+}
+
 #controlsBlock #buttonBlock {
-  box-shadow: 0px -3px 14px 0px rgba(173,173,173,1);
+  box-shadow: 0px -3px 14px 0px rgba(173, 173, 173, 1);
   background: white;
   padding: 10px;
   display: flex;
@@ -53,7 +110,7 @@
 }
 
 #colorsBlock #colorInternalBlock {
-  box-shadow: 0px -3px 14px 0px rgba(173,173,173,1);
+  box-shadow: 0px -3px 14px 0px rgba(173, 173, 173, 1);
   background: white;
   padding: 10px;
   display: flex;
@@ -61,9 +118,18 @@
   width: 20em;
   align-items: center;
   border-radius: 5px 5px 0 0;
-  
+
   animation-name: slideUp;
   animation-duration: 250ms;
+}
+
+#colorInternalBlock #visionColorButton {
+  display: flex;
+  color: #1976d2;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  margin-left: 10px;
 }
 
 #colorInternalBlock #redButton {
@@ -114,7 +180,7 @@
   background: white;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   font-size: 1.4em;
   width: 2.4em;
   height: 2.4em;
@@ -127,7 +193,7 @@
   background: white;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   font-size: 1.4em;
   width: 2.4em;
   height: 2.4em;
@@ -147,7 +213,7 @@
   color: white;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   font-size: 1.4em;
   width: 2.4em;
   height: 2.4em;
@@ -156,9 +222,7 @@
   align-items: center;
 }
 
-
-
-@media( max-width: 600px) {
+@media (max-width: 600px) {
   #controlsBlock #buttonBlock {
     width: 18em;
   }

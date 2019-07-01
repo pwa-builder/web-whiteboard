@@ -1,6 +1,7 @@
 import { Component, Element, State, Prop, h } from '@stencil/core';
 
 import { b64toBlob } from '../../helpers/utils';
+import { test } from '../../services/graph';
 
 import { get, set } from 'idb-keyval';
 
@@ -176,6 +177,49 @@ export class AppImages {
               });
               console.log(shareURL);
 
+              const activity = {
+                "appActivityId": `${shareURL.link.webUrl}`,
+                "activitySourceHost": "https://webboard-app.web.app",
+                "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                "appDisplayName": "Musically",
+                "activationUrl": `${shareURL.link.webUrl}`,
+                "contentUrl": `${shareURL.link.webUrl}`,
+                "fallbackUrl": "https://webboard-app.web.app",
+                "contentInfo": {
+                  "@context": "https://schema.org",
+                  "@type": "Image",
+                  "title": "webboard"
+                },
+                "visualElements": {
+                  "attribution": {
+                    "iconUrl": "https://webboard-app.web.app/assets/icon/512.png",
+                    "alternateText": "Webboard",
+                    "addImageQuery": false,
+                  },
+                  "description": `${shareURL.link.webUrl} was created in Webboard`,
+                  "backgroundColor": "#ff0000",
+                  "displayText": `New drawing created in Webboard`,
+                  "content": {
+                    "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "body":
+                      [{
+                        "type": "TextBlock",
+                        "text": "Webboard"
+                      }]
+                  }
+                },
+                "historyItems": [
+                  {
+                    "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    "startedDateTime": new Date().toISOString(),
+                    "lastActiveDateTime": new Date().toISOString(),
+                  }
+                ]
+              }
+
+              await test(shareURL.link.webUrl, activity);
+
               if ((navigator as any).share) {
                 await (navigator as any).share({
                   title: 'webboard',
@@ -220,6 +264,35 @@ export class AppImages {
     (this.el.closest('ion-modal') as any).dismiss();
   }
 
+  async searchImages(e) {
+    let searchImages = [];
+
+    if (e.target.value) {
+      this.images.forEach((image) => {
+        if (image.tags) {
+          image.tags.filter((tag) => {
+            console.log(tag);
+            if (tag.name.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1) {
+              searchImages.push(image);
+            }
+          })
+        }
+        // return (item.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1);
+      });
+  
+      if (searchImages.length > 0) {
+        this.images = searchImages;
+      }
+      else {
+        this.images = await get('images');
+      }
+    }
+    else {
+      this.images = await get('images');
+    }
+
+  }
+
   render() {
     return (
       <div id="mainDiv">
@@ -232,6 +305,9 @@ export class AppImages {
         {this.images && this.images.length > 0 ?
           <div>
             <h2>Saved Boards</h2>
+
+            <ion-searchbar id="imageBar" onIonChange={(event) => this.searchImages(event)} debounce={250} animated placeholder="search"></ion-searchbar>
+
             <div id='imageList'>
               {
                 this.images.map((image) => {
@@ -250,6 +326,49 @@ export class AppImages {
                       </div>
 
                       <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
+
+                      <div id="bottomSection">
+
+                        <div id="imageTags">
+                          {image.tags ? <p id="tagsP">Tags: </p> : null}
+                          {
+                            image.tags ? image.tags.map((tag) => {
+                              if (tag.confidence > 0.8) {
+                                return (
+                                  <div class="imageTag">
+                                    {tag.name}
+                                  </div>
+                                )
+                              }
+                            }) : null
+                          }
+                        </div>
+
+                        <div id="imageColors">
+                          { image.color ? <p id="colorsP">Colors: </p> : null}
+
+                          {
+                            image.color && image.color.accentColor ?
+                              <div style={{ background: `#${image.color.accentColor}` }} class="colors">
+                                {`#${image.color.accentColor}`}
+                              </div>
+                              : null
+                          }
+
+                          {
+                            image.color ? image.color.dominantColors.map((color) => {
+                              if (color !== 'White') {
+                                return (
+                                  <div style={{ background: color }} class="colors">
+                                    {color}
+                                  </div>
+                                )
+                              }
+                            }) : null
+                          }
+                        </div>
+
+                      </div>
                     </div>
                   )
                 })

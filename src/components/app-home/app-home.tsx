@@ -15,6 +15,7 @@ export class AppHome {
   @State() drawingMode: string = 'pen';
   @State() savedImage: string | null = null;
   @State() grid: boolean = false;
+  @State() dragMode: boolean = false;
 
   @Prop({ connect: 'ion-alert-controller' }) alertCtrl: HTMLIonAlertControllerElement | null = null;
   @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
@@ -121,14 +122,23 @@ export class AppHome {
     await popover.present();
   }
 
+  doDrag() {
+    if (this.dragMode === true) {
+      this.dragMode = false;
+    }
+    else {
+      this.dragMode = true;
+    }
+  }
+
   render() {
     return [
       <div class='app-home'>
         <pwa-install></pwa-install>
         
-        <app-canvas savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
+        <app-canvas dragMode={this.dragMode} savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
 
-        <app-controls onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
+        <app-controls onDragMode={() => this.doDrag()} onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
 
         <div id="settingsBlock">
           <mgt-msal-provider client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>

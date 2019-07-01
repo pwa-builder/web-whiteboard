@@ -4,6 +4,43 @@
   height: 100%;
 }
 
+@media (min-width: 1200px) {
+  ion-searchbar#imageBar {
+    width: 32.8em;
+    margin-left: 2em;
+  }
+}
+
+#imageColors {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  overflow: auto;
+}
+
+#imageColors .colors {
+  color: white;
+  border-radius: 24px;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-weight: bold;
+  margin-right: 12px;
+}
+
+#colorsP,
+#tagsP {
+  margin-right: 10px;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+#colorsP {
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+
 #mainDiv {
   overflow-y: scroll;
 }
@@ -13,9 +50,6 @@ h2 {
 }
 
 #imageList {
-  display: grid;
-  grid-template-columns: auto auto;
-  grid-gap: 20px;
   margin: 2em;
 }
 
@@ -23,14 +57,15 @@ h2 {
   padding-left: 16px;
   border-radius: 12px;
   background: white;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-  height: 15em;
-  width: 15em;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+
+  height: 24em;
+  margin-bottom: 2em;
 }
 
 #imageBlock img {
   width: 100%;
-  height: 10em;
+  height: 12em;
 }
 
 #imageBlock #titleBlock {
@@ -50,14 +85,46 @@ h2 {
 }
 
 #buttonBlock {
-  padding-top: 16px;
-  padding-left: 16px;
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 9999;
+  height: 3em;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 10px;
 }
 
 #buttonBlock button {
   background: none;
   border: none;
   font-size: 1.4em;
+}
+
+#bottomSection {
+  margin-top: 1em;
+  /* height: 9em; */
+  margin-right: 12px;
+}
+
+#imageTags {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  overflow: auto;
+}
+
+#imageTags .imageTag {
+  background: #b3b3b3;
+  color: white;
+  border-radius: 24px;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-weight: bold;
+  margin-right: 12px;
 }
 
 @media (max-width: 600px) {
