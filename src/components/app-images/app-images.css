@@ -84,6 +84,12 @@ h2 {
   font-size: 20px;
 }
 
+#segmentToolbar {
+  padding-left: 6em;
+  padding-right: 6em;
+  margin-top: 2em;
+}
+
 #buttonBlock {
   display: flex;
   position: sticky;

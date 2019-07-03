@@ -1,0 +1,8 @@
+drive-preview div{
+    /* Component styles go here */
+
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

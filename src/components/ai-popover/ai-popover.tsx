@@ -59,17 +59,30 @@ export class AiPopover {
     await this.el.querySelector('ion-slides').slideNext();
 
     setTimeout(async () => {
-      await this.el.closest('ion-popover').dismiss();
+      await this.el.closest('ion-modal').dismiss();
     }, 1600)
   }
 
   async turnOff() {
     localStorage.removeItem('ai');
-    await this.el.closest('ion-popover').dismiss();
+    await this.el.closest('ion-modal').dismiss();
+  }
+
+  async close() {
+    (this.el.closest('ion-modal') as any).dismiss();
   }
 
   render() {
-    return (
+    return [
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button onClick={() => this.close()}>
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>,
       <ion-content>
         <ion-slides>
           <ion-slide id="slideOne">
@@ -94,6 +107,6 @@ export class AiPopover {
           </ion-slide>
         </ion-slides>
       </ion-content>
-    );
+    ];
   }
 }

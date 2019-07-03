@@ -3,6 +3,8 @@ import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core
 import { set, get, del } from 'idb-keyval';
 import 'pinch-zoom-element';
 
+import { saveImages } from "../../services/api";
+
 @Component({
   tag: 'app-canvas',
   styleUrl: 'app-canvas.css'
@@ -172,18 +174,63 @@ export class AppCanvas {
       if (images) {
         images.push({ name, color: data.color, tags: data.tags, url: canvasImage });
         await set('images', images);
+
+        let remoteImages = [];
+
+        images.forEach((image) => {
+          if (image.id) {
+            remoteImages.push({ id: image.id, name: image.name});
+          }
+        });
+
+        await saveImages(remoteImages);
       }
       else {
         await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage }]);
+
+        let remoteImages = [];
+
+        images.forEach((image) => {
+          if (image.id) {
+            remoteImages.push({ id: image.id, name: image.name});
+          }
+        });
+
+        await saveImages(remoteImages);
       }
     }
     else {
       if (images) {
         images.push({ name, url: canvasImage });
         await set('images', images);
+
+        let remoteImages = [];
+
+        if (images && images.length > 0) {
+          images.forEach((image) => {
+            if (image.id) {
+              remoteImages.push({ id: image.id, name: image.name});
+            }
+          });
+        }
+
+        await saveImages(remoteImages);
       }
       else {
         await set('images', [{ name, url: canvasImage }]);
+
+
+        let remoteImages = [];
+
+        if (images && images.length > 0) {
+          images.forEach((image) => {
+            if (image.id) {
+              remoteImages.push({ id: image.id, name: image.name});
+            }
+          });
+        }
+
+        await saveImages(remoteImages);
       }
     }
 

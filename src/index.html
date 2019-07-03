@@ -30,6 +30,28 @@
 
   <!--<script src="node_modules/@microsoft/mgt/dist/bundle/mgt-loader.js"></script>-->
 
+  <script>
+    window.requestIdleCallback =
+      window.requestIdleCallback ||
+      function (cb) {
+        var start = Date.now();
+        return setTimeout(function () {
+          cb({
+            didTimeout: false,
+            timeRemaining: function () {
+              return Math.max(0, 50 - (Date.now() - start));
+            }
+          });
+        }, 1);
+      }
+
+    window.cancelIdleCallback =
+      window.cancelIdleCallback ||
+      function (id) {
+        clearTimeout(id);
+      }
+  </script>
+
 
   <script>
     var mgt = function (e) {

@@ -38,32 +38,12 @@ ion-popover {
 
 @media (max-width: 600px) {
   #aiButton {
-    top: 9.8em;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-    font-size: 1.4em;
-    width: 2.4em;
-    height: 2.4em;
-    border-radius: 50%;
-    left: 16px;
-  }
-
-  #aiButton ion-icon {
     display: none;
   }
 
   ion-popover {
     --width: 326px !important;
     --height: 341px !important;
-  }
-}
-
-@media (max-width: 380px) {
-  #controlsBlock {
-    margin-left: 4em;
-  }
-
-  #aiButton {
-    width: 2.4em;
   }
 }
 

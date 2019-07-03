@@ -121,13 +121,12 @@ export class AppControls {
     await modal.present();
   }
 
-  async turnAI(ev) {
-    const popover = await this.popoverCtrl.create({
+  async turnAI() {
+    const modal = await this.modalCtrl.create({
       component: 'ai-popover',
-      event: ev
     });
 
-    await popover.present();
+    await modal.present();
   }
 
   async openColorVision() {
@@ -155,25 +154,54 @@ export class AppControls {
   render() {
     return [
       <div id="main">
-        <button id="aiButton" onClick={(event) => this.turnAI(event)}>
+        <button id="aiButton" onClick={() => this.turnAI()}>
           <ion-icon name="eye"></ion-icon>
 
           <span id="aiSpan">AI</span>
         </button>
 
-        <div id='saveButtonDiv'>
-          <button id='allImagesButton' onClick={() => this.openAllImages()}>
-            <ion-icon name='images'></ion-icon>
-          </button>
+        {
+          window.matchMedia("(min-width: 800px)").matches ? <div id='saveButtonDiv'>
+            <button id='allImagesButton' onClick={() => this.openAllImages()}>
+              <ion-icon name='images'></ion-icon>
+            </button>
 
-          <button onClick={() => this.save()} id='saveButton'>
-            <ion-icon name='save'></ion-icon>
-          </button>
+            <button onClick={() => this.save()} id='saveButton'>
+              <ion-icon name='save'></ion-icon>
+            </button>
 
-          <button onClick={(event) => this.openSettings(event)} id="tasksButton">
-            <ion-icon name="today"></ion-icon>
-          </button>
-        </div>
+            <button onClick={(event) => this.openSettings(event)} id="tasksButton">
+              <ion-icon name="today"></ion-icon>
+            </button>
+            
+          </div> :
+
+            <ion-fab vertical="top" horizontal="start">
+              <ion-fab-button>
+                <ion-icon name="menu"></ion-icon>
+              </ion-fab-button>
+
+              <ion-fab-list side="bottom">
+                <ion-fab-button color="primary" onClick={() => this.openAllImages()}>
+                  <ion-icon name='images'></ion-icon>
+                </ion-fab-button>
+
+                <ion-fab-button color="secondary" onClick={() => this.save()}>
+                  <ion-icon name="save"></ion-icon>
+                </ion-fab-button>
+
+                <ion-fab-button color="secondary" onClick={(event) => this.openSettings(event)}>
+                  <ion-icon name="today"></ion-icon>
+                </ion-fab-button>
+
+                <ion-fab-button color="primary" onClick={() => this.turnAI()}>
+                  ai
+                </ion-fab-button>
+              </ion-fab-list>
+
+            </ion-fab>
+        }
+
         {!this.openColors ? <div id='controlsBlock'>
           <div id='buttonBlock'>
             <button onClick={() => this.changeColor()}>
@@ -222,8 +250,8 @@ export class AppControls {
               <ion-icon name="color-filter"></ion-icon>
             </button>
           </div>
-          </div> : null}
+        </div> : null}
       </div>
     ];
-      }
-    }
+  }
+}

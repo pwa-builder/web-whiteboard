@@ -30,6 +30,9 @@ export namespace Components {
   interface AppRoot {}
   interface AppSettings {}
   interface ColorModal {}
+  interface DrivePreview {
+    'imageInfo': any;
+  }
   interface ImagePopover {}
   interface InstallModal {
     'installEvent': any;
@@ -94,6 +97,12 @@ declare global {
     new (): HTMLColorModalElement;
   };
 
+  interface HTMLDrivePreviewElement extends Components.DrivePreview, HTMLStencilElement {}
+  var HTMLDrivePreviewElement: {
+    prototype: HTMLDrivePreviewElement;
+    new (): HTMLDrivePreviewElement;
+  };
+
   interface HTMLImagePopoverElement extends Components.ImagePopover, HTMLStencilElement {}
   var HTMLImagePopoverElement: {
     prototype: HTMLImagePopoverElement;
@@ -121,6 +130,7 @@ declare global {
     'app-root': HTMLAppRootElement;
     'app-settings': HTMLAppSettingsElement;
     'color-modal': HTMLColorModalElement;
+    'drive-preview': HTMLDrivePreviewElement;
     'image-popover': HTMLImagePopoverElement;
     'install-modal': HTMLInstallModalElement;
     'pwa-install': HTMLPwaInstallElement;
@@ -154,6 +164,9 @@ declare namespace LocalJSX {
   interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
   interface AppSettings extends JSXBase.HTMLAttributes<HTMLAppSettingsElement> {}
   interface ColorModal extends JSXBase.HTMLAttributes<HTMLColorModalElement> {}
+  interface DrivePreview extends JSXBase.HTMLAttributes<HTMLDrivePreviewElement> {
+    'imageInfo'?: any;
+  }
   interface ImagePopover extends JSXBase.HTMLAttributes<HTMLImagePopoverElement> {}
   interface InstallModal extends JSXBase.HTMLAttributes<HTMLInstallModalElement> {
     'installEvent'?: any;
@@ -170,6 +183,7 @@ declare namespace LocalJSX {
     'app-root': AppRoot;
     'app-settings': AppSettings;
     'color-modal': ColorModal;
+    'drive-preview': DrivePreview;
     'image-popover': ImagePopover;
     'install-modal': InstallModal;
     'pwa-install': PwaInstall;
