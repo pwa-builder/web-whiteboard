@@ -51,7 +51,29 @@ export class AppCanvas {
         }
         tempImage.src = canvasState;
       }
-    })
+    });
+
+    this.canvasElement.oncontextmenu = async (e) => {
+      e.preventDefault();
+
+      const clipboardItems = await (navigator.clipboard as any).read();
+      console.log(clipboardItems);
+
+      if (clipboardItems) {
+        const blobOutput = await clipboardItems[0].getType('image/png');
+
+        if (blobOutput) {
+          const imageURL = window.URL.createObjectURL(blobOutput);
+
+          const tempImage = new Image();
+          tempImage.onload = () => {
+            this.context.drawImage(tempImage, 0, 0);
+          }
+          tempImage.src = imageURL;
+
+        }
+      }
+    }
   }
 
   @Watch('savedDrawing')
@@ -123,7 +145,7 @@ export class AppCanvas {
         tempImage.onload = async () => {
           console.log('image loaded');
           this.context.drawImage(tempImage, 0, 0);
-  
+
           tempImage = null
         }
         tempImage.src = drawImage;
@@ -169,7 +191,7 @@ export class AppCanvas {
         body: byteArr
       });
       const data = await response.json();
-      
+
       console.log(data);
 
       if (images) {
@@ -180,7 +202,7 @@ export class AppCanvas {
 
         images.forEach((image) => {
           if (image.id) {
-            remoteImages.push({ id: image.id, name: image.name});
+            remoteImages.push({ id: image.id, name: image.name });
           }
         });
 
@@ -193,7 +215,7 @@ export class AppCanvas {
 
         images.forEach((image) => {
           if (image.id) {
-            remoteImages.push({ id: image.id, name: image.name});
+            remoteImages.push({ id: image.id, name: image.name });
           }
         });
 
@@ -210,7 +232,7 @@ export class AppCanvas {
         if (images && images.length > 0) {
           images.forEach((image) => {
             if (image.id) {
-              remoteImages.push({ id: image.id, name: image.name});
+              remoteImages.push({ id: image.id, name: image.name });
             }
           });
         }
@@ -226,7 +248,7 @@ export class AppCanvas {
         if (images && images.length > 0) {
           images.forEach((image) => {
             if (image.id) {
-              remoteImages.push({ id: image.id, name: image.name});
+              remoteImages.push({ id: image.id, name: image.name });
             }
           });
         }
