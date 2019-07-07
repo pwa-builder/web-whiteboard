@@ -14,3 +14,9 @@
 app-home {
   background: white;
 }
+
+@media(min-width: 1200px) {
+  .imagesModal {
+    --width: 56em !important;
+  }
+}

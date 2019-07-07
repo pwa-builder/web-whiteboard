@@ -76,7 +76,7 @@ export class AiPopover {
     return [
       <ion-header>
         <ion-toolbar>
-          <ion-buttons slot="start">
+          <ion-buttons slot="end">
             <ion-button onClick={() => this.close()}>
               <ion-icon name="close"></ion-icon>
             </ion-button>

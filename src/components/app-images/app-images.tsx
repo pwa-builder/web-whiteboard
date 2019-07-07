@@ -5,7 +5,7 @@ import { test } from '../../services/graph';
 
 import { get, set } from 'idb-keyval';
 
-import { getSavedImages, saveImages } from '../../services/api';
+// import { saveImages } from '../../services/api';
 
 @Component({
   tag: 'app-images',
@@ -14,7 +14,7 @@ import { getSavedImages, saveImages } from '../../services/api';
 })
 export class AppImages {
 
-  @State() images: any[];
+  @State() images: any[] = [];
   @State() cloudImages: any;
   @State() showUpload: boolean = false;
   @State() imageSection: string = 'local';
@@ -24,26 +24,34 @@ export class AppImages {
 
   @Element() el: HTMLElement;
 
-  async componentDidLoad() {
-    let provider = (window as any).mgt.Providers.globalProvider;
-    console.log(provider);
-    const account = provider._userAgentApplication.getAccount();
-    console.log(account);
-
-    if (account !== null) {
-      this.showUpload = true;
-    }
-
+  async componentWillLoad() {
     (window as any).requestIdleCallback(async () => {
+      let provider = (window as any).mgt.Providers.globalProvider;
+      console.log(provider);
+      const account = provider._userAgentApplication.getAccount();
+      console.log(account);
+
+      if (account !== null) {
+        this.showUpload = true;
+      }
+
       const images: any[] = await get('images');
       console.log(images);
-
-      this.cloudImages = await (getSavedImages() as any);
-      console.log('cloudImages', this.cloudImages);
 
       if (images) {
         this.images = images;
       }
+
+      const tempImages = [];
+
+      this.images.forEach((image) => {
+        if (image.id) {
+          tempImages.push(image);
+        }
+      });
+
+      this.cloudImages = tempImages;
+      console.log(this.cloudImages);
     }, {
         timeout: 2000
       })
@@ -127,7 +135,7 @@ export class AppImages {
 
                 this.images = await get('images');
 
-                let remoteImages = [];
+                /*let remoteImages = [];
 
                 this.images.forEach((image) => {
                   if (image.id) {
@@ -135,7 +143,7 @@ export class AppImages {
                   }
                 });
 
-                saveImages(remoteImages);
+                saveImages(remoteImages);*/
 
                 const toast = await this.toastCtrl.create({
                   message: "Board uploaded to OneDrive",
@@ -216,6 +224,7 @@ export class AppImages {
     }*/
 
     const sheet = await this.actionSheetCtrl.create({
+      header: 'Sharing',
       buttons: [
         {
           text: "Share",
@@ -356,22 +365,30 @@ export class AppImages {
   render() {
     return (
       <div id="mainDiv">
-        <div id='buttonBlock'>
-          <button onClick={() => this.close()}>
-            <ion-icon name='close'></ion-icon>
-          </button>
-        </div>
+        <ion-header>
+          <ion-toolbar>
+
+            <ion-title>
+              Saved Boards
+            </ion-title>
+
+            <ion-buttons slot="end">
+              <ion-button onClick={() => this.close()}>
+                <ion-icon name='close'></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
 
         {this.images && this.images.length > 0 ?
           <div>
-            <h2>Saved Boards</h2>
 
             <ion-searchbar id="imageBar" onIonChange={(event) => this.searchImages(event)} debounce={250} animated placeholder="search"></ion-searchbar>
 
             <ion-toolbar id="segmentToolbar">
               <ion-segment value="local" onIonChange={(event) => this.segmentChange(event)}>
                 <ion-segment-button value="local">
-                  <ion-label>All Boards</ion-label>
+                  <ion-label>All</ion-label>
                 </ion-segment-button>
                 <ion-segment-button value="cloud">
                   <ion-label>Cloud</ion-label>
@@ -383,7 +400,7 @@ export class AppImages {
               {
                 this.imageSection === 'local' ?
                   this.images.map((image) => {
-                    return (
+                    /*return (
                       <div id='imageBlock'>
                         <div id="titleBlock">
                           <h4 onClick={() => this.choose(image.url, image.name)}>{image.name}</h4>
@@ -442,10 +459,62 @@ export class AppImages {
 
                         </div>
                       </div>
+                    )*/
+
+                    return (
+                      <ion-card onClick={() => this.choose(image.url, image.name)}>
+                        <ion-card-header>
+                          {image.desc ? <ion-card-subtitle>{image.desc}</ion-card-subtitle> : null}
+                          <ion-card-title>{image.name}</ion-card-title>
+                        </ion-card-header>
+
+                        <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
+
+                        <ion-card-content>
+                          <div id="imageTags">
+                            {image.tags ? <p id="tagsP">Tags: </p> : null}
+                            {
+                              image.tags ? image.tags.map((tag) => {
+                                if (tag.confidence > 0.8) {
+                                  return (
+                                    <div class="imageTag">
+                                      {tag.name}
+                                    </div>
+                                  )
+                                }
+                              }) : null
+                            }
+                          </div>
+
+                          <div id="imageColors">
+                            {image.color ? <p id="colorsP">Colors: </p> : null}
+
+                            {
+                              image.color && image.color.accentColor ?
+                                <div style={{ background: `#${image.color.accentColor}` }} class="colors">
+                                  {`#${image.color.accentColor}`}
+                                </div>
+                                : null
+                            }
+
+                            {
+                              image.color ? image.color.dominantColors.map((color) => {
+                                if (color !== 'White') {
+                                  return (
+                                    <div style={{ background: color }} class="colors">
+                                      {color}
+                                    </div>
+                                  )
+                                }
+                              }) : null
+                            }
+                          </div>
+                        </ion-card-content>
+                      </ion-card>
                     )
                   })
                   :
-                  this.cloudImages.image.map((image) => {
+                  this.cloudImages.map((image) => {
                     return (
                       <ion-item lines="none">
                         <ion-thumbnail slot="start">
@@ -470,8 +539,12 @@ export class AppImages {
                     )
                   })
               }
-            </div> </div> : <h2>No Saved Boards</h2>}
+            </div>
+          </div> : <h2>No Saved Boards</h2>}
+
       </div>
+
+
     );
   }
 }

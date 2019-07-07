@@ -80,15 +80,17 @@ export class AppHome {
     this.savedImage = null;
 
     const modal = await this.modalCtrl.create({
-      component: 'app-images'
+      component: 'app-images',
+      cssClass: 'imagesModal'
     });
     await modal.present();
 
     const { data } = await modal.onDidDismiss();
     console.log(data);
 
-    this.savedImage = data.url;
-
+    if (data && data.url) {
+      this.savedImage = data.url;
+    }
   }
 
   async doGrid() {

@@ -3,7 +3,7 @@ import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core
 import { set, get, del } from 'idb-keyval';
 import 'pinch-zoom-element';
 
-import { saveImages } from "../../services/api";
+// import { saveImages } from "../../services/api";
 
 @Component({
   tag: 'app-canvas',
@@ -160,7 +160,7 @@ export class AppCanvas {
         byteArr[i] = bytes.charCodeAt(i);
       }
 
-      const response = await fetch(`https://westus2.api.cognitive.microsoft.com/vision/v2.0/analyze?visualFeatures=Tags,Color`, {
+      const response = await fetch(`https://westus2.api.cognitive.microsoft.com/vision/v2.0/analyze?visualFeatures=Tags,Color,Description`, {
         headers: {
           "Ocp-Apim-Subscription-Key": "d930861b5bba49e5939b843f9c4e5846",
           "Content-Type": "application/octet-stream"
@@ -170,9 +170,10 @@ export class AppCanvas {
       });
       const data = await response.json();
       
+      console.log(data);
 
       if (images) {
-        images.push({ name, color: data.color, tags: data.tags, url: canvasImage });
+        images.push({ name, color: data.color, desc: data.description.captions[0].text, tags: data.tags, url: canvasImage });
         await set('images', images);
 
         let remoteImages = [];
@@ -183,10 +184,10 @@ export class AppCanvas {
           }
         });
 
-        await saveImages(remoteImages);
+        // await saveImages(remoteImages);
       }
       else {
-        await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage }]);
+        await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage, desc: data.description.captions[0].text }]);
 
         let remoteImages = [];
 
@@ -196,7 +197,7 @@ export class AppCanvas {
           }
         });
 
-        await saveImages(remoteImages);
+        // await saveImages(remoteImages);
       }
     }
     else {
@@ -214,7 +215,7 @@ export class AppCanvas {
           });
         }
 
-        await saveImages(remoteImages);
+        // await saveImages(remoteImages);
       }
       else {
         await set('images', [{ name, url: canvasImage }]);
@@ -230,7 +231,7 @@ export class AppCanvas {
           });
         }
 
-        await saveImages(remoteImages);
+        // await saveImages(remoteImages);
       }
     }
 
@@ -241,7 +242,7 @@ export class AppCanvas {
     this.canvasElement.width = window.innerWidth;
 
     this.context = (this.canvasElement.getContext('2d', {
-      // desynchronized: true
+      desynchronized: true
     }) as CanvasRenderingContext2D);
 
     this.context.fillStyle = 'white';
@@ -362,7 +363,7 @@ export class AppCanvas {
       this.context.lineTo(this.mousePos.x, this.mousePos.y);
 
       if (this.mousePos.type !== 'mouse') {
-        this.context.lineWidth = this.mousePos.width - 40;
+        this.context.lineWidth = this.mousePos.width - 30;
       }
       else {
         this.context.lineWidth = 10;

@@ -1,4 +1,4 @@
-import { Component, Element, h } from '@stencil/core';
+import { Component, Element, Prop, h } from '@stencil/core';
 
 declare var ImageCapture: any;
 
@@ -9,6 +9,8 @@ declare var ImageCapture: any;
 export class ColorModal {
 
   @Element() el: HTMLElement;
+
+  @Prop({ connect: 'ion-loading-controller' }) loadingCtrl: HTMLIonLoadingControllerElement | null = null;
 
   stream: MediaStream;
   capture;
@@ -28,6 +30,11 @@ export class ColorModal {
   }
 
   async grabColor() {
+    const loading = await this.loadingCtrl.create({
+      message: "Analyzing..."
+    });
+    await loading.present();
+
     const blobPhoto = await this.capture.takePhoto();
 
     let reader = new FileReader();
@@ -47,6 +54,7 @@ export class ColorModal {
 
         console.log(data.color.accentColor);
 
+        await loading.dismiss();
         await (this.el.closest('ion-modal') as any).dismiss(data.color.accentColor);
       }
     }
