@@ -4,8 +4,11 @@
 
 This is the main repository for Webboard, an open source, multi-platform, intelligent whiteboarding app.
 
+## Screenshots
 
-## Get it here:
+![example image](https://raw.githubusercontent.com/jgw96/web-whiteboard/master/example_img.jpg)
+
+## Get it here
 
 [![webboard](https://user-images.githubusercontent.com/9122190/28998498-0df3c0c8-7a03-11e7-8780-2c71d0b3330e.png)](https://webboard-app.web.app)
 
