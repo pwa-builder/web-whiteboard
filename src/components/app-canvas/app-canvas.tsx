@@ -34,10 +34,11 @@ export class AppCanvas {
   componentDidLoad() {
     console.log('Component has been rendered');
 
+    window.matchMedia("(min-width: 1200px)").matches ? 
     window.addEventListener('resize', () => {
       console.log('setting up canvas');
       this.setupCanvas();
-    })
+    }) : null
 
     this.setupCanvas();
 
@@ -360,7 +361,25 @@ export class AppCanvas {
     }, { passive: false });
 
     this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
-      this.mousePos = this.getMousePos(this.canvasElement, e);
+      if ((e as any).getPredictedEvents) {
+
+        this.mousePos = this.getMousePos(this.canvasElement, e);
+
+        const predEvents = (e as any).getPredictedEvents();
+
+        /*predEvents.forEach((pred) => {
+          this.mousePos = this.getMousePos(this.canvasElement, pred);
+        })*/
+        if (predEvents[0]) {
+          this.mousePos = this.getMousePos(this.canvasElement, predEvents[0]);
+        }
+        else {
+          this.mousePos = this.getMousePos(this.canvasElement, e);
+        }
+      }
+      else {
+        this.mousePos = this.getMousePos(this.canvasElement, e);
+      }
     }, { passive: false });
   }
 
