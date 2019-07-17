@@ -37,7 +37,7 @@ import { Component, h, State, Prop } from '@stencil/core';
 export class PWAInstall {
 
   @State() deferredPrompt: any;
-  @State() showInstall: boolean;
+  @State() showInstall: boolean = false;
 
   @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
 
