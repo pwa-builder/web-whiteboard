@@ -4,6 +4,7 @@ import { b64toBlob } from '../../helpers/utils';
 import { test } from '../../services/graph';
 
 import { get, set } from 'idb-keyval';
+// import * as comlink from 'https://unpkg.com/comlink@4.0.1';
 
 // import { saveImages } from '../../services/api';
 
@@ -40,22 +41,20 @@ export class AppImages {
 
       if (images) {
         this.images = images;
+      };
+
+      const imageWorker = new Worker('/assets/canvas-worker.js');
+      imageWorker.postMessage(this.images);
+
+      imageWorker.onmessage = (message) => {
+        console.log(message.data);
+
+        this.cloudImages = message.data;
       }
-
-      const tempImages = [];
-
-      this.images.forEach((image) => {
-        if (image.id) {
-          tempImages.push(image);
-        }
-      });
-
-      this.cloudImages = tempImages;
-      console.log(this.cloudImages);
     }, {
         timeout: 2000
       })
-  }
+    }
 
   choose(url: string, name: string) {
     (this.el.closest('ion-modal') as any).dismiss({ url, name });
@@ -464,8 +463,23 @@ export class AppImages {
                     return (
                       <ion-card onClick={() => this.choose(image.url, image.name)}>
                         <ion-card-header>
-                          {image.desc ? <ion-card-subtitle>{image.desc}</ion-card-subtitle> : null}
-                          <ion-card-title>{image.name}</ion-card-title>
+
+                          <div id="buttonBar">
+                            <div>
+                              {image.desc ? <ion-card-subtitle>{image.desc}</ion-card-subtitle> : null}
+                              <ion-card-title>{image.name}</ion-card-title>
+                            </div>
+
+                            <div>
+                              {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear">
+                                <ion-icon name="cloud-upload"></ion-icon>
+                              </ion-button> :
+                                <ion-button onClick={() => this.share(image.id, image)} icon-only fill="clear">
+                                  <ion-icon name="share"></ion-icon>
+                                </ion-button>
+                              }
+                            </div>
+                          </div>
                         </ion-card-header>
 
                         <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>

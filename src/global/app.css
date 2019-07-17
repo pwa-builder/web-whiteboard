@@ -34,6 +34,11 @@ button {
   outline: none;
 }
 
+.installModal {
+  --width: 860px;
+  --height: 640px;
+}
+
 :root {
   --ion-color-primary: #1976d2;
   --ion-color-primary-rgb: 25,118,210;
