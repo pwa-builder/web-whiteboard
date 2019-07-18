@@ -1,12 +1,18 @@
 onmessage = function (e) {
 
-  const tempImages = [];
+  console.log(e.data.name);
+  console.log(e.data.data);
 
-  e.data.forEach((image) => {
-    if (image.id) {
-      tempImages.push(image);
-    }
-  });
+  if (e.data.name === "cloudImages") {
+    const tempImages = [];
 
-  postMessage(tempImages);
+    e.data.data.forEach((image) => {
+      if (image.id) {
+        tempImages.push(image);
+      }
+    });
+
+    postMessage(tempImages);
+  }
+
 }

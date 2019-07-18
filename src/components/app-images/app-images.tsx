@@ -44,7 +44,7 @@ export class AppImages {
       };
 
       const imageWorker = new Worker('/assets/canvas-worker.js');
-      imageWorker.postMessage(this.images);
+      imageWorker.postMessage({ name: 'cloudImages', data: this.images });
 
       imageWorker.onmessage = (message) => {
         console.log(message.data);
@@ -54,7 +54,7 @@ export class AppImages {
     }, {
         timeout: 2000
       })
-    }
+  }
 
   choose(url: string, name: string) {
     (this.el.closest('ion-modal') as any).dismiss({ url, name });

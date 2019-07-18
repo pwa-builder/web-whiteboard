@@ -14,14 +14,14 @@
     "test.watch": "stencil test --spec --e2e --watch"
   },
   "dependencies": {
-    "@ionic/core": "^4.6.0",
+    "@ionic/core": "^4.6.2",
     "@microsoft/mgt": "^0.1.1",
     "comlink": "^4.0.1",
     "idb-keyval": "^3.2.0",
     "pinch-zoom-element": "^1.1.1"
   },
   "devDependencies": {
-    "@stencil/core": "^1.1.2",
+    "@stencil/core": "^1.1.7",
     "workbox-build": "4.3.1"
   }
 }

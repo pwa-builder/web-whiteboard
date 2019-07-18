@@ -3,6 +3,10 @@ import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core
 import { set, get, del } from 'idb-keyval';
 import 'pinch-zoom-element';
 
+import { b64toBlob } from '../../helpers/utils';
+
+import { exportToOneNote } from '../../services/graph';
+
 // import { saveImages } from "../../services/api";
 
 @Component({
@@ -16,11 +20,13 @@ export class AppCanvas {
   @Prop() color: string = 'red';
   @Prop() mode: string = 'pen';
   @Prop() savedDrawing: string | null = null;
+  @Prop({ mutable: true }) dragMode: boolean = false;
 
   @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
+  @Prop({ connect: 'ion-alert-controller' }) alertCtrl: HTMLIonAlertControllerElement | null = null;
 
   @State() drawing: boolean = false;
-  @Prop({ mutable: true }) dragMode: boolean = false;
+  @State() copyingText: boolean = false;
 
   canvasElement: HTMLCanvasElement;
   gridCanvas: HTMLCanvasElement;
@@ -34,11 +40,11 @@ export class AppCanvas {
   componentDidLoad() {
     console.log('Component has been rendered');
 
-    window.matchMedia("(min-width: 1200px)").matches ? 
-    window.addEventListener('resize', () => {
-      console.log('setting up canvas');
-      this.setupCanvas();
-    }) : null
+    window.matchMedia("(min-width: 1200px)").matches ?
+      window.addEventListener('resize', () => {
+        console.log('setting up canvas');
+        this.setupCanvas();
+      }) : null
 
     this.setupCanvas();
 
@@ -163,6 +169,92 @@ export class AppCanvas {
     }
 
     return await del('canvasState');
+  }
+
+  async doTextCopy() {
+    this.copyingText = true;
+
+    const canvasImage = this.canvasElement.toDataURL();
+
+
+    const splitData = canvasImage.split(',')[1];
+
+    const bytes = window.atob(splitData);
+    const buf = new ArrayBuffer(bytes.length);
+    let byteArr = new Uint8Array(buf);
+
+    for (var i = 0; i < bytes.length; i++) {
+      byteArr[i] = bytes.charCodeAt(i);
+    }
+
+    const response = await fetch("https://westus2.api.cognitive.microsoft.com/vision/v2.0/read/core/asyncBatchAnalyze", {
+      headers: {
+        "Ocp-Apim-Subscription-Key": "d930861b5bba49e5939b843f9c4e5846",
+        "Content-Type": "application/octet-stream"
+      },
+      method: "POST",
+      body: byteArr
+    });
+
+    console.log(response);
+    const headers = response.headers;
+
+    setTimeout(async () => {
+      console.log('trying to get data');
+
+      const textURL = headers.get("Operation-Location");
+      console.log(textURL);
+
+      const response = await fetch(textURL, {
+        headers: {
+          "Ocp-Apim-Subscription-Key": "d930861b5bba49e5939b843f9c4e5846",
+          "Content-Type": "application/octet-stream"
+        }
+      });
+      const textData = await response.json();
+
+      console.log('textData', textData);
+      console.log(textData.recognitionResults.lines);
+
+      const textArray = [];
+
+      if (textData.recognitionResults[0].lines) {
+        textData.recognitionResults[0].lines.forEach((textObj) => {
+          if (textObj.text) {
+            textArray.push(textObj.text);
+          }
+        });
+
+        const fullText = textArray.join('.');
+        console.log(fullText);
+
+        if (fullText.length > 0) {
+          await navigator.clipboard.writeText(fullText);
+
+          (window as any).requestIdleCallback(async () => {
+            const toast = await this.toastCtrl.create({
+              message: 'Text copied to clipboard',
+              duration: 1200
+            });
+            await toast.present();
+          })
+        }
+
+        this.copyingText = false;
+      }
+      else {
+        this.copyingText = false;
+
+        (window as any).requestIdleCallback(async () => {
+          const toast = await this.toastCtrl.create({
+            message: 'No text to copy',
+            duration: 1200
+          });
+          await toast.present();
+        })
+      }
+
+    }, 10000);
   }
 
   @Method()
@@ -404,7 +496,7 @@ export class AppCanvas {
       this.context.lineTo(this.mousePos.x, this.mousePos.y);
 
       if (this.mousePos.type !== 'mouse') {
-        this.context.lineWidth = this.mousePos.width - 30;
+        this.context.lineWidth = this.mousePos.width - 40;
       }
       else {
         this.context.lineWidth = 10;
@@ -455,9 +547,104 @@ export class AppCanvas {
     })
   }
 
+  @Method()
+  async exportToOneNote() {
+
+    const alert = await this.alertCtrl.create({
+      header: "Name",
+      message: "Your board will be uploaded to OneDrive first, what would you like to name it?",
+      inputs: [
+        {
+          placeholder: "My board",
+          name: "name"
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel')
+          }
+        }, {
+          text: 'Ok',
+          handler: async (data) => {
+            console.log('Confirm Ok', data.name);
+            const name = data.name;
+            console.log(name);
+
+            const imageUrl = this.canvasElement.toDataURL();
+            const imageBlob = b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
+
+            console.log(imageBlob);
+
+            let provider = (window as any).mgt.Providers.globalProvider;
+            if (provider) {
+              let graphClient = provider.graph.client;
+              console.log(graphClient);
+
+              try {
+                const driveItem = await graphClient.api('/me/drive/root/children').middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).post({
+                  "name": "webboard",
+                  "folder": {}
+                });
+                console.log(driveItem);
+
+                const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
+                console.log(fileUpload);
+
+              
+
+                await exportToOneNote(fileUpload.webUrl, name);
+ 
+              }
+              catch (err) {
+                console.error(err);
+              }
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+    const data = await alert.onDidDismiss();
+    console.log(data);
+
+    /*const imageUrl = this.canvasElement.toDataURL();
+    const imageBlob = b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
+
+    console.log(imageBlob);
+
+    let provider = (window as any).mgt.Providers.globalProvider;
+    if (provider) {
+      let graphClient = provider.graph.client;
+      console.log(graphClient);
+
+      try {
+        const driveItem = await graphClient.api('/me/drive/root/children').middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).post({
+          "name": "webboard",
+          "folder": {}
+        });
+        console.log(driveItem);
+
+        const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${image.name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
+        console.log(fileUpload);
+
+      }
+      catch (err) {
+        console.error(err);
+      }
+    }*/
+  }
+
   render() {
     return (
       <div>
+        {window.matchMedia("(min-width: 1200px)").matches ? <button id="copyTextButton" onClick={() => this.doTextCopy()}>
+          {this.copyingText ? <ion-spinner></ion-spinner> : <span>Copy Text</span>}
+        </button> : null}
+
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 
         {this.dragMode ?

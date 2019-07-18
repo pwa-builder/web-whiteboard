@@ -17,6 +17,7 @@ export namespace Components {
     'color': string;
     'dragMode': boolean;
     'drawGrid': () => Promise<unknown>;
+    'exportToOneNote': () => Promise<void>;
     'mode': string;
     'saveCanvas': (name: string) => Promise<void>;
     'savedDrawing': string | null;
@@ -153,6 +154,7 @@ declare namespace LocalJSX {
     'onDoGrid'?: (event: CustomEvent<any>) => void;
     'onDragMode'?: (event: CustomEvent<any>) => void;
     'onEraserMode'?: (event: CustomEvent<any>) => void;
+    'onExport'?: (event: CustomEvent<any>) => void;
     'onPenMode'?: (event: CustomEvent<any>) => void;
     'onSaveCanvas'?: (event: CustomEvent<any>) => void;
   }

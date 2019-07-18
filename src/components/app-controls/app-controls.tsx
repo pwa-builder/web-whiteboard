@@ -10,6 +10,7 @@ export class AppControls {
   @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
   @Prop({ connect: 'ion-popover-controller' }) popoverCtrl: HTMLIonPopoverControllerElement | null = null;
   @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
+  @Prop({ connect: 'ion-alert-controller' }) alertCtrl: HTMLIonAlertControllerElement | null = null;
 
   @State() openColors: boolean = false;
   @State() erasing: boolean = false;
@@ -23,6 +24,7 @@ export class AppControls {
   @Event() doGrid: EventEmitter;
   @Event() addImage: EventEmitter;
   @Event() dragMode: EventEmitter;
+  @Event() export: EventEmitter;
 
   @Element() el: HTMLElement;
 
@@ -151,6 +153,30 @@ export class AppControls {
     }
   }
 
+  async exportToNote() {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirm',
+      message: 'Export to OneNote?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel: blah');
+          }
+        }, {
+          text: 'Yes',
+          handler: () => {
+            console.log('Confirm Okay');
+            this.export.emit();
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   render() {
     return [
       <div id="main">
@@ -173,7 +199,7 @@ export class AppControls {
             <button onClick={(event) => this.openSettings(event)} id="tasksButton">
               <ion-icon name="today"></ion-icon>
             </button>
-            
+
           </div> :
 
             <ion-fab vertical="top" horizontal="start">
@@ -196,6 +222,10 @@ export class AppControls {
 
                 <ion-fab-button color="primary" onClick={() => this.turnAI()}>
                   ai
+                </ion-fab-button>
+
+                <ion-fab-button color="light" onClick={() => this.exportToNote()}>
+                  <ion-icon src="/assets/notes_icon.svg"></ion-icon>
                 </ion-fab-button>
               </ion-fab-list>
 
@@ -227,6 +257,10 @@ export class AppControls {
 
             <button onClick={() => this.addImagePop()}>
               <ion-icon name="images"></ion-icon>
+            </button>
+
+            <button onClick={() => this.exportToNote()}>
+              <ion-icon src="/assets/notes_icon.svg"></ion-icon>
             </button>
 
             <button onClick={() => this.clear()}>

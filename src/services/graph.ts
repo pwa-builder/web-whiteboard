@@ -47,7 +47,6 @@ export async function test(id: string, activityObject: any) {
 }
 
 export async function createActivity(token: string, activityObject: any, id: string) {
-
   if (token) {
     const headers = new Headers();
     const bearer = "Bearer " + token;
@@ -73,5 +72,35 @@ export async function createActivity(token: string, activityObject: any, id: str
       An auth token must be passed in. To learn more about how to get an auth token
       for the Microsoft Graph API, check out https://github.com/AzureAD/microsoft-authentication-library-for-js.
     `);
+  }
+}
+
+export async function exportToOneNote(imageUrl: string, name: string) {
+  if (imageUrl) {
+    /*const graphEndpoint = "https://graph.microsoft.com/v1.0/me/onenote/pages";
+
+    const response = await fetch(graphEndpoint, options);
+    const data = await response.json();*/
+
+    const provider = (window as any).mgt.Providers.globalProvider;
+    let graphClient = provider.graph.client;
+    console.log(graphClient);
+
+    const data = await graphClient.api(`/me/onenote/pages`).header("Content-Type", "application/xhtml+xml").post(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${name}</title>
+        <meta name="created" content="2015-07-22T09:00:00-08:00" />
+      </head>
+      <body>
+        <a href="${imageUrl}">Onedrive link to Image</a>
+      </body>
+    </html>
+    `);
+
+    console.log(data);
+
+    return data;
   }
 }
