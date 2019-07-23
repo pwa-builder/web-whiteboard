@@ -39,6 +39,11 @@ button {
   --height: 640px;
 }
 
+ion-icon svg {
+  width: 25px;
+  height: 25px;
+}
+
 :root {
   --ion-color-primary: #1976d2;
   --ion-color-primary-rgb: 25,118,210;

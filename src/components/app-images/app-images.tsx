@@ -1,7 +1,7 @@
 import { Component, Element, State, Prop, h } from '@stencil/core';
 
 import { b64toBlob } from '../../helpers/utils';
-import { test } from '../../services/graph';
+// import { test } from '../../services/graph';
 
 import { get, set } from 'idb-keyval';
 // import * as comlink from 'https://unpkg.com/comlink@4.0.1';
@@ -190,7 +190,7 @@ export class AppImages {
     await sheet.present();
   }
 
-  async share(id: number, image) {
+  async share(id: number, image, event) {
     /*let provider = (window as any).mgt.Providers.globalProvider;
     let graphClient = provider.graph.client;
 
@@ -229,97 +229,67 @@ export class AppImages {
           text: "Share",
           icon: "share",
           handler: async (): Promise<any> => {
-            let provider = (window as any).mgt.Providers.globalProvider;
-            let graphClient = provider.graph.client;
+            (window as any).requestIdleCallback(async () => {
+              let provider = (window as any).mgt.Providers.globalProvider;
+              let graphClient = provider.graph.client;
 
-            try {
-              const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
-                "type": "view",
-                "scope": "anonymous"
-              });
-              console.log(shareURL);
-
-              const activity = {
-                "appActivityId": `${shareURL.link.webUrl}`,
-                "activitySourceHost": "https://webboard-app.web.app",
-                "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-                "appDisplayName": "Musically",
-                "activationUrl": `${shareURL.link.webUrl}`,
-                "contentUrl": `${shareURL.link.webUrl}`,
-                "fallbackUrl": "https://webboard-app.web.app",
-                "contentInfo": {
-                  "@context": "https://schema.org",
-                  "@type": "Image",
-                  "title": "webboard"
-                },
-                "visualElements": {
-                  "attribution": {
-                    "iconUrl": "https://webboard-app.web.app/assets/icon/512.png",
-                    "alternateText": "Webboard",
-                    "addImageQuery": false,
-                  },
-                  "description": `${shareURL.link.webUrl} was created in Webboard`,
-                  "backgroundColor": "#ff0000",
-                  "displayText": `New drawing created in Webboard`,
-                  "content": {
-                    "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
-                    "type": "AdaptiveCard",
-                    "body":
-                      [{
-                        "type": "TextBlock",
-                        "text": "Webboard"
-                      }]
-                  }
-                },
-                "historyItems": [
-                  {
-                    "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    "startedDateTime": new Date().toISOString(),
-                    "lastActiveDateTime": new Date().toISOString(),
-                  }
-                ]
-              }
-
-              await test(shareURL.link.webUrl, activity);
-
-              if ((navigator as any).share) {
-                await (navigator as any).share({
-                  title: 'webboard',
-                  text: 'You have been shared a board, click the link to view!',
-                  url: shareURL.link.webUrl,
-                })
-              }
-              else {
-                await navigator.clipboard.writeText(shareURL.link.webUrl);
-
-                const toast = await this.toastCtrl.create({
-                  message: "Sharing URL saved to clipboard",
-                  duration: 1800
+              try {
+                const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
+                  "type": "view",
+                  "scope": "anonymous"
                 });
-                await toast.present();
+                console.log(shareURL);
+
+                if ((navigator as any).share) {
+                  await (navigator as any).share({
+                    title: 'webboard',
+                    text: 'You have been shared a board, click the link to view!',
+                    url: shareURL.link.webUrl,
+                  })
+                }
+                else {
+                  await navigator.clipboard.writeText(shareURL.link.webUrl);
+
+                  const toast = await this.toastCtrl.create({
+                    message: "Sharing URL saved to clipboard",
+                    duration: 1800
+                  });
+                  await toast.present();
+                }
               }
-            }
-            catch (err) {
-              console.error(err);
-            }
+              catch (err) {
+                console.error(err);
+              }
+
+            }, {
+                timeout: 1200
+              })
+
           }
         },
+
         {
           text: "Download",
           icon: "download",
           handler: () => {
             console.log('download');
 
-            const anchor = document.createElement('a');
-            anchor.href = image.url;
-            anchor.download = 'default.jpg';
-            anchor.click();
-            window.URL.revokeObjectURL(image.url);
+            (window as any).requestIdleCallback(() => {
+              const anchor = document.createElement('a');
+              anchor.href = image.url;
+              anchor.download = 'default.jpg';
+              anchor.click();
+              window.URL.revokeObjectURL(image.url);
+            }, {
+                timeout: 1200
+              })
           }
         }
       ]
     });
     await sheet.present();
+
+    event.preventDefault();
   }
 
   async close() {
@@ -403,7 +373,7 @@ export class AppImages {
                       <div id='imageBlock'>
                         <div id="titleBlock">
                           <h4 onClick={() => this.choose(image.url, image.name)}>{image.name}</h4>
-
+  
                           {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear" size="small">
                             <ion-icon name="cloud-upload"></ion-icon>
                           </ion-button> :
@@ -412,11 +382,11 @@ export class AppImages {
                             </ion-button>
                           }
                         </div>
-
+  
                         <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
-
+  
                         <div id="bottomSection">
-
+  
                           <div id="imageTags">
                             {image.tags ? <p id="tagsP">Tags: </p> : null}
                             {
@@ -431,10 +401,10 @@ export class AppImages {
                               }) : null
                             }
                           </div>
-
+  
                           <div id="imageColors">
                             {image.color ? <p id="colorsP">Colors: </p> : null}
-
+  
                             {
                               image.color && image.color.accentColor ?
                                 <div style={{ background: `#${image.color.accentColor}` }} class="colors">
@@ -442,7 +412,7 @@ export class AppImages {
                                 </div>
                                 : null
                             }
-
+  
                             {
                               image.color ? image.color.dominantColors.map((color) => {
                                 if (color !== 'White') {
@@ -455,7 +425,7 @@ export class AppImages {
                               }) : null
                             }
                           </div>
-
+  
                         </div>
                       </div>
                     )*/
@@ -474,7 +444,7 @@ export class AppImages {
                               {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear">
                                 <ion-icon name="cloud-upload"></ion-icon>
                               </ion-button> :
-                                <ion-button onClick={() => this.share(image.id, image)} icon-only fill="clear">
+                                <ion-button onClick={(event) => this.share(image.id, image, event)} icon-only fill="clear">
                                   <ion-icon name="share"></ion-icon>
                                 </ion-button>
                               }
@@ -541,7 +511,7 @@ export class AppImages {
                         </ion-label>
 
                         <ion-buttons slot="end">
-                          <ion-button onClick={() => this.share(image.id, image)} fill="clear" slot="end">
+                          <ion-button onClick={(event) => this.share(image.id, image, event)} fill="clear" slot="end">
                             <ion-icon name="share"></ion-icon>
                           </ion-button>
 

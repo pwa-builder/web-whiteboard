@@ -10,6 +10,11 @@
   justify-content: center;
 }
 
+#controlsBlock #oneSvg svg {
+  width: 30px;
+  height: 30px;
+}
+
 #aiButton {
   z-index: 9999;
   position: fixed;

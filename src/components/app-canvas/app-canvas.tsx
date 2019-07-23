@@ -1,13 +1,11 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
 
 import { set, get, del } from 'idb-keyval';
-import 'pinch-zoom-element';
 
 import { b64toBlob } from '../../helpers/utils';
+import { getNewFileHandle } from '../../helpers/files-api';
 
 import { exportToOneNote } from '../../services/graph';
-
-// import { saveImages } from "../../services/api";
 
 @Component({
   tag: 'app-canvas',
@@ -36,6 +34,7 @@ export class AppCanvas {
   dragContext: CanvasRenderingContext2D;
   lastPos: any;
   mousePos: any;
+  fileHandle: any;
 
   componentDidLoad() {
     console.log('Component has been rendered');
@@ -259,6 +258,7 @@ export class AppCanvas {
 
   @Method()
   async saveCanvas(name: string) {
+
     const canvasImage = this.canvasElement.toDataURL();
     const images: any[] = await get('images');
 
@@ -288,7 +288,10 @@ export class AppCanvas {
       console.log(data);
 
       if (images) {
-        images.push({ name, color: data.color, desc: data.description.captions[0].text, tags: data.tags, url: canvasImage });
+        await this.saveToFS();
+
+        const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
+        images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
         await set('images', images);
 
         let remoteImages = [];
@@ -299,10 +302,15 @@ export class AppCanvas {
           }
         });
 
+
         // await saveImages(remoteImages);
       }
       else {
-        await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage, desc: data.description.captions[0].text }]);
+        await this.saveToFS();
+
+
+        const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
+        await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage, desc }]);
 
         let remoteImages = [];
 
@@ -312,11 +320,13 @@ export class AppCanvas {
           }
         });
 
+
         // await saveImages(remoteImages);
       }
     }
     else {
       if (images) {
+        await this.saveToFS();
         images.push({ name, url: canvasImage });
         await set('images', images);
 
@@ -330,9 +340,13 @@ export class AppCanvas {
           });
         }
 
+
+
         // await saveImages(remoteImages);
       }
       else {
+
+        await this.saveToFS();
         await set('images', [{ name, url: canvasImage }]);
 
 
@@ -346,10 +360,32 @@ export class AppCanvas {
           });
         }
 
+        this.saveToFS();
+
         // await saveImages(remoteImages);
       }
     }
 
+  }
+
+  async saveToFS() {
+    if ("chooseFileSystemEntries" in window) {
+      this.fileHandle = await getNewFileHandle();
+
+      console.log(this.fileHandle);
+
+      if (this.fileHandle) {
+        const file_writer = await this.fileHandle.createWriter();
+        console.log(file_writer);
+
+        this.canvasElement.toBlob(async (blob) => {
+          await file_writer.write(0, blob);
+          await file_writer.close();
+        }, 'image/jpeg');
+      }
+
+      return this.fileHandle;
+    }
   }
 
   setupCanvas() {
@@ -449,6 +485,17 @@ export class AppCanvas {
       (window as any).requestIdleCallback(async () => {
         let canvasState = this.canvasElement.toDataURL();
         await set('canvasState', canvasState);
+
+        if ("chooseFileSystemEntries" in window && this.fileHandle) {
+          const file_writer = await this.fileHandle.createWriter();
+          console.log(file_writer);
+  
+          this.canvasElement.toBlob(async (blob) => {
+            await file_writer.write(0, blob);
+            await file_writer.close();
+          }, 'image/jpeg');
+        }
+        
       })
     }, { passive: false });
 
@@ -549,7 +596,6 @@ export class AppCanvas {
 
   @Method()
   async exportToOneNote() {
-
     const alert = await this.alertCtrl.create({
       header: "Name",
       message: "Your board will be uploaded to OneDrive first, what would you like to name it?",
@@ -574,6 +620,8 @@ export class AppCanvas {
             const name = data.name;
             console.log(name);
 
+            await this.saveCanvas(name);
+
             const imageUrl = this.canvasElement.toDataURL();
             const imageBlob = b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
 
@@ -594,10 +642,10 @@ export class AppCanvas {
                 const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
                 console.log(fileUpload);
 
-              
+
 
                 await exportToOneNote(fileUpload.webUrl, name);
- 
+
               }
               catch (err) {
                 console.error(err);
@@ -648,9 +696,7 @@ export class AppCanvas {
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 
         {this.dragMode ?
-          <pinch-zoom>
-            <canvas id="dragCanvas" ref={(el) => this.dragCanvasElement = el as HTMLCanvasElement}></canvas>
-          </pinch-zoom>
+          <canvas id="dragCanvas" ref={(el) => this.dragCanvasElement = el as HTMLCanvasElement}></canvas>
 
           : <canvas id="regCanvas" ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>}
       </div >

@@ -34,7 +34,10 @@ export class AppHome {
   async save() {
     const appCanvas = this.el.querySelector('app-canvas');
 
-    if (this.alertCtrl) {
+    if ("chooseFileSystemEntries" in window) {
+      appCanvas.saveCanvas('');
+    }
+    else if (this.alertCtrl) {
       const alert = await this.alertCtrl.create({
         header: 'File Name',
         subHeader: 'Enter a name for the file',

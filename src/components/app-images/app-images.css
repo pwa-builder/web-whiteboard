@@ -79,6 +79,11 @@ h2 {
   margin: 2em;
 }
 
+#imageList img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
 #imageBlock {
   padding-left: 16px;
   border-radius: 12px;

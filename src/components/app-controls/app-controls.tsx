@@ -225,7 +225,7 @@ export class AppControls {
                 </ion-fab-button>
 
                 <ion-fab-button color="light" onClick={() => this.exportToNote()}>
-                  <ion-icon src="/assets/notes_icon.svg"></ion-icon>
+                  <ion-icon src="/assets/onenote.svg"></ion-icon>
                 </ion-fab-button>
               </ion-fab-list>
 
@@ -259,9 +259,9 @@ export class AppControls {
               <ion-icon name="images"></ion-icon>
             </button>
 
-            <button onClick={() => this.exportToNote()}>
-              <ion-icon src="/assets/notes_icon.svg"></ion-icon>
-            </button>
+            {window.matchMedia("(min-width: 1200px)").matches ? <button onClick={() => this.exportToNote()}>
+              <ion-icon id="oneSvg" src="/assets/onenote.svg"></ion-icon>
+            </button> : null}
 
             <button onClick={() => this.clear()}>
               <ion-icon name="trash"></ion-icon>
