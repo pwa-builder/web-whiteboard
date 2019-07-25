@@ -3,7 +3,7 @@ import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core
 import { set, get, del } from 'idb-keyval';
 
 import { b64toBlob } from '../../helpers/utils';
-import { getNewFileHandle } from '../../helpers/files-api';
+import { getNewFileHandle, readFile } from '../../helpers/files-api';
 
 import { exportToOneNote } from '../../services/graph';
 
@@ -35,6 +35,7 @@ export class AppCanvas {
   lastPos: any;
   mousePos: any;
   fileHandle: any;
+  fileWriter: any;
 
   componentDidLoad() {
     console.log('Component has been rendered');
@@ -95,6 +96,39 @@ export class AppCanvas {
       tempImage = null
     }
     tempImage.src = this.savedDrawing;
+  }
+
+  @Method()
+  async writeNativeFile(fileHandler) {
+    this.fileHandle = fileHandler;
+
+    if (this.fileHandle) {
+      /*let tempImage = new Image();
+
+      tempImage.onload = async () => {
+        console.log('image loaded');
+        await this.clearCanvas();
+
+        this.context.drawImage(tempImage, 0, 0);
+
+        tempImage = null
+      }
+      tempImage.src = this.savedDrawing;*/
+
+      const fileContents: any = await readFile(this.fileHandle);
+      console.log(fileContents);
+
+      let tempImage = new Image();
+      tempImage.onload = async () => {
+        console.log('image loaded');
+
+        this.context.drawImage(tempImage, 0, 0);
+        this.setupMouseEvents();
+
+        tempImage = null
+      }
+      tempImage.src = fileContents;
+    }
   }
 
   @Watch('color')
@@ -161,6 +195,9 @@ export class AppCanvas {
 
   @Method()
   async clearCanvas() {
+    this.fileHandle = null;
+    this.fileWriter = null;
+
     this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
     if (this.savedDrawing) {
@@ -288,10 +325,17 @@ export class AppCanvas {
       console.log(data);
 
       if (images) {
-        await this.saveToFS();
+        const handle = await this.saveToFS();
 
         const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
-        images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
+
+        if (handle) {
+          images.push({ name: handle.name, color: data.color, desc, tags: data.tags, url: canvasImage });
+        }
+        else {
+          images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
+        }
+
         await set('images', images);
 
         let remoteImages = [];
@@ -306,11 +350,17 @@ export class AppCanvas {
         // await saveImages(remoteImages);
       }
       else {
-        await this.saveToFS();
+        const handle = await this.saveToFS();
 
 
         const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
-        await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage, desc }]);
+
+        if (handle) {
+          await set('images', [{ name: handle.name, color: data.color, tags: data.tags, url: canvasImage, desc }]);
+        }
+        else {
+          await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage, desc }]);
+        }
 
         let remoteImages = [];
 
@@ -326,8 +376,15 @@ export class AppCanvas {
     }
     else {
       if (images) {
-        await this.saveToFS();
-        images.push({ name, url: canvasImage });
+        const handle = await this.saveToFS();
+        console.log(handle);
+        if (handle) {
+          images.push({ name: handle.name, url: canvasImage });
+        }
+        else {
+          images.push({ name, url: canvasImage });
+        }
+
         await set('images', images);
 
         let remoteImages = [];
@@ -345,9 +402,14 @@ export class AppCanvas {
         // await saveImages(remoteImages);
       }
       else {
+        const handle = await this.saveToFS();
 
-        await this.saveToFS();
-        await set('images', [{ name, url: canvasImage }]);
+        if (handle) {
+          await set('images', [{ name: handle.name, url: canvasImage }]);
+        }
+        else {
+          await set('images', [{ name, url: canvasImage }]);
+        }
 
 
         let remoteImages = [];
@@ -359,8 +421,6 @@ export class AppCanvas {
             }
           });
         }
-
-        this.saveToFS();
 
         // await saveImages(remoteImages);
       }
@@ -375,13 +435,15 @@ export class AppCanvas {
       console.log(this.fileHandle);
 
       if (this.fileHandle) {
-        const file_writer = await this.fileHandle.createWriter();
-        console.log(file_writer);
+        this.fileWriter = await this.fileHandle.createWriter();
+        console.log(this.fileWriter);
 
         this.canvasElement.toBlob(async (blob) => {
-          await file_writer.write(0, blob);
-          await file_writer.close();
+          await this.fileWriter.write(0, blob);
+          await this.fileWriter.close();
         }, 'image/jpeg');
+
+        this.setupMouseEvents();
       }
 
       return this.fileHandle;
@@ -457,7 +519,8 @@ export class AppCanvas {
     })
   }
 
-  setupMouseEvents() {
+  async setupMouseEvents() {
+    console.log('setting up mouse events');
     this.drawing = false;
 
     this.mousePos = { x: 0, y: 0 };
@@ -480,6 +543,7 @@ export class AppCanvas {
     }, { passive: false });
 
     this.canvasElement.addEventListener("pointerup", () => {
+      console.log('pointer up');
       this.drawing = false;
 
       (window as any).requestIdleCallback(async () => {
@@ -487,38 +551,23 @@ export class AppCanvas {
         await set('canvasState', canvasState);
 
         if ("chooseFileSystemEntries" in window && this.fileHandle) {
-          const file_writer = await this.fileHandle.createWriter();
-          console.log(file_writer);
-  
+          console.log('writing to file');
+          this.fileWriter = await this.fileHandle.createWriter();
+
+          console.log('this.fileWriter in pointer up', this.fileWriter);
+          console.log("chooseFileSystemEntries" in window);
+
           this.canvasElement.toBlob(async (blob) => {
-            await file_writer.write(0, blob);
-            await file_writer.close();
+            await this.fileWriter.write(0, blob);
+            await this.fileWriter.close();
           }, 'image/jpeg');
         }
-        
+
       })
     }, { passive: false });
 
     this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
-      if ((e as any).getPredictedEvents) {
-
-        this.mousePos = this.getMousePos(this.canvasElement, e);
-
-        const predEvents = (e as any).getPredictedEvents();
-
-        /*predEvents.forEach((pred) => {
-          this.mousePos = this.getMousePos(this.canvasElement, pred);
-        })*/
-        if (predEvents[0]) {
-          this.mousePos = this.getMousePos(this.canvasElement, predEvents[0]);
-        }
-        else {
-          this.mousePos = this.getMousePos(this.canvasElement, e);
-        }
-      }
-      else {
-        this.mousePos = this.getMousePos(this.canvasElement, e);
-      }
+      this.mousePos = this.getMousePos(this.canvasElement, e);
     }, { passive: false });
   }
 

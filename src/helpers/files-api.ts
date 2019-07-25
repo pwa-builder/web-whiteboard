@@ -28,7 +28,7 @@ export function getFileHandle() {
 }
 
 /**
- * Create a handle to a new (text) file on the local file system.
+ * Create a handle to a new file on the local file system.
  *
  * @return {!Promise<FileSystemFileHandle>} Handle to the new file.
  */
@@ -52,9 +52,6 @@ export function getNewFileHandle() {
  */
 export async function readFile(fileHandle) {
   const file = await fileHandle.getFile();
-  if (file.text) {
-    return await _readFileBlob(file);
-  }
   return await _readFileLegacy(file);
 }
 
@@ -67,7 +64,7 @@ export async function readFile(fileHandle) {
  * @return {Promise<string>} A promise that resolves to the parsed string.
  */
 export function _readFileBlob(file) {
-  const result = file.text();
+  const result = file.blob();
   return result;
 }
 
@@ -86,7 +83,7 @@ export function _readFileLegacy(file) {
       const text = (e.srcElement as any).result;
       resolve(text);
     });
-    reader.readAsText(file);
+    reader.readAsDataURL(file);
   });
 }
 

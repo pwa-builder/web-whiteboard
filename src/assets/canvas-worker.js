@@ -14,5 +14,4 @@ onmessage = function (e) {
 
     postMessage(tempImages);
   }
-
 }
