@@ -21,6 +21,7 @@ export namespace Components {
     'mode': string;
     'saveCanvas': (name: string) => Promise<void>;
     'savedDrawing': string | null;
+    'writeNativeFile': (fileHandler: any) => Promise<void>;
   }
   interface AppControls {}
   interface AppHome {}

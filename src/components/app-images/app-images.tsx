@@ -1,6 +1,7 @@
 import { Component, Element, State, Prop, h } from '@stencil/core';
 
 import { b64toBlob } from '../../helpers/utils';
+import { getFileHandle } from '../../helpers/files-api';
 // import { test } from '../../services/graph';
 
 import { get, set } from 'idb-keyval';
@@ -331,6 +332,17 @@ export class AppImages {
     this.imageSection = event.target.value;
   }
 
+  async openNativeFile() {
+    const file_handle = await getFileHandle();
+    console.log(file_handle);
+
+    if (file_handle) {
+      document.querySelector('app-canvas').writeNativeFile(file_handle);
+    }
+    
+    this.close();
+  }
+
   render() {
     return (
       <div id="mainDiv">
@@ -342,6 +354,10 @@ export class AppImages {
             </ion-title>
 
             <ion-buttons slot="end">
+              {"chooseFileSystemEntries" in window ? <ion-button onClick={() => this.openNativeFile()}>
+                <ion-icon name="folder"></ion-icon>
+              </ion-button> : null}
+
               <ion-button onClick={() => this.close()}>
                 <ion-icon name='close'></ion-icon>
               </ion-button>
