@@ -35,6 +35,7 @@ export class AppCanvas {
   lastPos: any;
   mousePos: any;
   fileHandle: any;
+  fileWriter: any;
 
   componentDidLoad() {
     console.log('Component has been rendered');
@@ -195,6 +196,7 @@ export class AppCanvas {
   @Method()
   async clearCanvas() {
     this.fileHandle = null;
+    this.fileWriter = null;
 
     this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
@@ -433,12 +435,12 @@ export class AppCanvas {
       console.log(this.fileHandle);
 
       if (this.fileHandle) {
-        const file_writer = await this.fileHandle.createWriter();
-        console.log(file_writer);
+        this.fileWriter = await this.fileHandle.createWriter();
+        console.log(this.fileWriter);
 
         this.canvasElement.toBlob(async (blob) => {
-          await file_writer.write(0, blob);
-          await file_writer.close();
+          await this.fileWriter.write(0, blob);
+          await this.fileWriter.close();
         }, 'image/jpeg');
 
         this.setupMouseEvents();
@@ -550,14 +552,14 @@ export class AppCanvas {
 
         if ("chooseFileSystemEntries" in window && this.fileHandle) {
           console.log('writing to file');
-          const file_writer = await this.fileHandle.createWriter();
+          this.fileWriter = await this.fileHandle.createWriter();
 
-          console.log('file_writer in pointer up', file_writer);
+          console.log('this.fileWriter in pointer up', this.fileWriter);
           console.log("chooseFileSystemEntries" in window);
 
           this.canvasElement.toBlob(async (blob) => {
-            await file_writer.write(0, blob);
-            await file_writer.close();
+            await this.fileWriter.write(0, blob);
+            await this.fileWriter.close();
           }, 'image/jpeg');
         }
 

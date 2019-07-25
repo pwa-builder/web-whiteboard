@@ -207,6 +207,11 @@ ion-popover {
   align-items: center;
 }
 
+#brushIcon {
+  animation-name: spin;
+  animation-duration: 300ms;
+}
+
 @media (max-width: 600px) {
   #controlsBlock #buttonBlock {
     width: 18em;
@@ -225,4 +230,9 @@ ion-popover {
   to {
     transform: translateY(0);
   }
+}
+
+@keyframes spin {
+  from {transform:rotate(0deg);}
+  to {transform:rotate(360deg);}
 }

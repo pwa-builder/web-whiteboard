@@ -1,8 +1,5 @@
 import { Component, Element, Prop, State, h } from '@stencil/core';
 
-/*import '@microsoft/mgt/dist/es6/components/mgt-login/mgt-login.js';
-import '@microsoft/mgt/dist/es6/components/providers/mgt-msal-provider.js';*/
-
 @Component({
   tag: 'app-home',
   styleUrl: 'app-home.css'
@@ -16,6 +13,7 @@ export class AppHome {
   @State() savedImage: string | null = null;
   @State() grid: boolean = false;
   @State() dragMode: boolean = false;
+  @State() currentFileName: string | null = null;
 
   @Prop({ connect: 'ion-alert-controller' }) alertCtrl: HTMLIonAlertControllerElement | null = null;
   @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
@@ -26,9 +24,15 @@ export class AppHome {
     this.color = ev.detail;
   }
 
-  clear() {
-    const appCanvas = this.el.querySelector('app-canvas');
-    appCanvas.clearCanvas();
+  async clear() {
+    this.currentFileName = null;
+
+    (window as any).requestIdleCallback(async () => {
+      const appCanvas = this.el.querySelector('app-canvas');
+      await appCanvas.clearCanvas();
+    }, {
+      timeout: 2000
+    });
   }
 
   async save() {
@@ -57,10 +61,14 @@ export class AppHome {
             }
           }, {
             text: 'Ok',
-            handler: (data) => {
+            handler: async (data) => {
               console.log('Confirm Ok', data);
               console.log(appCanvas);
-              appCanvas.saveCanvas(data.fileName);
+              await appCanvas.saveCanvas(data.fileName);
+
+              console.log(data);
+
+              this.currentFileName = data.fileName;
             }
           }
         ]
@@ -92,6 +100,10 @@ export class AppHome {
     console.log(data);
 
     if (data && data.url) {
+      if (data.name) {
+        this.currentFileName = data.name;
+      }
+
       this.savedImage = data.url;
     }
   }
@@ -146,7 +158,11 @@ export class AppHome {
     return [
       <div class='app-home'>
         <pwa-install></pwa-install>
-        
+
+        {this.currentFileName ? <div id="fileNameDiv">
+          <span>{this.currentFileName}</span>
+        </div> : null}
+
         <app-canvas dragMode={this.dragMode} savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
 
         <app-controls onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>

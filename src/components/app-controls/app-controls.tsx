@@ -50,7 +50,18 @@ export class AppControls {
   }
 
   clear() {
-    this.clearCanvas.emit();
+    const jumpAni = this.el.querySelector("#trashIcon").animate(
+      {
+        transform: ['translateY(0px)', 'translateY(-8px)', 'translateY(0px)']
+      },
+      {
+        duration: 200
+      }
+    );
+
+    jumpAni.onfinish = () => {
+      this.clearCanvas.emit();
+    }
   }
 
   async erase() {
@@ -117,10 +128,22 @@ export class AppControls {
       event: ev
     });
     await popover.present();*/
-    const modal = await this.modalCtrl.create({
-      component: 'image-popover'
-    });
-    await modal.present();
+
+    const jumpAni = this.el.querySelector("#imagesIcon").animate(
+      {
+        transform: ['translateY(0px)', 'translateY(-8px)', 'translateY(0px)']
+      },
+      {
+        duration: 200
+      }
+    );
+
+    jumpAni.onfinish = async () => {
+      const modal = await this.modalCtrl.create({
+        component: 'image-popover'
+      });
+      await modal.present();
+    }
   }
 
   async turnAI() {
@@ -239,7 +262,7 @@ export class AppControls {
             </button>
 
             <button onClick={() => this.erase()}>
-              {!this.erasing ? <ion-icon name="remove-circle-outline"></ion-icon> : <ion-icon name="brush"></ion-icon>}
+              {!this.erasing ? <ion-icon id="eraseIcon" name="remove-circle-outline"></ion-icon> : <ion-icon id="brushIcon" name="brush"></ion-icon>}
             </button>
 
             <button onClick={() => this.openGrid()}>
@@ -256,7 +279,7 @@ export class AppControls {
     </label>*/}
 
             <button onClick={() => this.addImagePop()}>
-              <ion-icon name="images"></ion-icon>
+              <ion-icon id="imagesIcon" name="images"></ion-icon>
             </button>
 
             {window.matchMedia("(min-width: 1200px)").matches ? <button onClick={() => this.exportToNote()}>
@@ -264,7 +287,7 @@ export class AppControls {
             </button> : null}
 
             <button onClick={() => this.clear()}>
-              <ion-icon name="trash"></ion-icon>
+              <ion-icon id="trashIcon" name="trash"></ion-icon>
             </button>
           </div>
         </div> : null}

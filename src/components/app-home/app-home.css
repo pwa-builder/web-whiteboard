@@ -15,6 +15,42 @@ app-home {
   background: white;
 }
 
+#fileNameDiv {
+  z-index: 9999;
+  position: fixed;
+  width: 100%;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#fileNameDiv span {
+  background: #1976d25e;
+  color: white;
+  font-size: 18px;
+  padding-left: 2em;
+  padding-right: 2em;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-radius: 22px;
+  margin-top: 10px;
+  backdrop-filter: blur(10px);
+  animation-name: slidedown;
+  animation-duration: 300ms;
+}
+
+@keyframes slidedown {
+  from {
+    opacity: 0.6;
+    transform: translateY(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media(min-width: 1200px) {
   .imagesModal {
     --width: 56em !important;
