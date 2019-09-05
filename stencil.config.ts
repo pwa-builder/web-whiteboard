@@ -6,9 +6,15 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: {
-        swSrc: 'src/sw.js'
-      }
+      serviceWorker: null,
+      copy: [
+        {
+          src: "icons"
+        },
+        {
+          src: "pwabuilder-sw.js"
+        }
+      ]
     }
   ],
   globalScript: 'src/global/app.ts',
