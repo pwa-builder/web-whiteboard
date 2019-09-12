@@ -168,14 +168,14 @@ export class AppHome {
         <app-controls onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
 
         <div id="settingsBlock">
+          <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(ev) => this.openSettings(ev)} fill="clear">
+            <ion-icon color="primary" name="settings"></ion-icon>
+          </ion-button>
+
           <mgt-msal-provider scopes="Notes.Create" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
           <mgt-login></mgt-login>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
-
-          {/*<ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(ev) => this.openSettings(ev)} fill="clear">
-            <ion-icon color="primary" name="settings"></ion-icon>
-    </ion-button>*/}
         </div>
 
         {/*<ion-button onClick={() => this.openSettings()} id="settingsButton" fill="clear">

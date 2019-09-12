@@ -7,7 +7,7 @@ import { Component, h, State, Prop } from '@stencil/core';
     #desktopInstallButton {
       position: fixed;
       top: 2em;
-      right: 13em;
+      right: 15em;
       background: #1976d2;
       color: white;
       font-size: 12px;
@@ -40,10 +40,6 @@ export class PWAInstall {
   @State() showInstall: boolean = false;
 
   @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
-
-  componentWillLoad() {
-    console.log('Component is about to be rendered');
-  }
 
   componentDidLoad() {
     console.log('in here');
