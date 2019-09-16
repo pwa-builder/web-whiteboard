@@ -179,6 +179,7 @@ export class AppControls {
   async exportToNote() {
     const alert = await this.alertCtrl.create({
       header: 'Confirm',
+      subHeader: 'export to onenote',
       message: 'Export to OneNote?',
       buttons: [
         {
@@ -219,10 +220,6 @@ export class AppControls {
               <ion-icon name='save'></ion-icon>
             </button>
 
-            <button onClick={(event) => this.openSettings(event)} id="tasksButton">
-              <ion-icon name="today"></ion-icon>
-            </button>
-
           </div> :
 
             <ion-fab vertical="top" horizontal="start">
@@ -237,10 +234,6 @@ export class AppControls {
 
                 <ion-fab-button color="secondary" onClick={() => this.save()}>
                   <ion-icon name="save"></ion-icon>
-                </ion-fab-button>
-
-                <ion-fab-button color="secondary" onClick={(event) => this.openSettings(event)}>
-                  <ion-icon name="today"></ion-icon>
                 </ion-fab-button>
 
                 <ion-fab-button color="primary" onClick={() => this.turnAI()}>

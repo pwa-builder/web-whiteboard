@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "org.webboard.app",
+    "sha256_cert_fingerprints": [
+      "C6:FD:F2:80:7A:A5:AB:DC:CD:4D:B6:6D:83:2E:E8:53:3B:DF:23:34:67:24:54:D1:71:5A:0F:E8:3E:4A:FE:DD"
+    ]
+  }
+}]

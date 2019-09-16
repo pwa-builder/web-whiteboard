@@ -12,6 +12,9 @@ export const config: Config = {
       copy: [
         {
           src: "icons"
+        },
+        {
+          src: ".well-known"
         }
       ]
     }
