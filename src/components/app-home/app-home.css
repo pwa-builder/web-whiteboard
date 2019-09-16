@@ -34,6 +34,12 @@ app-home {
   align-items: center;
 }
 
+@media(max-width: 500px) {
+  #fileNameDiv {
+    display: none;
+  }
+}
+
 #fileNameDiv span {
   background: #1976d25e;
   color: white;

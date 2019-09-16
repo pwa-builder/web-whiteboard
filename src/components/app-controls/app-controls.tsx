@@ -255,7 +255,7 @@ export class AppControls {
             </button>
 
             <button onClick={() => this.erase()}>
-              {!this.erasing ? <ion-icon id="eraseIcon" name="remove-circle-outline"></ion-icon> : <ion-icon id="brushIcon" name="brush"></ion-icon>}
+              {!this.erasing ? <ion-icon id="eraseIcon" src="/assets/eraser-solid.svg"></ion-icon> : <ion-icon id="brushIcon" name="brush"></ion-icon>}
             </button>
 
             <button onClick={() => this.openGrid()}>
