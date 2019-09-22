@@ -40,11 +40,6 @@
   #aiButton {
     display: none;
   }
-
-  ion-popover {
-    --width: 326px !important;
-    --height: 341px !important;
-  }
 }
 
 #controlsBlock #buttonBlock {
@@ -207,6 +202,11 @@
   animation-duration: 300ms;
 }
 
+#imagesHeaderEl ion-toolbar {
+  --background: #ffffff70;
+  backdrop-filter: blur(10px);
+}
+
 @media (max-width: 600px) {
   #controlsBlock #buttonBlock {
     width: 18em;
@@ -214,6 +214,12 @@
 
   #colorsBlock #colorInternalBlock {
     width: 18em;
+  }
+}
+
+@media(min-width: 1200px) {
+  .extImageModal {
+    --width: 56em !important;
   }
 }
 

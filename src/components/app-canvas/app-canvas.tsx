@@ -592,7 +592,7 @@ export class AppCanvas {
       this.context.lineTo(this.mousePos.x, this.mousePos.y);
 
       if (this.mousePos.type !== 'mouse') {
-        this.context.lineWidth = this.mousePos.width - 40;
+        this.context.lineWidth = this.mousePos.width - 20;
       }
       else {
         this.context.lineWidth = 10;
@@ -610,6 +610,10 @@ export class AppCanvas {
       this.context.moveTo(this.lastPos.x, this.lastPos.y);
       this.context.lineTo(this.mousePos.x, this.mousePos.y);
 
+      if (this.mousePos.type === 'mouse') {
+        this.context.lineWidth = 30;
+      }
+
       this.lastPos = this.mousePos;
 
       this.context.stroke();
@@ -621,6 +625,8 @@ export class AppCanvas {
 
   @Method()
   addImageToCanvas(imageString: string) {
+    this.mode = "something";
+
     return new Promise(() => {
       let base_image = new Image();
 
@@ -635,12 +641,14 @@ export class AppCanvas {
         const canvasElement = this.canvasElement;
         const context = this.context;
 
-        this.canvasElement.addEventListener('click', async function handler(ev) {
-
+        // weirdness
+        let that = this;
+        this.canvasElement.addEventListener('click', async function handler (ev) {
           context.drawImage(base_image, ev.clientX, ev.clientY, base_image.width - 400, base_image.height - 400);
           await toast.dismiss();
 
           canvasElement.removeEventListener('click', handler);
+          that.mode = "pen";
         });
       }
     })

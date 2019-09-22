@@ -136,7 +136,8 @@ export class AppControls {
 
     jumpAni.onfinish = async () => {
       const modal = await modalCtrl.create({
-        component: 'image-popover'
+        component: 'image-popover',
+        cssClass: 'extImageModal'
       });
       await modal.present();
     }

@@ -8,7 +8,7 @@ import { getFileHandle } from '../../helpers/files-api';
 import { get, set } from 'idb-keyval';
 // import * as comlink from 'https://unpkg.com/comlink@4.0.1';
 
-import { getSavedImages } from '../../services/api';
+import { getSavedImages, saveImagesS } from '../../services/api';
 
 @Component({
   tag: 'app-images',
@@ -198,6 +198,8 @@ export class AppImages {
                 });
 
                 saveImages(remoteImages);*/
+
+                await saveImagesS(this.images);
 
                 const toast = await toastCtrl.create({
                   message: "Board uploaded to OneDrive",
@@ -400,7 +402,7 @@ export class AppImages {
   render() {
     return (
       <div id="mainDiv">
-        <ion-header>
+        <ion-header id="imagesHeaderEl">
           <ion-toolbar>
 
             <ion-title>
@@ -443,67 +445,6 @@ export class AppImages {
               {
                 this.imageSection === 'local' ?
                   this.images.map((image) => {
-                    /*return (
-                      <div id='imageBlock'>
-                        <div id="titleBlock">
-                          <h4 onClick={() => this.choose(image.url, image.name)}>{image.name}</h4>
-  
-                          {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear" size="small">
-                            <ion-icon name="cloud-upload"></ion-icon>
-                          </ion-button> :
-                            <ion-button onClick={() => this.share(image.id, image)} icon-only fill="clear" size="small">
-                              <ion-icon name="share"></ion-icon>
-                            </ion-button>
-                          }
-                        </div>
-  
-                        <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
-  
-                        <div id="bottomSection">
-  
-                          <div id="imageTags">
-                            {image.tags ? <p id="tagsP">Tags: </p> : null}
-                            {
-                              image.tags ? image.tags.map((tag) => {
-                                if (tag.confidence > 0.8) {
-                                  return (
-                                    <div class="imageTag">
-                                      {tag.name}
-                                    </div>
-                                  )
-                                }
-                              }) : null
-                            }
-                          </div>
-  
-                          <div id="imageColors">
-                            {image.color ? <p id="colorsP">Colors: </p> : null}
-  
-                            {
-                              image.color && image.color.accentColor ?
-                                <div style={{ background: `#${image.color.accentColor}` }} class="colors">
-                                  {`#${image.color.accentColor}`}
-                                </div>
-                                : null
-                            }
-  
-                            {
-                              image.color ? image.color.dominantColors.map((color) => {
-                                if (color !== 'White') {
-                                  return (
-                                    <div style={{ background: color }} class="colors">
-                                      {color}
-                                    </div>
-                                  )
-                                }
-                              }) : null
-                            }
-                          </div>
-  
-                        </div>
-                      </div>
-                    )*/
-
                     return (
                       <ion-card onClick={() => this.choose(image.url, image.name)}>
                         <ion-card-header>
@@ -530,9 +471,9 @@ export class AppImages {
 
                         <ion-card-content>
                           <div id="imageTags">
-                            {image.tags ? <p id="tagsP">Tags: </p> : null}
+                            {image.tags && image.tags.length > 0 ? <p id="tagsP">Tags: </p> : null}
                             {
-                              image.tags ? image.tags.map((tag) => {
+                              image.tags && image.tags.length > 0 ? image.tags.map((tag) => {
                                 if (tag.confidence > 0.8) {
                                   return (
                                     <div class="imageTag">

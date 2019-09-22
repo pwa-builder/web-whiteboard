@@ -4,6 +4,17 @@
   height: 100%;
 }
 
+#imagesHeaderEl {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+#imagesHeaderEl ion-toolbar {
+  --background: #ffffff70;
+  backdrop-filter: blur(10px);
+}
+
 #buttonBar {
   display: flex;
   justify-content: space-between;
