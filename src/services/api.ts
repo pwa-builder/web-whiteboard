@@ -1,6 +1,6 @@
 const url = "https://webboard-server.azurewebsites.net";
 
-export async function saveImages(images: any) {
+export async function saveImagesS(images: any) {
   console.log(images);
 
   const provider = (window as any).mgt.Providers.globalProvider;
@@ -11,13 +11,14 @@ export async function saveImages(images: any) {
   const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
 
   if (images && user) {
+    console.log('making a request');
     const response = await fetch(`${url}/images`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        image: images,
+        images: images,
         user: user
       })
     });

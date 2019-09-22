@@ -1,4 +1,5 @@
-import { Component, Element, State, Prop, h } from '@stencil/core';
+import { Component, Element, State, h } from '@stencil/core';
+import { loadingController, toastController as toastCtrl, actionSheetController as actionSheetCtrl } from '@ionic/core';
 
 import { b64toBlob } from '../../helpers/utils';
 import { getFileHandle } from '../../helpers/files-api';
@@ -7,7 +8,7 @@ import { getFileHandle } from '../../helpers/files-api';
 import { get, set } from 'idb-keyval';
 // import * as comlink from 'https://unpkg.com/comlink@4.0.1';
 
-// import { saveImages } from '../../services/api';
+import { getSavedImages } from '../../services/api';
 
 @Component({
   tag: 'app-images',
@@ -20,9 +21,6 @@ export class AppImages {
   @State() cloudImages: any;
   @State() showUpload: boolean = false;
   @State() imageSection: string = 'local';
-
-  @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
-  @Prop({ connect: 'ion-action-sheet-controller' }) actionSheetCtrl: HTMLIonActionSheetControllerElement | null = null;
 
   @Element() el: HTMLElement;
 
@@ -42,19 +40,75 @@ export class AppImages {
 
       if (images) {
         this.images = images;
-      };
 
-      const imageWorker = new Worker('/assets/canvas-worker.js');
-      imageWorker.postMessage({ name: 'cloudImages', data: this.images });
+        const imageWorker = new Worker('/assets/canvas-worker.js');
+        imageWorker.postMessage({ name: 'cloudImages', data: this.images });
 
-      imageWorker.onmessage = (message) => {
-        console.log(message.data);
+        imageWorker.onmessage = (message) => {
+          console.log(message.data);
 
-        this.cloudImages = message.data;
+          this.cloudImages = message.data;
+        }
+
       }
+      else {
+        const loading = await loadingController.create({
+          message: "Loading images from the cloud..."
+        });
+        await loading.present();
+
+        console.log('trying to get images from the cloud');
+        try {
+          const data = await getSavedImages();
+          console.log(data);
+
+          this.images = data.images
+
+          await loading.dismiss();
+
+          await set('images', this.images);
+        }
+        catch (err) {
+          console.error(err);
+          await loading.dismiss();
+        }
+      }
+
     }, {
-        timeout: 2000
-      })
+      timeout: 2000
+    })
+  }
+
+  async componentDidLoad() {
+    (window as any).requestIdleCallback(async () => {
+      console.log('updating local');
+      const data = await getSavedImages();
+      console.log(data);
+      await set('images', data.images);
+    });
+  }
+
+  async refreshImages() {
+    const loading = await loadingController.create({
+      message: "Loading images from the cloud..."
+    });
+    await loading.present();
+
+    console.log('trying to get images from the cloud');
+    try {
+      const data = await getSavedImages();
+      console.log(data);
+
+      this.images = data.images
+
+      await loading.dismiss();
+
+      await set('images', this.images);
+    }
+    catch (err) {
+      console.error(err);
+      await loading.dismiss();
+    }
   }
 
   choose(url: string, name: string) {
@@ -101,7 +155,7 @@ export class AppImages {
   async uploadToDrive(image, ev) {
     ev.preventDefault();
 
-    const sheet = await this.actionSheetCtrl.create({
+    const sheet = await actionSheetCtrl.create({
       header: "Share",
       buttons: [
         {
@@ -145,7 +199,7 @@ export class AppImages {
 
                 saveImages(remoteImages);*/
 
-                const toast = await this.toastCtrl.create({
+                const toast = await toastCtrl.create({
                   message: "Board uploaded to OneDrive",
                   duration: 1800
                 });
@@ -154,7 +208,7 @@ export class AppImages {
               catch (err) {
                 console.error(err);
 
-                const toast = await this.toastCtrl.create({
+                const toast = await toastCtrl.create({
                   message: "Upload failed, try again later",
                   duration: 1800
                 });
@@ -223,7 +277,7 @@ export class AppImages {
       console.error(err);
     }*/
 
-    const sheet = await this.actionSheetCtrl.create({
+    const sheet = await actionSheetCtrl.create({
       header: 'Sharing',
       buttons: [
         {
@@ -251,7 +305,7 @@ export class AppImages {
                 else {
                   await navigator.clipboard.writeText(shareURL.link.webUrl);
 
-                  const toast = await this.toastCtrl.create({
+                  const toast = await toastCtrl.create({
                     message: "Sharing URL saved to clipboard",
                     duration: 1800
                   });
@@ -263,8 +317,8 @@ export class AppImages {
               }
 
             }, {
-                timeout: 1200
-              })
+              timeout: 1200
+            })
 
           }
         },
@@ -282,8 +336,8 @@ export class AppImages {
               anchor.click();
               window.URL.revokeObjectURL(image.url);
             }, {
-                timeout: 1200
-              })
+              timeout: 1200
+            })
           }
         }
       ]
@@ -339,7 +393,7 @@ export class AppImages {
     if (file_handle) {
       document.querySelector('app-canvas').writeNativeFile(file_handle);
     }
-    
+
     this.close();
   }
 
@@ -354,6 +408,10 @@ export class AppImages {
             </ion-title>
 
             <ion-buttons slot="end">
+              <ion-button onClick={() => this.refreshImages()}>
+                <ion-icon name="refresh-circle"></ion-icon>
+              </ion-button>
+
               {"chooseFileSystemEntries" in window ? <ion-button onClick={() => this.openNativeFile()}>
                 <ion-icon name="folder"></ion-icon>
               </ion-button> : null}

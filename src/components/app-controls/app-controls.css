@@ -33,7 +33,7 @@
   padding-right: 0.9em;
   padding-top: 8px;
   padding-bottom: 8px;
-  box-shadow: 0px -3px 14px 0px rgba(173, 173, 173, 1);
+  box-shadow: 0px 0px 14px 4px rgba(25, 118, 210, 0.51);
 }
 
 @media (max-width: 600px) {
@@ -193,7 +193,7 @@
   color: white;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  box-shadow: 0px 0px 14px 4px rgba(25, 118, 210, 0.51);
   font-size: 1.4em;
   width: 2.4em;
   height: 2.4em;

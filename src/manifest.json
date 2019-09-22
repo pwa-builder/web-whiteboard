@@ -10,7 +10,7 @@
     "description": "Enhance your work day and solve your cross platform whiteboarding needs with webboard! Draw text, shapes, attach images and more and share those whiteobards with anyone through OneDrive!",
     "orientation": "Portrait",
     "background_color": "#1976d2",
-    "related_applications": "",
+    "related_applications": [],
     "prefer_related_applications": false,
     "icons": [
         {

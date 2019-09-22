@@ -1,4 +1,5 @@
-import { Component, Element, Event, EventEmitter, State, Prop, h } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, State, h } from '@stencil/core';
+import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl, toastController as toastCtrl } from '@ionic/core';
 
 
 @Component({
@@ -6,11 +7,6 @@ import { Component, Element, Event, EventEmitter, State, Prop, h } from '@stenci
   styleUrl: 'app-controls.css'
 })
 export class AppControls {
-
-  @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
-  @Prop({ connect: 'ion-popover-controller' }) popoverCtrl: HTMLIonPopoverControllerElement | null = null;
-  @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
-  @Prop({ connect: 'ion-alert-controller' }) alertCtrl: HTMLIonAlertControllerElement | null = null;
 
   @State() openColors: boolean = false;
   @State() erasing: boolean = false;
@@ -69,7 +65,7 @@ export class AppControls {
       this.eraserMode.emit();
       this.erasing = true;
 
-      const eraseToast = await this.toastCtrl.create({
+      const eraseToast = await toastCtrl.create({
         message: 'erase mode',
         duration: 1300,
         position: 'top'
@@ -80,7 +76,7 @@ export class AppControls {
       this.erasing = false;
       this.penMode.emit();
 
-      const penToast = await this.toastCtrl.create({
+      const penToast = await toastCtrl.create({
         message: 'pen mode',
         duration: 1300,
         position: 'top'
@@ -103,7 +99,7 @@ export class AppControls {
   }
 
   async openSettings(ev: Event) {
-    const popover = await this.popoverCtrl.create({
+    const popover = await popoverCtrl.create({
       component: 'app-settings',
       event: ev
     });
@@ -123,7 +119,7 @@ export class AppControls {
   }
 
   async addImagePop() {
-    /*const popover = await this.popoverCtrl.create({
+    /*const popover = await popoverCtrl.create({
       component: 'image-popover',
       event: ev
     });
@@ -139,7 +135,7 @@ export class AppControls {
     );
 
     jumpAni.onfinish = async () => {
-      const modal = await this.modalCtrl.create({
+      const modal = await modalCtrl.create({
         component: 'image-popover'
       });
       await modal.present();
@@ -147,7 +143,7 @@ export class AppControls {
   }
 
   async turnAI() {
-    const modal = await this.modalCtrl.create({
+    const modal = await modalCtrl.create({
       component: 'ai-popover',
     });
 
@@ -155,7 +151,7 @@ export class AppControls {
   }
 
   async openColorVision() {
-    const modal = await this.modalCtrl.create({
+    const modal = await modalCtrl.create({
       component: 'color-modal'
     });
     await modal.present();
@@ -167,7 +163,7 @@ export class AppControls {
     if (colorData.data && colorData.data.length > 0) {
       this.selectColor(`#${colorData.data}`);
 
-      const toast = await this.toastCtrl.create({
+      const toast = await toastCtrl.create({
         message: `Found this color: #${colorData.data}`,
         duration: 1200,
         position: "top",
@@ -177,7 +173,7 @@ export class AppControls {
   }
 
   async exportToNote() {
-    const alert = await this.alertCtrl.create({
+    const alert = await alertCtrl.create({
       header: 'Confirm',
       subHeader: 'export to onenote',
       message: 'Export to OneNote?',

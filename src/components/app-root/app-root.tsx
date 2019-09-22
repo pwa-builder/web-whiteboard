@@ -1,13 +1,11 @@
-import { Component, Prop, Listen, h } from '@stencil/core';
+import { Component, Listen, h } from '@stencil/core';
+import { toastController as toastCtrl } from '@ionic/core';
 
 @Component({
   tag: 'app-root',
   styleUrl: 'app-root.css'
 })
 export class AppRoot {
-
-  @Prop({ connect: 'ion-toast-controller' })
-  toastCtrl: HTMLIonToastControllerElement;
 
   @Listen("swUpdate", { target: 'window' })
   async onSWUpdate() {
@@ -20,7 +18,7 @@ export class AppRoot {
       return;
     }
 
-    const toast = await this.toastCtrl.create({
+    const toast = await toastCtrl.create({
       message: "New version available",
       showCloseButton: true,
       closeButtonText: "Reload"

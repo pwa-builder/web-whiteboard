@@ -1,4 +1,5 @@
-import { Component, h, State, Prop } from '@stencil/core';
+import { Component, h, State } from '@stencil/core';
+import { modalController as modalCtrl } from '@ionic/core';
 
 
 @Component({
@@ -39,8 +40,6 @@ export class PWAInstall {
   @State() deferredPrompt: any;
   @State() showInstall: boolean = false;
 
-  @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
-
   componentDidLoad() {
     console.log('in here');
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -55,7 +54,7 @@ export class PWAInstall {
   }
 
   async install() {
-    const modal = await this.modalCtrl.create({
+    const modal = await modalCtrl.create({
       component: 'install-modal',
       cssClass: 'installModal',
       componentProps: {

@@ -1,4 +1,5 @@
-import { Component, Element, Prop, State, h } from '@stencil/core';
+import { Component, Element, State, h } from '@stencil/core';
+import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl} from '@ionic/core';
 
 @Component({
   tag: 'app-home',
@@ -14,10 +15,6 @@ export class AppHome {
   @State() grid: boolean = false;
   @State() dragMode: boolean = false;
   @State() currentFileName: string | null = null;
-
-  @Prop({ connect: 'ion-alert-controller' }) alertCtrl: HTMLIonAlertControllerElement | null = null;
-  @Prop({ connect: 'ion-modal-controller' }) modalCtrl: HTMLIonModalControllerElement | null = null;
-  @Prop({ connect: 'ion-popover-controller' }) popoverCtrl: HTMLIonPopoverControllerElement | null = null;
 
   changeColor(ev: CustomEvent) {
     console.log(ev.detail);
@@ -41,8 +38,8 @@ export class AppHome {
     if ("chooseFileSystemEntries" in window) {
       appCanvas.saveCanvas('');
     }
-    else if (this.alertCtrl) {
-      const alert = await this.alertCtrl.create({
+    else if (alertCtrl) {
+      const alert = await alertCtrl.create({
         header: 'File Name',
         subHeader: 'Enter a name for the file',
         inputs: [
@@ -90,7 +87,7 @@ export class AppHome {
   async allImages() {
     this.savedImage = null;
 
-    const modal = await this.modalCtrl.create({
+    const modal = await modalCtrl.create({
       component: 'app-images',
       cssClass: 'imagesModal'
     });
@@ -132,7 +129,7 @@ export class AppHome {
   }
 
   async openSettings(ev: Event) {
-    const popover = await this.popoverCtrl.create({
+    const popover = await popoverCtrl.create({
       component: 'app-settings',
       event: ev
     });

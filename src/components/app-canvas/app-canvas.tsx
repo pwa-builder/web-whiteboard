@@ -1,4 +1,5 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
+import { toastController as toastCtrl, alertController as alertCtrl } from '@ionic/core';
 
 import { set, get, del } from 'idb-keyval';
 
@@ -6,6 +7,7 @@ import { b64toBlob } from '../../helpers/utils';
 import { getNewFileHandle, readFile } from '../../helpers/files-api';
 
 import { exportToOneNote } from '../../services/graph';
+import { saveImagesS } from '../../services/api';
 
 @Component({
   tag: 'app-canvas',
@@ -19,9 +21,6 @@ export class AppCanvas {
   @Prop() mode: string = 'pen';
   @Prop() savedDrawing: string | null = null;
   @Prop({ mutable: true }) dragMode: boolean = false;
-
-  @Prop({ connect: 'ion-toast-controller' }) toastCtrl: HTMLIonToastControllerElement | null = null;
-  @Prop({ connect: 'ion-alert-controller' }) alertCtrl: HTMLIonAlertControllerElement | null = null;
 
   @State() drawing: boolean = false;
   @State() copyingText: boolean = false;
@@ -268,7 +267,7 @@ export class AppCanvas {
           await navigator.clipboard.writeText(fullText);
 
           (window as any).requestIdleCallback(async () => {
-            const toast = await this.toastCtrl.create({
+            const toast = await toastCtrl.create({
               message: 'Text copied to clipboard',
               duration: 1200
             });
@@ -282,7 +281,7 @@ export class AppCanvas {
         this.copyingText = false;
 
         (window as any).requestIdleCallback(async () => {
-          const toast = await this.toastCtrl.create({
+          const toast = await toastCtrl.create({
             message: 'No text to copy',
             duration: 1200
           });
@@ -341,13 +340,14 @@ export class AppCanvas {
         let remoteImages = [];
 
         images.forEach((image) => {
-          if (image.id) {
-            remoteImages.push({ id: image.id, name: image.name });
+          console.log(image);
+          if (image) {
+            remoteImages.push(image);
           }
         });
 
 
-        // await saveImages(remoteImages);
+        await this.saveImages(remoteImages);
       }
       else {
         const handle = await this.saveToFS();
@@ -365,13 +365,13 @@ export class AppCanvas {
         let remoteImages = [];
 
         images.forEach((image) => {
-          if (image.id) {
-            remoteImages.push({ id: image.id, name: image.name });
+          if (image) {
+            remoteImages.push(image);
           }
         });
 
 
-        // await saveImages(remoteImages);
+        await this.saveImages(remoteImages);
       }
     }
     else {
@@ -389,17 +389,13 @@ export class AppCanvas {
 
         let remoteImages = [];
 
-        if (images && images.length > 0) {
-          images.forEach((image) => {
-            if (image.id) {
-              remoteImages.push({ id: image.id, name: image.name });
-            }
-          });
-        }
+        images.forEach((image) => {
+          if (image) {
+            remoteImages.push({ id: image.id, name: image.name });
+          }
+        });
 
-
-
-        // await saveImages(remoteImages);
+        await this.saveImages(remoteImages);
       }
       else {
         const handle = await this.saveToFS();
@@ -414,18 +410,22 @@ export class AppCanvas {
 
         let remoteImages = [];
 
-        if (images && images.length > 0) {
-          images.forEach((image) => {
-            if (image.id) {
-              remoteImages.push({ id: image.id, name: image.name });
-            }
-          });
-        }
+        images.forEach((image) => {
+          if (image) {
+            remoteImages.push({ id: image.id, name: image.name });
+          }
+        });
 
-        // await saveImages(remoteImages);
+
+        await this.saveImages(remoteImages);
       }
     }
 
+  }
+
+  async saveImages(images: any[]) {
+    console.log(images);
+    await saveImagesS(images);
   }
 
   async saveToFS() {
@@ -598,19 +598,22 @@ export class AppCanvas {
         this.context.lineWidth = 10;
       }
 
+      this.lastPos = this.mousePos;
+
       this.context.stroke();
       this.context.closePath();
 
-      this.lastPos = this.mousePos;
     }
     else if (this.drawing && this.mode === 'erase') {
       this.context.globalCompositeOperation = 'destination-out';
       this.context.beginPath();
       this.context.moveTo(this.lastPos.x, this.lastPos.y);
       this.context.lineTo(this.mousePos.x, this.mousePos.y);
+
+      this.lastPos = this.mousePos;
+
       this.context.stroke();
       this.context.closePath();
-      this.lastPos = this.mousePos;
     }
 
     requestAnimationFrame(() => this.renderCanvas());
@@ -624,7 +627,7 @@ export class AppCanvas {
       base_image.src = imageString;
 
       base_image.onload = async () => {
-        const toast = await this.toastCtrl.create({
+        const toast = await toastCtrl.create({
           message: "Tap where you would like the image"
         })
         await toast.present();
@@ -634,7 +637,7 @@ export class AppCanvas {
 
         this.canvasElement.addEventListener('click', async function handler(ev) {
 
-          context.drawImage(base_image, ev.clientX, ev.clientY, 400, 400);
+          context.drawImage(base_image, ev.clientX, ev.clientY, base_image.width - 400, base_image.height - 400);
           await toast.dismiss();
 
           canvasElement.removeEventListener('click', handler);
@@ -645,7 +648,7 @@ export class AppCanvas {
 
   @Method()
   async exportToOneNote() {
-    const alert = await this.alertCtrl.create({
+    const alert = await alertCtrl.create({
       header: "Name",
       message: "Your board will be uploaded to OneDrive first, what would you like to name it?",
       inputs: [

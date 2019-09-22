@@ -14,7 +14,7 @@
     "test.watch": "stencil test --spec --e2e --watch"
   },
   "dependencies": {
-    "@ionic/core": "^4.9.0",
+    "@ionic/core": "^4.9.1",
     "@microsoft/mgt": "^0.1.1",
     "comlink": "^4.0.1",
     "idb-keyval": "^3.2.0",
