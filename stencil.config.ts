@@ -9,12 +9,16 @@ export const config: Config = {
       serviceWorker: {
         swSrc: 'src/sw.js'
       },
+      baseUrl: "https://webboard-app.web.app",
       copy: [
         {
           src: "icons"
         },
         {
           src: ".well-known"
+        },
+        {
+          src: "mgt.js"
         }
       ]
     }

@@ -24,11 +24,9 @@
 
   <link href="/build/app.css" rel="stylesheet">
 
+  <link rel="preload" href="mgt.js" as="script">
+
   <link rel="preconnect" href="https://static2.sharepointonline.com">
-
-  <script src="https://unpkg.com/@microsoft/mgt/dist/bundle/mgt-loader.js"></script>
-
-  <!--<script src="node_modules/@microsoft/mgt/dist/bundle/mgt-loader.js"></script>-->
 
   <script>
     window.requestIdleCallback =
@@ -59,10 +57,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icon/apple-touch-icon.png">
   <link rel="icon" type="image/x-icon" href="/assets/icon/favicon.ico">
   <link rel="manifest" href="/manifest.json">
+
 </head>
 
 <body>
-  <app-root></app-root>
+  <app-root>
+  </app-root>
+
+  <script src="mgt.js"></script>
 </body>
 
 </html>

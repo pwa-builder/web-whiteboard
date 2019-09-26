@@ -519,28 +519,25 @@ export class AppCanvas {
     this.drawing = false;
 
     this.mousePos = { x: 0, y: 0 };
-    this.lastPos = this.mousePos;
+    // this.lastPos = this.mousePos;
+    // this.lastPos = { x: 0, y: 0 };
 
     // handle mouse events
     this.canvasElement.addEventListener("pointerdown", (e) => {
-
+      console.log('pointer down');
       this.lastPos = this.getMousePos(this.canvasElement, e);
 
-      if (e.pointerType === 'touch') {
-        setTimeout(() => {
-          this.drawing = true;
-        }, 20)
-      }
-      else {
+      if (e.pointerType !== 'touch') {
         this.drawing = true;
       }
     });
 
-    this.canvasElement.addEventListener("pointerup", (e) => {
+    this.canvasElement.addEventListener("pointerup", () => {
       console.log('pointer up');
       this.drawing = false;
 
-      this.mousePos = this.getMousePos(this.canvasElement, e);
+      // this.lastPos = this.getMousePos(this.canvasElement, e);
+      this.lastPos = null;
 
       (window as any).requestIdleCallback(async () => {
         let canvasState = this.canvasElement.toDataURL();
@@ -566,6 +563,10 @@ export class AppCanvas {
       this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
         this.mousePos = this.getMousePos(this.canvasElement, e);
 
+        if (e.pointerType === "touch") {
+          this.drawing = true;
+        }
+
         const allEvents = (e as any).getPredictedEvents();
         if (allEvents.length > 0) {
           for (let i = 0; i < allEvents.length; i++) {
@@ -580,6 +581,10 @@ export class AppCanvas {
     else {
       this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
         this.mousePos = this.getMousePos(this.canvasElement, e);
+
+        if (e.pointerType === "touch") {
+          this.drawing = true;
+        }
       });
     }
   }
@@ -599,22 +604,24 @@ export class AppCanvas {
   renderCanvas() {
     if (this.drawing && this.mode === 'pen') {
 
-      this.context.globalCompositeOperation = 'source-over';
-      this.context.beginPath();
-      this.context.moveTo(this.lastPos.x, this.lastPos.y);
-      this.context.lineTo(this.mousePos.x, this.mousePos.y);
+      if (this.lastPos) {
+        this.context.globalCompositeOperation = 'source-over';
+        this.context.beginPath();
+        this.context.moveTo(this.lastPos.x, this.lastPos.y);
+        this.context.lineTo(this.mousePos.x, this.mousePos.y);
 
-      if (this.mousePos.type !== 'mouse') {
-        this.context.lineWidth = this.mousePos.width - 20;
-      }
-      else {
-        this.context.lineWidth = 10;
+        if (this.mousePos.type !== 'mouse') {
+          this.context.lineWidth = this.mousePos.width - 20;
+        }
+        else {
+          this.context.lineWidth = 10;
+        }
+
+        this.context.stroke();
+        this.context.closePath();
       }
 
       this.lastPos = this.mousePos;
-
-      this.context.stroke();
-      this.context.closePath();
 
     }
     else if (this.drawing && this.mode === 'erase') {
@@ -627,10 +634,10 @@ export class AppCanvas {
         this.context.lineWidth = 30;
       }
 
-      this.lastPos = this.mousePos;
-
       this.context.stroke();
       this.context.closePath();
+
+      this.lastPos = this.mousePos;
     }
 
     requestAnimationFrame(() => this.renderCanvas());

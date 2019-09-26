@@ -370,7 +370,6 @@ export class AppImages {
         if (image.name.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1) {
           searchImages.push(image);
         }
-        // return (item.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1);
       });
 
       if (searchImages.length > 0) {
