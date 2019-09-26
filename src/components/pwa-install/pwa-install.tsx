@@ -8,7 +8,7 @@ import { modalController as modalCtrl } from '@ionic/core';
     #desktopInstallButton {
       position: fixed;
       top: 2em;
-      right: 15em;
+      right: 20em;
       background: #1976d2;
       color: white;
       font-size: 12px;

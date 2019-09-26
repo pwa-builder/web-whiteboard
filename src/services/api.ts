@@ -11,6 +11,7 @@ export async function saveImagesS(images: any) {
   const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
 
   if (images && user) {
+    
     console.log('making a request');
     const response = await fetch(`${url}/images`, {
       method: "POST",

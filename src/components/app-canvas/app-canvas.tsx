@@ -102,18 +102,6 @@ export class AppCanvas {
     this.fileHandle = fileHandler;
 
     if (this.fileHandle) {
-      /*let tempImage = new Image();
-
-      tempImage.onload = async () => {
-        console.log('image loaded');
-        await this.clearCanvas();
-
-        this.context.drawImage(tempImage, 0, 0);
-
-        tempImage = null
-      }
-      tempImage.src = this.savedDrawing;*/
-
       const fileContents: any = await readFile(this.fileHandle);
       console.log(fileContents);
 
@@ -311,15 +299,22 @@ export class AppCanvas {
         byteArr[i] = bytes.charCodeAt(i);
       }
 
-      const response = await fetch(`https://westus2.api.cognitive.microsoft.com/vision/v2.0/analyze?visualFeatures=Tags,Color,Description`, {
-        headers: {
-          "Ocp-Apim-Subscription-Key": "d930861b5bba49e5939b843f9c4e5846",
-          "Content-Type": "application/octet-stream"
-        },
-        method: "POST",
-        body: byteArr
-      });
-      const data = await response.json();
+      let data = null;
+
+      try {
+        const response = await fetch(`https://westus2.api.cognitive.microsoft.com/vision/v2.0/analyze?visualFeatures=Tags,Color,Description`, {
+          headers: {
+            "Ocp-Apim-Subscription-Key": "d930861b5bba49e5939b843f9c4e5846",
+            "Content-Type": "application/octet-stream"
+          },
+          method: "POST",
+          body: byteArr
+        });
+        data = await response.json();
+
+      } catch (error) {
+        console.error(error);
+      }
 
       console.log(data);
 
