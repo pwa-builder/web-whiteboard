@@ -564,14 +564,17 @@ export class AppCanvas {
 
     if ((PointerEvent.prototype as any).getPredictedEvents) {
       this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
+        this.mousePos = this.getMousePos(this.canvasElement, e);
+
         const allEvents = (e as any).getPredictedEvents();
         if (allEvents.length > 0) {
-          allEvents.forEach(e => {
-            this.mousePos = this.getMousePos(this.canvasElement, e);
-          });
+          for (let i = 0; i < allEvents.length; i++) {
+            if (i === allEvents.length - 1) {
+              this.mousePos = this.getMousePos(this.canvasElement, e)
+            }
+          }
         }
 
-        this.mousePos = this.getMousePos(this.canvasElement, e);
       });
     }
     else {
