@@ -535,16 +535,18 @@ export class AppCanvas {
 
         setTimeout(() => {
           this.drawing = true;
-        }, 10)
+        }, 20)
       }
       else {
         this.drawing = true;
       }
     }, { passive: false });
 
-    this.canvasElement.addEventListener("pointerup", () => {
+    this.canvasElement.addEventListener("pointerup", (e) => {
       console.log('pointer up');
       this.drawing = false;
+
+      this.mousePos = this.getMousePos(this.canvasElement, e);
 
       (window as any).requestIdleCallback(async () => {
         let canvasState = this.canvasElement.toDataURL();
@@ -643,7 +645,7 @@ export class AppCanvas {
 
         // weirdness
         let that = this;
-        this.canvasElement.addEventListener('click', async function handler (ev) {
+        this.canvasElement.addEventListener('click', async function handler(ev) {
           context.drawImage(base_image, ev.clientX, ev.clientY, base_image.width - 400, base_image.height - 400);
           await toast.dismiss();
 

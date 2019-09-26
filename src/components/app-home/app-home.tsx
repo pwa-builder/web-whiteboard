@@ -16,6 +16,26 @@ export class AppHome {
   @State() dragMode: boolean = false;
   @State() currentFileName: string | null = null;
 
+  wakeLockController: any;
+
+  componentDidLoad() {
+    this.setupWakeLock();
+  }
+  
+  async setupWakeLock() {
+    if ('WakeLock' in window) {
+      this.wakeLockController = new AbortController();
+      const signal = this.wakeLockController.signal;
+
+      try {
+        await (window as any).WakeLock.request('screen', { signal })
+      } 
+      catch (err) {
+        console.error(err);
+      }
+    }
+  }
+
   changeColor(ev: CustomEvent) {
     console.log(ev.detail);
     this.color = ev.detail;
@@ -149,6 +169,12 @@ export class AppHome {
     console.log('exporting...');
     const appCanvas = this.el.querySelector('app-canvas');
     await appCanvas.exportToOneNote();
+  }
+
+  componentDidUnload() {
+    if (this.wakeLockController) {
+      this.wakeLockController.abort();
+    }
   }
 
   render() {
