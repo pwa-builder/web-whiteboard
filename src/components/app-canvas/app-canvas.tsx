@@ -527,7 +527,6 @@ export class AppCanvas {
       this.lastPos = this.getMousePos(this.canvasElement, e);
 
       if (e.pointerType === 'touch') {
-
         setTimeout(() => {
           this.drawing = true;
         }, 20)
@@ -535,7 +534,7 @@ export class AppCanvas {
       else {
         this.drawing = true;
       }
-    }, { passive: false });
+    });
 
     this.canvasElement.addEventListener("pointerup", (e) => {
       console.log('pointer up');
@@ -561,11 +560,25 @@ export class AppCanvas {
         }
 
       })
-    }, { passive: false });
+    });
 
-    this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
-      this.mousePos = this.getMousePos(this.canvasElement, e);
-    }, { passive: false });
+    if ((PointerEvent.prototype as any).getPredictedEvents) {
+      this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
+        const allEvents = (e as any).getPredictedEvents();
+        if (allEvents.length > 0) {
+          allEvents.forEach(e => {
+            this.mousePos = this.getMousePos(this.canvasElement, e);
+          });
+        }
+
+        this.mousePos = this.getMousePos(this.canvasElement, e);
+      });
+    }
+    else {
+      this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
+        this.mousePos = this.getMousePos(this.canvasElement, e);
+      });
+    }
   }
 
   getMousePos(canvasDom, mouseEvent) {
