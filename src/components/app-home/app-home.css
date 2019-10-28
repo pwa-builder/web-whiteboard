@@ -1,3 +1,10 @@
+#pwaInstallButton {
+  position: fixed;
+  z-index: -1;
+  top: 20px;
+  right: 18em;
+}
+
 #settingsButton {
   font-size: 18px;
 }
@@ -9,19 +16,16 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
+  background: white;
 
   box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.37);
   border-radius: 24px;
   min-width: 202px;
-
+  z-index: -1;
 }
 
 .login-button {
   border-radius: 24px;
-}
-
-app-home {
-  background: white;
 }
 
 #fileNameDiv {
@@ -34,7 +38,16 @@ app-home {
   align-items: center;
 }
 
-@media(max-width: 500px) {
+app-canvas {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -2;
+}
+
+@media (max-width: 500px) {
   #fileNameDiv {
     display: none;
   }
@@ -66,7 +79,7 @@ app-home {
   }
 }
 
-@media(min-width: 1200px) {
+@media (min-width: 1200px) {
   .imagesModal {
     --width: 56em !important;
   }

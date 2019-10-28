@@ -28,6 +28,12 @@ import { Component, Element, h, State } from '@stencil/core';
       margin-top: 2em;
     }
 
+    @media (min-width: 800px) {
+      .swiper-slide#slideOne ion-button {
+        margin-top: 4em;
+      }
+    }
+
     #slideOne h2 {
       font-weight: bold;
     }
@@ -59,22 +65,27 @@ export class AiPopover {
     await this.el.querySelector('ion-slides').slideNext();
 
     setTimeout(async () => {
-      await this.el.closest('ion-modal').dismiss();
+      await this.close();
     }, 1600)
   }
 
   async turnOff() {
     localStorage.removeItem('ai');
-    await this.el.closest('ion-modal').dismiss();
+    await this.close();
   }
 
   async close() {
-    (this.el.closest('ion-modal') as any).dismiss();
+    try {
+      await (this.el.closest('ion-modal') as any).dismiss();
+    }
+    catch (err) {
+      await (this.el.closest('ion-popover') as any).dismiss();
+    }
   }
 
   render() {
     return [
-      <ion-header>
+      <ion-header no-border>
         <ion-toolbar>
           <ion-buttons slot="end">
             <ion-button onClick={() => this.close()}>

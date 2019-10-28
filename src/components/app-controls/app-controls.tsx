@@ -10,6 +10,7 @@ export class AppControls {
 
   @State() openColors: boolean = false;
   @State() erasing: boolean = false;
+  @State() changePenWidth: boolean = false;
 
   @Event() colorSelected: EventEmitter;
   @Event() clearCanvas: EventEmitter;
@@ -21,12 +22,29 @@ export class AppControls {
   @Event() addImage: EventEmitter;
   @Event() dragMode: EventEmitter;
   @Event() export: EventEmitter;
+  @Event() doShare: EventEmitter;
 
   @Element() el: HTMLElement;
+
+  penWidth: number;
 
   changeColor() {
     this.penMode.emit();
     this.openColors = true;
+  }
+
+  handleWidth(event) {
+    const canvas: HTMLCanvasElement = document.querySelector("#regCanvas");
+
+    if (event.detail.value) {
+      canvas.getContext('2d').lineWidth = event.detail.value;
+
+      (window as any).requestIdleCallback(() => {
+        this.penWidth = event.detail.value;
+      }, {
+        timeout: '2000'
+      })
+    }
   }
 
   close() {
@@ -99,6 +117,7 @@ export class AppControls {
   }
 
   async openSettings(ev: Event) {
+    console.log(ev);
     const popover = await popoverCtrl.create({
       component: 'app-settings',
       event: ev
@@ -143,12 +162,23 @@ export class AppControls {
     }
   }
 
-  async turnAI() {
-    const modal = await modalCtrl.create({
-      component: 'ai-popover',
-    });
+  async turnAI(ev) {
+    if (window.matchMedia("(min-width: 1200px)").matches) {
+      const popover = await popoverCtrl.create({
+        component: 'ai-popover',
+        event: ev,
+        cssClass: "aiPopover"
+      })
 
-    await modal.present();
+      await popover.present();
+    }
+    else {
+      const modal = await modalCtrl.create({
+        component: 'ai-popover',
+      });
+
+      await modal.present();
+    }
   }
 
   async openColorVision() {
@@ -198,10 +228,14 @@ export class AppControls {
     await alert.present();
   }
 
+  deskShare() {
+    this.doShare.emit();
+  }
+
   render() {
     return [
       <div id="main">
-        <button id="aiButton" onClick={() => this.turnAI()}>
+        <button id="aiButton" onClick={(event) => this.turnAI(event)}>
           <ion-icon name="eye"></ion-icon>
 
           <span id="aiSpan">AI</span>
@@ -216,6 +250,10 @@ export class AppControls {
             <button onClick={() => this.save()} id='saveButton'>
               <ion-icon name='save'></ion-icon>
             </button>
+
+            { typeof((navigator as any).canShare) === "function" ? <button id="deskShareButton" onClick={() => this.deskShare()}>
+              <ion-icon name="share"></ion-icon>
+            </button> : null }
 
           </div> :
 
@@ -233,7 +271,11 @@ export class AppControls {
                   <ion-icon name="save"></ion-icon>
                 </ion-fab-button>
 
-                <ion-fab-button color="primary" onClick={() => this.turnAI()}>
+                {typeof((navigator as any).canShare) === "function" ? <ion-fab-button color="primary" onClick={() => this.deskShare()}>
+                  <ion-icon name="share"></ion-icon>
+                </ion-fab-button> : null}
+
+                <ion-fab-button color="light" onClick={(event) => this.turnAI(event)}>
                   ai
                 </ion-fab-button>
 

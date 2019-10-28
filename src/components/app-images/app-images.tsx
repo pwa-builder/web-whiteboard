@@ -39,7 +39,9 @@ export class AppImages {
       console.log(images);
 
       if (images) {
-        this.images = images;
+        this.images = this.cleanImages(images);
+
+        saveImagesS(this.images);
 
         const imageWorker = new Worker('/assets/canvas-worker.js');
         imageWorker.postMessage({ name: 'cloudImages', data: this.images });
@@ -62,7 +64,7 @@ export class AppImages {
           const data = await getSavedImages();
           console.log(data);
 
-          this.images = data.images
+          this.images = this.cleanImages(data.images);
 
           await loading.dismiss();
 
@@ -83,9 +85,26 @@ export class AppImages {
     (window as any).requestIdleCallback(async () => {
       console.log('updating local');
       const data = await getSavedImages();
-      console.log(data);
-      await set('images', data.images);
+      console.log('data', data);
+
+      if (data.images) {
+        await set('images', data.images);
+      }
     });
+  }
+
+  cleanImages(images: any[]) {
+    let cleanImages = [];
+
+    images.forEach((image) => {
+      if (image.url) {
+        cleanImages.push(image);
+      }
+    });
+
+    if (cleanImages.length > 0) {
+      return cleanImages;
+    }
   }
 
   async refreshImages() {

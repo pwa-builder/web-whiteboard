@@ -8,6 +8,42 @@
   right: 0;
   display: flex;
   justify-content: center;
+  z-index: -2;
+}
+
+#penWidthDetail {
+  margin-right: 12px;
+  transition: width 200ms;
+}
+
+#penWidth {
+  position: fixed;
+  right: 0;
+  top: 6em;
+
+  --pen-setheight: 50px;
+  height: var(--pen-setheight);
+  background: white;
+  padding: 10px;
+  box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.37);
+  border-radius: 5px 0 0 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 1.4em;
+  transition: --pen-setheight 200ms;
+}
+
+#penWidth:hover {
+  --pen-setheight: 78px;
+}
+
+.aiPopover.sc-ion-popover-md-h {
+  --width: 400px;
+}
+
+.openPen {
+  --pen-setheight: 78px !important;
 }
 
 #controlsBlock #oneSvg svg {
@@ -16,7 +52,7 @@
 }
 
 #aiButton {
-  z-index: 9999;
+  z-index: -1;
   position: fixed;
   background: #1976d2;
   left: 20px;
@@ -33,6 +69,7 @@
   padding-right: 0.9em;
   padding-top: 8px;
   padding-bottom: 8px;
+  pointer-events: all;
   box-shadow: 0px 0px 14px 4px rgba(25, 118, 210, 0.51);
 }
 
@@ -149,6 +186,7 @@
   position: fixed;
   top: 82px;
   left: 16px;
+  z-index: -1;
 }
 
 #saveButton {
@@ -162,6 +200,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#deskShareButton {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  font-size: 1.4em;
+  width: 2.4em;
+  height: 2.4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 18px;
 }
 
 #tasksButton {
@@ -230,6 +282,15 @@
 
   to {
     transform: translateY(0);
+  }
+}
+
+@keyframes openPen {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1.5);
   }
 }
 

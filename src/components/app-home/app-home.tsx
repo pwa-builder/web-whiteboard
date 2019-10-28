@@ -1,5 +1,7 @@
-import { Component, Element, State, h } from '@stencil/core';
-import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl} from '@ionic/core';
+import { Component, Element, Listen, State, h } from '@stencil/core';
+import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl } from '@ionic/core';
+
+import '@pwabuilder/pwainstall';
 
 @Component({
   tag: 'app-home',
@@ -15,13 +17,19 @@ export class AppHome {
   @State() grid: boolean = false;
   @State() dragMode: boolean = false;
   @State() currentFileName: string | null = null;
+  @State() canInstall: boolean = false;
 
   wakeLockController: any;
 
-  componentDidLoad() {
-    this.setupWakeLock();
+  async componentDidLoad() {
+    await this.setupWakeLock();
   }
-  
+
+  @Listen('beforeinstallprompt', { target: 'window' })
+  handleInstall() {
+    this.canInstall = true;
+  }
+
   async setupWakeLock() {
     if ('WakeLock' in window) {
       this.wakeLockController = new AbortController();
@@ -29,7 +37,7 @@ export class AppHome {
 
       try {
         await (window as any).WakeLock.request('screen', { signal })
-      } 
+      }
       catch (err) {
         console.error(err);
       }
@@ -149,6 +157,7 @@ export class AppHome {
   }
 
   async openSettings(ev: Event) {
+    console.log(ev);
     const popover = await popoverCtrl.create({
       component: 'app-settings',
       event: ev
@@ -171,6 +180,21 @@ export class AppHome {
     await appCanvas.exportToOneNote();
   }
 
+  openInstall() {
+    const pwaInstall = (this.el.querySelector('pwa-install') as HTMLElement);
+    
+    if (pwaInstall.hasAttribute('openmodal')) {
+      pwaInstall.removeAttribute('openmodal');
+    }
+    else {
+      pwaInstall.setAttribute('openmodal', '');
+    }
+  }
+
+  doShare() {
+    this.el.querySelector('app-canvas').shareCanvas();
+  }
+
   componentDidUnload() {
     if (this.wakeLockController) {
       this.wakeLockController.abort();
@@ -182,13 +206,18 @@ export class AppHome {
       <div class='app-home'>
         <pwa-install></pwa-install>
 
+        {this.canInstall ? <ion-button id="pwaInstallButton" shape="round" size="small" onClick={() => this.openInstall()}>
+          <ion-icon slot="start" name="download"></ion-icon>
+          Install
+        </ion-button> : null}
+
         {this.currentFileName ? <div id="fileNameDiv">
           <span>{this.currentFileName}</span>
         </div> : null}
 
-        <app-canvas dragMode={this.dragMode} savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
+        <app-canvas savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
 
-        <app-controls onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
+        <app-controls onDoShare={() => this.doShare()} onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
 
         <div id="settingsBlock">
           <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(ev) => this.openSettings(ev)} fill="clear">

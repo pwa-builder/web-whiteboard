@@ -7,19 +7,37 @@
     "start_url": "/",
     "short_name": "Webboard",
     "theme_color": "#1976d2",
-    "description": "Enhance your work day and solve your cross platform whiteboarding needs with webboard! Draw text, shapes, attach images and more and share those whiteobards with anyone through OneDrive!",
-    "orientation": "Portrait",
+    "description": "Enhance your work day and solve your cross platform whiteboarding needs with webboard! Draw text, shapes, attach images and more and share those whiteboards with anyone through OneDrive!",
+    "orientation": "any",
     "background_color": "#1976d2",
     "related_applications": [],
     "prefer_related_applications": false,
+    "screenshots": [
+      {
+        "src": "assets/screen.png"
+      },
+      {
+        "src": "assets/screen.png"
+      },
+      {
+        "src": "assets/screen.png"
+      }
+    ],
+    "features": [
+      "Cross Platform",
+      "low-latency inking",
+      "fast",
+      "useful AI"
+    ],
     "icons": [
         {
-            "src": "icons/android/android-launchericon-144-144.png",
-            "sizes": "144x144"
+            "src": "icons/android/android-launchericon-64-64.png",
+            "sizes": "64x64"
         },
         {
             "src": "icons/android/android-launchericon-192-192.png",
-            "sizes": "192x192"
+            "sizes": "192x192",
+            "purpose": "maskable any"
         },
         {
             "src": "icons/android/android-launchericon-48-48.png",
@@ -27,15 +45,12 @@
         },
         {
             "src": "icons/android/android-launchericon-512-512.png",
-            "sizes": "512x512"
+            "sizes": "512x512",
+            "purpose": "maskable"
         },
         {
-            "src": "icons/android/android-launchericon-72-72.png",
-            "sizes": "72x72"
-        },
-        {
-            "src": "icons/android/android-launchericon-96-96.png",
-            "sizes": "96x96"
+            "src": "icons/android/android-launchericon-28-28.png",
+            "sizes": "28x28"
         }
     ]
 }

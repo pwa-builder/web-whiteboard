@@ -34,7 +34,6 @@ export async function getSavedImages() {
   const provider = (window as any).mgt.Providers.globalProvider;
   const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
 
-  console.log('here', user);
   if (user) {
     const response = await fetch(`${url}/getImages`, {
       method: "POST",

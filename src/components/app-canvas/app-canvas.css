@@ -4,7 +4,7 @@
 }
 
 canvas {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
@@ -13,7 +13,7 @@ canvas {
 }
 
 #copyTextButton {
-  z-index: 9999;
+  z-index: -1;
   position: fixed;
   bottom: 8px;
   right: 20px;
@@ -30,4 +30,30 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
+  display: none;
+}
+
+#customContextMenu {
+  z-index: 9999;
+  position: absolute;
+  background: white;
+  opacity: 0;
+  box-shadow: 0 0 14px 4px #00000075;
+  border-radius: 3px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+#customContextMenu button {
+  background: none;
+  font-weight: bold;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+#customContextMenu button:hover {
+  background: #80808045;
 }

@@ -9,6 +9,10 @@ import { getNewFileHandle, readFile } from '../../helpers/files-api';
 import { exportToOneNote } from '../../services/graph';
 import { saveImagesS } from '../../services/api';
 
+import 'pinch-zoom-element';
+
+declare var ClipboardItem;
+
 @Component({
   tag: 'app-canvas',
   styleUrl: 'app-canvas.css'
@@ -24,6 +28,8 @@ export class AppCanvas {
 
   @State() drawing: boolean = false;
   @State() copyingText: boolean = false;
+  @State() openContextMenu: boolean = false;
+  @State() doDrag: boolean = false;
 
   canvasElement: HTMLCanvasElement;
   gridCanvas: HTMLCanvasElement;
@@ -31,10 +37,12 @@ export class AppCanvas {
   context: CanvasRenderingContext2D;
   dragCanvasElement: HTMLCanvasElement;
   dragContext: CanvasRenderingContext2D;
+  contextElement: HTMLDivElement;
   lastPos: any;
   mousePos: any;
   fileHandle: any;
   fileWriter: any;
+  contextAnimation: Animation;
 
   componentDidLoad() {
     console.log('Component has been rendered');
@@ -59,27 +67,92 @@ export class AppCanvas {
       }
     });
 
-    this.canvasElement.oncontextmenu = async (e) => {
+    this.canvasElement.oncontextmenu = async (e: any) => {
       e.preventDefault();
 
-      const clipboardItems = await (navigator.clipboard as any).read();
-      console.log(clipboardItems);
+      this.openContextMenu = true;
 
-      if (clipboardItems) {
-        const blobOutput = await clipboardItems[0].getType('image/png');
+      setTimeout(() => {
+        console.log(e.clientY);
+        console.log(this.contextElement);
+        this.contextElement.style.top = `${e.clientY}px`;
+        this.contextElement.style.left = `${e.clientX}px`;
 
-        if (blobOutput) {
-          const imageURL = window.URL.createObjectURL(blobOutput);
+        this.contextAnimation = this.contextElement.animate([
+          { transform: 'translateY(0)', opacity: 0 },
+          { transform: 'translateY(20px)', opacity: 1 }
+        ], {
+          duration: 100,
+          fill: 'both'
+        })
+      }, 20);
 
-          const tempImage = new Image();
-          tempImage.onload = () => {
-            this.context.drawImage(tempImage, 0, 0);
-          }
-          tempImage.src = imageURL;
 
+      let that = this;
+      this.canvasElement.addEventListener('click', async function handler() {
+        that.contextAnimation.reverse();
+
+        that.contextAnimation.onfinish = () => {
+          that.openContextMenu = false;
         }
+
+        that.canvasElement.removeEventListener('click', handler);
+      });
+
+    }
+  }
+
+  async pasteImage(ev) {
+    console.log(ev);
+    this.contextAnimation.reverse();
+
+    this.contextAnimation.onfinish = () => {
+      console.log('in here');
+      this.openContextMenu = false;
+    }
+
+    const clipboardItems = await (navigator.clipboard as any).read();
+    console.log(clipboardItems);
+
+    if (clipboardItems) {
+
+      let blobOutput = null;
+
+      try {
+        blobOutput = await clipboardItems[0].getType('image/png');
+      }
+      catch (err) {
+        console.error(err);
+      }
+
+      if (blobOutput) {
+        const imageURL = window.URL.createObjectURL(blobOutput);
+
+        const tempImage = new Image();
+        tempImage.onload = () => {
+          this.context.drawImage(tempImage, ev.clientX, ev.clientY);
+        }
+        tempImage.src = imageURL;
+
       }
     }
+  }
+
+  copyImage() {
+    this.contextAnimation.reverse();
+
+    this.contextAnimation.onfinish = () => {
+      this.openContextMenu = false;
+    }
+
+    this.canvasElement.toBlob(async (blob) => {
+      await (navigator.clipboard as any).write([
+        new ClipboardItem(Object.defineProperty({}, blob.type, {
+          value: blob,
+          enumerable: true
+        }))
+      ]);
+    });
   }
 
   @Watch('savedDrawing')
@@ -116,6 +189,28 @@ export class AppCanvas {
       }
       tempImage.src = fileContents;
     }
+  }
+
+  @Method()
+  async shareCanvas() {
+    if ((navigator as any).canShare) {
+      this.canvasElement.toBlob(async (blob) => {
+        console.log(blob);
+
+        const file = new File([blob], "default.jpg");
+
+        if ((navigator as any).canShare && (navigator as any).canShare(file)) {
+          await (navigator as any).share({
+            files: [file],
+            title: 'Whiteboard',
+            text: 'Check out this whiteboard from WebBoard https://webboard-app.web.app',
+          })
+        } else {
+          console.log('Your system doesn\'t support sharing files.');
+        }
+      });
+    }
+
   }
 
   @Watch('color')
@@ -186,6 +281,9 @@ export class AppCanvas {
     this.fileWriter = null;
 
     this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+
+    this.context.fillStyle = 'white';
+    this.context.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
     if (this.savedDrawing) {
       this.savedDrawing = null;
@@ -334,8 +432,10 @@ export class AppCanvas {
 
         let remoteImages = [];
 
+        console.log('going through images');
+
         images.forEach((image) => {
-          console.log(image);
+          console.log('image', image);
           if (image) {
             remoteImages.push(image);
           }
@@ -357,16 +457,8 @@ export class AppCanvas {
           await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage, desc }]);
         }
 
-        let remoteImages = [];
+        // await this.saveImages(remoteImages);
 
-        images.forEach((image) => {
-          if (image) {
-            remoteImages.push(image);
-          }
-        });
-
-
-        await this.saveImages(remoteImages);
       }
     }
     else {
@@ -385,8 +477,9 @@ export class AppCanvas {
         let remoteImages = [];
 
         images.forEach((image) => {
+          console.log(image);
           if (image) {
-            remoteImages.push({ id: image.id, name: image.name });
+            remoteImages.push(image);
           }
         });
 
@@ -402,24 +495,25 @@ export class AppCanvas {
           await set('images', [{ name, url: canvasImage }]);
         }
 
+        /*if (images) {
+          let remoteImages = [];
 
-        let remoteImages = [];
-
-        images.forEach((image) => {
-          if (image) {
-            remoteImages.push({ id: image.id, name: image.name });
-          }
-        });
+          images.forEach((image) => {
+            if (image) {
+              remoteImages.push(image);
+            }
+          });
 
 
-        await this.saveImages(remoteImages);
+          await this.saveImages(remoteImages);
+        }*/
       }
     }
 
   }
 
   async saveImages(images: any[]) {
-    console.log(images);
+    console.log('images before cloudSave', images);
     await saveImagesS(images);
   }
 
@@ -524,7 +618,17 @@ export class AppCanvas {
 
     // handle mouse events
     this.canvasElement.addEventListener("pointerdown", (e) => {
-      console.log('pointer down');
+      console.log('pointerdown', e.ctrlKey);
+
+      if (e.ctrlKey === true) {
+        this.doDrag = true;
+        return;
+      }
+      else {
+        this.doDrag = false;
+      }
+
+      this.canvasElement.setPointerCapture(e.pointerId);
       this.lastPos = this.getMousePos(this.canvasElement, e);
 
       if (e.pointerType !== 'touch') {
@@ -532,8 +636,10 @@ export class AppCanvas {
       }
     });
 
-    this.canvasElement.addEventListener("pointerup", () => {
-      console.log('pointer up');
+    this.canvasElement.addEventListener("pointerup", (e) => {
+      console.log('pointerup');
+      this.canvasElement.releasePointerCapture(e.pointerId);
+
       this.drawing = false;
 
       // this.lastPos = this.getMousePos(this.canvasElement, e);
@@ -612,9 +718,6 @@ export class AppCanvas {
 
         if (this.mousePos.type !== 'mouse') {
           this.context.lineWidth = this.mousePos.width - 20;
-        }
-        else {
-          this.context.lineWidth = 10;
         }
 
         this.context.stroke();
@@ -738,47 +841,27 @@ export class AppCanvas {
     await alert.present();
     const data = await alert.onDidDismiss();
     console.log(data);
-
-    /*const imageUrl = this.canvasElement.toDataURL();
-    const imageBlob = b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
-
-    console.log(imageBlob);
-
-    let provider = (window as any).mgt.Providers.globalProvider;
-    if (provider) {
-      let graphClient = provider.graph.client;
-      console.log(graphClient);
-
-      try {
-        const driveItem = await graphClient.api('/me/drive/root/children').middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).post({
-          "name": "webboard",
-          "folder": {}
-        });
-        console.log(driveItem);
-
-        const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${image.name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
-        console.log(fileUpload);
-
-      }
-      catch (err) {
-        console.error(err);
-      }
-    }*/
   }
 
   render() {
     return (
       <div>
+        {
+          this.openContextMenu ?
+            <div ref={(el) => this.contextElement = el as HTMLDivElement} id="customContextMenu">
+              <button onClick={(event) => this.pasteImage(event)}>Paste Image</button>
+              <button onClick={() => this.copyImage()}>Copy Image</button>
+            </div>
+            : null
+        }
+
         {window.matchMedia("(min-width: 1200px)").matches ? <button id="copyTextButton" onClick={() => this.doTextCopy()}>
           {this.copyingText ? <ion-spinner></ion-spinner> : <span>Copy Text</span>}
         </button> : null}
 
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 
-        {this.dragMode ?
-          <canvas id="dragCanvas" ref={(el) => this.dragCanvasElement = el as HTMLCanvasElement}></canvas>
-
-          : <canvas id="regCanvas" ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>}
+        <canvas id="regCanvas" ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>
       </div >
     );
   }
