@@ -9,8 +9,6 @@ import { getNewFileHandle, readFile } from '../../helpers/files-api';
 import { exportToOneNote } from '../../services/graph';
 import { saveImagesS } from '../../services/api';
 
-import 'pinch-zoom-element';
-
 declare var ClipboardItem;
 
 @Component({
@@ -47,11 +45,12 @@ export class AppCanvas {
   componentDidLoad() {
     console.log('Component has been rendered');
 
-    window.matchMedia("(min-width: 1200px)").matches ?
+    if (window.matchMedia("(min-width: 1200px)").matches === true) {
       window.addEventListener('resize', () => {
-        console.log('setting up canvas');
-        this.setupCanvas();
-      }) : null
+        console.log('resizing');
+        this.resizeCanvas();
+      })
+    }
 
     this.setupCanvas();
 
@@ -67,39 +66,66 @@ export class AppCanvas {
       }
     });
 
-    this.canvasElement.oncontextmenu = async (e: any) => {
-      e.preventDefault();
+    (window as any).requestIdleCallback(async () => {
+      this.canvasElement.oncontextmenu = async (e: any) => {
+        e.preventDefault();
 
-      this.openContextMenu = true;
+        this.openContextMenu = true;
 
-      setTimeout(() => {
-        console.log(e.clientY);
-        console.log(this.contextElement);
-        this.contextElement.style.top = `${e.clientY}px`;
-        this.contextElement.style.left = `${e.clientX}px`;
+        setTimeout(() => {
+          console.log(e.clientY);
+          console.log(this.contextElement);
+          this.contextElement.style.top = `${e.clientY}px`;
+          this.contextElement.style.left = `${e.clientX}px`;
 
-        this.contextAnimation = this.contextElement.animate([
-          { transform: 'translateY(0)', opacity: 0 },
-          { transform: 'translateY(20px)', opacity: 1 }
-        ], {
-          duration: 100,
-          fill: 'both'
-        })
-      }, 20);
+          this.contextAnimation = this.contextElement.animate([
+            { transform: 'translateY(0)', opacity: 0 },
+            { transform: 'translateY(20px)', opacity: 1 }
+          ], {
+            duration: 100,
+            fill: 'both'
+          })
+        }, 20);
 
 
-      let that = this;
-      this.canvasElement.addEventListener('click', async function handler() {
-        that.contextAnimation.reverse();
+        let that = this;
+        this.canvasElement.addEventListener('click', async function handler() {
+          that.contextAnimation.reverse();
 
-        that.contextAnimation.onfinish = () => {
-          that.openContextMenu = false;
-        }
+          that.contextAnimation.onfinish = () => {
+            that.openContextMenu = false;
+          }
 
-        that.canvasElement.removeEventListener('click', handler);
-      });
+          that.canvasElement.removeEventListener('click', handler);
+        });
 
+      }
+    });
+  }
+
+  async resizeCanvas() {
+    const canvasState = await (get('canvasState') as any);
+
+    this.context.canvas.width = window.innerWidth;
+    this.context.canvas.height = window.innerHeight;
+
+    this.context.fillStyle = 'white';
+    this.context.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+
+    this.context.lineCap = 'round';
+    this.context.lineJoin = 'round';
+    this.context.strokeStyle = this.color;
+    this.context.lineWidth = 10;
+
+
+    if (canvasState) {
+      const tempImage = new Image();
+      tempImage.onload = () => {
+        this.context.drawImage(tempImage, 0, 0);
+      }
+      tempImage.src = canvasState;
     }
+
   }
 
   async pasteImage(ev) {
@@ -268,6 +294,8 @@ export class AppCanvas {
           console.log('image loaded');
           this.context.drawImage(tempImage, 0, 0);
 
+          URL.revokeObjectURL(drawImage);
+
           tempImage = null
         }
         tempImage.src = drawImage;
@@ -299,6 +327,8 @@ export class AppCanvas {
 
 
     const splitData = canvasImage.split(',')[1];
+
+    URL.revokeObjectURL(canvasImage);
 
     const bytes = window.atob(splitData);
     const buf = new ArrayBuffer(bytes.length);
@@ -510,6 +540,8 @@ export class AppCanvas {
       }
     }
 
+    URL.revokeObjectURL(canvasImage);
+
   }
 
   async saveImages(images: any[]) {
@@ -565,8 +597,10 @@ export class AppCanvas {
 
     console.log(this.color);
 
-    this.setupMouseEvents();
-    // this.setupTouchEvents();
+    (window as any).requestIdleCallback(() => {
+      this.setupMouseEvents();
+    })
+    // this.setupMouseEvents();
 
     this.renderCanvas();
   }
@@ -718,6 +752,9 @@ export class AppCanvas {
 
         if (this.mousePos.type !== 'mouse') {
           this.context.lineWidth = this.mousePos.width - 20;
+        }
+        else if (this.mousePos.type !== 'touch') {
+          this.context.lineWidth = 10;
         }
 
         this.context.stroke();

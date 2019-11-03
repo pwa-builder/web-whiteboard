@@ -26,6 +26,22 @@ export class AppSettings {
               Send Feedback
             </ion-label>
           </ion-item>
+
+          <ion-item href="https://play.google.com/store/apps/details?id=org.webboard.app">
+            <ion-icon slot="start" name="logo-android"></ion-icon>
+            <ion-label>
+              Webboard for Android
+            </ion-label>
+          </ion-item>
+
+          <ion-item href="https://www.microsoft.com/store/productId/9P53Q9BF3MV6">
+            <ion-icon slot="start" name="logo-windows"></ion-icon>
+
+            <ion-label>
+              Webboard for Windows
+            </ion-label>
+          </ion-item>
+
         </ion-list>
       </div>
     );

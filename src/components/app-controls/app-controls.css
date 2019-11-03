@@ -11,6 +11,10 @@
   z-index: -2;
 }
 
+ion-fab {
+  z-index: -1;
+}
+
 #penWidthDetail {
   margin-right: 12px;
   transition: width 200ms;

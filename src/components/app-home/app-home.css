@@ -5,8 +5,23 @@
   right: 18em;
 }
 
+#mobileInstallButton {
+  position: fixed;
+  bottom: 4px;
+  right: 8px;
+  background: #d3d3d3a6;
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  z-index: -1;
+}
+
 #settingsButton {
   font-size: 18px;
+}
+
+.settingsPopover .popover-content {
+  border-radius: 14px !important;
 }
 
 #settingsBlock {

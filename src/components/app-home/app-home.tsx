@@ -22,7 +22,7 @@ export class AppHome {
   wakeLockController: any;
 
   async componentDidLoad() {
-    await this.setupWakeLock();
+    this.setupWakeLock();
   }
 
   @Listen('beforeinstallprompt', { target: 'window' })
@@ -160,7 +160,8 @@ export class AppHome {
     console.log(ev);
     const popover = await popoverCtrl.create({
       component: 'app-settings',
-      event: ev
+      event: ev,
+      cssClass: 'settingsPopover'
     });
     await popover.present();
   }
@@ -182,7 +183,7 @@ export class AppHome {
 
   openInstall() {
     const pwaInstall = (this.el.querySelector('pwa-install') as HTMLElement);
-    
+
     if (pwaInstall.hasAttribute('openmodal')) {
       pwaInstall.removeAttribute('openmodal');
     }
@@ -206,10 +207,18 @@ export class AppHome {
       <div class='app-home'>
         <pwa-install></pwa-install>
 
-        {this.canInstall ? <ion-button id="pwaInstallButton" shape="round" size="small" onClick={() => this.openInstall()}>
+        {this.canInstall && (window.matchMedia("(min-width: 1200px)").matches) ? <ion-button id="pwaInstallButton" shape="round" size="small" onClick={() => this.openInstall()}>
           <ion-icon slot="start" name="download"></ion-icon>
           Install
-        </ion-button> : null}
+         </ion-button> : null}
+
+        {
+          this.canInstall && (window.matchMedia("(min-width: 1200px)").matches) === false ? 
+            <ion-button onClick={() => this.openInstall()} id="mobileInstallButton" fill="clear" size="small">
+              <ion-icon name="download"></ion-icon>
+            </ion-button>
+          : null
+        }
 
         {this.currentFileName ? <div id="fileNameDiv">
           <span>{this.currentFileName}</span>

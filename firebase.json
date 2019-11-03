@@ -11,12 +11,6 @@
         "source": "**",
         "destination": "/index.html"
       }
-    ],
-    "headers": [
-      {
-        "source": "/",
-        "headers": [{"key": "Link", "value": "</build/p-7f7762f4.js>;rel=preload;as=script,</build/p-2b3efcae.js>;rel=preload;as=script,</build/p-847abe33.js>;rel=preload;as=script,</build/p-g5n4wmu7.entry.js>;rel=preload;as=script,</build/p-pih5mftt.entry.js>;rel=preload;as=script,</build/p-bsidphib.entry.js>;rel=preload;as=script,</build/p-627b3a9c.js>;rel=preload;as=script,</build/p-a88b8db5.js>;rel=preload;as=script,</build/p-c6deafdf.js>;rel=preload;as=script,</build/p-cf997926.js>;rel=preload;as=script,</build/p-nsjjtj2f.css>;rel=preload;as=style,</build/p-ehc8wqnw.entry.js>;rel=preload;as=script,</build/p-rdrxbus2.js>;rel=preload;as=script"}]
-      }
     ]
   }
 }

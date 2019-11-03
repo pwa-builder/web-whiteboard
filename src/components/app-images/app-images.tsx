@@ -27,21 +27,16 @@ export class AppImages {
   async componentWillLoad() {
     (window as any).requestIdleCallback(async () => {
       let provider = (window as any).mgt.Providers.globalProvider;
-      console.log(provider);
       const account = provider._userAgentApplication.getAccount();
-      console.log(account);
 
       if (account !== null) {
         this.showUpload = true;
       }
 
       const images: any[] = await get('images');
-      console.log(images);
 
       if (images) {
         this.images = this.cleanImages(images);
-
-        saveImagesS(this.images);
 
         const imageWorker = new Worker('/assets/canvas-worker.js');
         imageWorker.postMessage({ name: 'cloudImages', data: this.images });
@@ -59,7 +54,6 @@ export class AppImages {
         });
         await loading.present();
 
-        console.log('trying to get images from the cloud');
         try {
           const data = await getSavedImages();
           console.log(data);
@@ -182,8 +176,6 @@ export class AppImages {
           icon: 'cloud',
           handler: async (): Promise<any> => {
             const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
-
-            console.log(imageBlob);
 
             let provider = (window as any).mgt.Providers.globalProvider;
             if (provider) {
@@ -334,7 +326,24 @@ export class AppImages {
                 }
               }
               catch (err) {
-                console.error(err);
+                const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+                const file = new File([imageBlob], "default.jpg");
+
+                if ((navigator as any).canShare && (navigator as any).canShare(file)) {
+                  (navigator as any).share({
+                    files: [file],
+                    title: 'Whiteboard',
+                    text: 'Check out this board from Webboard https://webboard-app.web.app',
+                  })
+                    .then(() => console.log('Share was successful.'))
+                    .catch((error) => console.log('Sharing failed', error));
+                } else {
+                  const toast = await toastCtrl.create({
+                    message: "You must be logged in to share",
+                    duration: 1200
+                  });
+                  await toast.present();
+                }
               }
 
             }, {

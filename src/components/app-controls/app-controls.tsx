@@ -120,7 +120,8 @@ export class AppControls {
     console.log(ev);
     const popover = await popoverCtrl.create({
       component: 'app-settings',
-      event: ev
+      event: ev,
+      cssClass: 'settingsPopover'
     });
     await popover.present();
   }
