@@ -50,7 +50,8 @@ export class AppImages {
       }
       else {
         const loading = await loadingController.create({
-          message: "Loading images from the cloud..."
+          message: "Loading images from the cloud...",
+          showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
         });
         await loading.present();
 
@@ -103,7 +104,8 @@ export class AppImages {
 
   async refreshImages() {
     const loading = await loadingController.create({
-      message: "Loading images from the cloud..."
+      message: "Loading images from the cloud...",
+      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await loading.present();
 
@@ -271,120 +273,106 @@ export class AppImages {
   }
 
   async share(id: number, image, event) {
-    /*let provider = (window as any).mgt.Providers.globalProvider;
-    let graphClient = provider.graph.client;
+    (window as any).requestIdleCallback(async () => {
+      let provider = (window as any).mgt.Providers.globalProvider;
+      let graphClient = provider.graph.client;
 
-    try {
-      const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
-        "type": "view",
-        "scope": "anonymous"
-      });
-      console.log(shareURL);
+      if ((navigator as any).canShare) {
+        const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+        const file = new File([imageBlob], "default.jpg");
 
-      if ((navigator as any).share) {
-        await (navigator as any).share({
-          title: 'webboard',
-          text: 'You have been shared a board, click the link to view!',
-          url: shareURL.link.webUrl,
-        })
-      }
-      else {
-        await navigator.clipboard.writeText(shareURL.link.webUrl);
+        if ((navigator as any).canShare(file)) {
+          (navigator as any).share({
+            files: [file],
+            title: 'Whiteboard',
+            text: 'Check out this board from Webboard https://webboard-app.web.app',
+          })
+            .then(() => console.log('Share was successful.'))
+            .catch((error) => console.log('Sharing failed', error));
+        }
 
-        const toast = await this.toastCtrl.create({
-          message: "Sharing URL saved to clipboard",
-          duration: 1800
-        });
-        await toast.present();
-      }
-    }
-    catch (err) {
-      console.error(err);
-    }*/
+      } else {
+        try {
+          const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
+            "type": "view",
+            "scope": "anonymous"
+          });
+          console.log(shareURL);
 
-    const sheet = await actionSheetCtrl.create({
-      header: 'Sharing',
-      buttons: [
-        {
-          text: "Share",
-          icon: "share",
-          handler: async (): Promise<any> => {
-            (window as any).requestIdleCallback(async () => {
-              let provider = (window as any).mgt.Providers.globalProvider;
-              let graphClient = provider.graph.client;
-
-              try {
-                const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
-                  "type": "view",
-                  "scope": "anonymous"
-                });
-                console.log(shareURL);
-
-                if ((navigator as any).share) {
-                  await (navigator as any).share({
-                    title: 'webboard',
-                    text: 'You have been shared a board, click the link to view!',
-                    url: shareURL.link.webUrl,
-                  })
-                }
-                else {
-                  await navigator.clipboard.writeText(shareURL.link.webUrl);
-
-                  const toast = await toastCtrl.create({
-                    message: "Sharing URL saved to clipboard",
-                    duration: 1800
-                  });
-                  await toast.present();
-                }
-              }
-              catch (err) {
-                const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
-                const file = new File([imageBlob], "default.jpg");
-
-                if ((navigator as any).canShare && (navigator as any).canShare(file)) {
-                  (navigator as any).share({
-                    files: [file],
-                    title: 'Whiteboard',
-                    text: 'Check out this board from Webboard https://webboard-app.web.app',
-                  })
-                    .then(() => console.log('Share was successful.'))
-                    .catch((error) => console.log('Sharing failed', error));
-                } else {
-                  const toast = await toastCtrl.create({
-                    message: "You must be logged in to share",
-                    duration: 1200
-                  });
-                  await toast.present();
-                }
-              }
-
-            }, {
-              timeout: 1200
+          if ((navigator as any).share) {
+            await (navigator as any).share({
+              title: 'webboard',
+              text: 'You have been shared a board, click the link to view!',
+              url: shareURL.link.webUrl,
             })
-
           }
-        },
+          else {
+            await navigator.clipboard.writeText(shareURL.link.webUrl);
 
-        {
-          text: "Download",
-          icon: "download",
-          handler: () => {
-            console.log('download');
-
-            (window as any).requestIdleCallback(() => {
-              const anchor = document.createElement('a');
-              anchor.href = image.url;
-              anchor.download = 'default.jpg';
-              anchor.click();
-              window.URL.revokeObjectURL(image.url);
-            }, {
-              timeout: 1200
-            })
+            const toast = await toastCtrl.create({
+              message: "Sharing URL saved to clipboard",
+              duration: 1800
+            });
+            await toast.present();
           }
         }
-      ]
-    });
-    await sheet.present();
+        catch (err) {
+          const toast = await toastCtrl.create({
+            message: "You must be logged in to share",
+            duration: 1200
+          });
+          await toast.present();
+        }
+      }
+
+      /*try {
+        const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
+          "type": "view",
+          "scope": "anonymous"
+        });
+        console.log(shareURL);
+
+        if ((navigator as any).share) {
+          await (navigator as any).share({
+            title: 'webboard',
+            text: 'You have been shared a board, click the link to view!',
+            url: shareURL.link.webUrl,
+          })
+        }
+        else {
+          await navigator.clipboard.writeText(shareURL.link.webUrl);
+
+          const toast = await toastCtrl.create({
+            message: "Sharing URL saved to clipboard",
+            duration: 1800
+          });
+          await toast.present();
+        }
+      }
+      catch (err) {
+        const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+        const file = new File([imageBlob], "default.jpg");
+
+        if ((navigator as any).canShare && (navigator as any).canShare(file)) {
+          (navigator as any).share({
+            files: [file],
+            title: 'Whiteboard',
+            text: 'Check out this board from Webboard https://webboard-app.web.app',
+          })
+            .then(() => console.log('Share was successful.'))
+            .catch((error) => console.log('Sharing failed', error));
+        } else {
+          const toast = await toastCtrl.create({
+            message: "You must be logged in to share",
+            duration: 1200
+          });
+          await toast.present();
+        }
+      }*/
+
+    }, {
+      timeout: 1200
+    })
 
     event.preventDefault();
   }

@@ -30,7 +30,8 @@ export class ColorModal {
 
   async grabColor() {
     const loading = await loadingCtrl.create({
-      message: "Analyzing..."
+      message: "Analyzing...",
+      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await loading.present();
 
