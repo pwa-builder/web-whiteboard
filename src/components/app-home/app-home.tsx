@@ -1,7 +1,11 @@
 import { Component, Element, Listen, State, h } from '@stencil/core';
-import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl } from '@ionic/core';
+import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl, toastController } from '@ionic/core';
+
+import { set, get } from 'idb-keyval';
 
 import '@pwabuilder/pwainstall';
+
+declare var ga: any;
 
 @Component({
   tag: 'app-home',
@@ -23,6 +27,31 @@ export class AppHome {
 
   async componentDidLoad() {
     this.setupWakeLock();
+
+    const test = await get('firstSeen');
+
+    if (!test) {
+      const toast = await toastController.create({
+        message: "Webboard currently uses analytics to measure usage. No personal or identifiable data is collected. By continuing to use this app you agree to this.",
+        showCloseButton: true,
+        closeButtonText: "Ok"
+      });
+
+      await toast.present();
+
+      toast.onDidDismiss().then(async () => {
+        await set('firstSeen', true);
+      });
+
+      const modal = await modalCtrl.create({
+        component: 'app-intro'
+      });
+      await modal.present();
+
+      modal.onDidDismiss().then(() => {
+        ga('send', 'event', ['Event'], ['Get Started'], ['Getting started modal closed']);
+      });
+    }
   }
 
   @Listen('beforeinstallprompt', { target: 'window' })
@@ -62,6 +91,8 @@ export class AppHome {
 
   async save() {
     const appCanvas = this.el.querySelector('app-canvas');
+
+    ga('send', 'event', ['Button'], ['Save'], ['Saving Canvas']);
 
     if ("chooseFileSystemEntries" in window) {
       appCanvas.saveCanvas('');
@@ -215,11 +246,11 @@ export class AppHome {
          </ion-button> : null}
 
         {
-          this.canInstall && (window.matchMedia("(min-width: 1200px)").matches) === false ? 
+          this.canInstall && (window.matchMedia("(min-width: 1200px)").matches) === false ?
             <ion-button onClick={() => this.openInstall()} id="mobileInstallButton" fill="clear" size="small">
               <ion-icon name="download"></ion-icon>
             </ion-button>
-          : null
+            : null
         }
 
         {this.currentFileName ? <div id="fileNameDiv">

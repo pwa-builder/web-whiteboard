@@ -28,6 +28,7 @@ export namespace Components {
   interface AppControls {}
   interface AppHome {}
   interface AppImages {}
+  interface AppIntro {}
   interface AppProfile {
     'name': string;
   }
@@ -78,6 +79,12 @@ declare global {
   var HTMLAppImagesElement: {
     prototype: HTMLAppImagesElement;
     new (): HTMLAppImagesElement;
+  };
+
+  interface HTMLAppIntroElement extends Components.AppIntro, HTMLStencilElement {}
+  var HTMLAppIntroElement: {
+    prototype: HTMLAppIntroElement;
+    new (): HTMLAppIntroElement;
   };
 
   interface HTMLAppProfileElement extends Components.AppProfile, HTMLStencilElement {}
@@ -133,6 +140,7 @@ declare global {
     'app-controls': HTMLAppControlsElement;
     'app-home': HTMLAppHomeElement;
     'app-images': HTMLAppImagesElement;
+    'app-intro': HTMLAppIntroElement;
     'app-profile': HTMLAppProfileElement;
     'app-root': HTMLAppRootElement;
     'app-settings': HTMLAppSettingsElement;
@@ -167,6 +175,7 @@ declare namespace LocalJSX {
   }
   interface AppHome {}
   interface AppImages {}
+  interface AppIntro {}
   interface AppProfile {
     'name'?: string;
   }
@@ -191,6 +200,7 @@ declare namespace LocalJSX {
     'app-controls': AppControls;
     'app-home': AppHome;
     'app-images': AppImages;
+    'app-intro': AppIntro;
     'app-profile': AppProfile;
     'app-root': AppRoot;
     'app-settings': AppSettings;
@@ -213,6 +223,7 @@ declare module "@stencil/core" {
       'app-controls': LocalJSX.AppControls & JSXBase.HTMLAttributes<HTMLAppControlsElement>;
       'app-home': LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
       'app-images': LocalJSX.AppImages & JSXBase.HTMLAttributes<HTMLAppImagesElement>;
+      'app-intro': LocalJSX.AppIntro & JSXBase.HTMLAttributes<HTMLAppIntroElement>;
       'app-profile': LocalJSX.AppProfile & JSXBase.HTMLAttributes<HTMLAppProfileElement>;
       'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
       'app-settings': LocalJSX.AppSettings & JSXBase.HTMLAttributes<HTMLAppSettingsElement>;

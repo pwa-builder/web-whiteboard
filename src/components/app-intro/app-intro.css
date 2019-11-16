@@ -1,0 +1,44 @@
+#introBlock {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 22px;
+  background-image: url(/assets/intro.svg);
+  height: 68vh;
+  background-size: cover;
+}
+
+#introBlock h1 {
+  font-weight: bold;
+}
+
+#introContent {
+  overflow: hidden;
+}
+
+#introHeader {
+  position: fixed;
+  bottom: 9em;
+  left: 1em;
+  right: 1em;
+
+  padding: 14px;
+
+  padding-top: 1em;
+  padding-bottom: 1em;
+
+  background: white;
+  border-radius: 12px;
+}
+
+@media (min-width: 1200px) {
+  #introHeader {
+    left: 6em;
+    right: 6em;
+    bottom: 12em;
+
+    background: #ffffff8a;
+    backdrop-filter: blur(10px);
+  }
+}

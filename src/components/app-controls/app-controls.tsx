@@ -1,6 +1,7 @@
 import { Component, Element, Event, EventEmitter, State, h } from '@stencil/core';
 import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl, toastController as toastCtrl } from '@ionic/core';
 
+declare var ga: any;
 
 @Component({
   tag: 'app-controls',
@@ -31,6 +32,8 @@ export class AppControls {
   changeColor() {
     this.penMode.emit();
     this.openColors = true;
+
+    ga('send', 'event', ['Button'], ['Change Color'], ['Changing Color']);
   }
 
   handleWidth(event) {
@@ -79,6 +82,8 @@ export class AppControls {
   }
 
   async erase() {
+    ga('send', 'event', ['Button'], ['Erase'], ['Erasing']);
+
     if (!this.erasing) {
       this.eraserMode.emit();
       this.erasing = true;
