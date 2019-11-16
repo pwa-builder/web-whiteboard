@@ -158,7 +158,8 @@ export class AppControls {
     jumpAni.onfinish = async () => {
       const modal = await modalCtrl.create({
         component: 'image-popover',
-        cssClass: 'extImageModal'
+        cssClass: 'extImageModal',
+        showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
       });
       await modal.present();
     }

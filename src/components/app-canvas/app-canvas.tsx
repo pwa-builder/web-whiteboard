@@ -102,8 +102,13 @@ export class AppCanvas {
     });
 
     (window as any).requestIdleCallback(() => {
-      document.addEventListener('keydown', (ev) => {
-        if (ev.key.toLowerCase() === "s".toLowerCase() && ev.ctrlKey) {
+      document.addEventListener('keydown', async (ev) => {
+        if (ev.key.toLowerCase() === "s".toLowerCase() && ev.shiftKey && ev.ctrlKey) {
+          console.log('here');
+          await this.saveToFS();
+        }
+
+        else if (ev.key.toLowerCase() === "s".toLowerCase() && ev.ctrlKey) {
           this.quickSave(ev);
         }
       })
