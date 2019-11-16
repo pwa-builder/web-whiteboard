@@ -28,6 +28,7 @@ export class AppCanvas {
   @State() copyingText: boolean = false;
   @State() openContextMenu: boolean = false;
   @State() doDrag: boolean = false;
+  @State() saving: boolean = false;
 
   canvasElement: HTMLCanvasElement;
   gridCanvas: HTMLCanvasElement;
@@ -672,6 +673,8 @@ export class AppCanvas {
       console.log('pointerup');
       this.canvasElement.releasePointerCapture(e.pointerId);
 
+      this.saving = true;
+
       this.drawing = false;
 
       // this.lastPos = this.getMousePos(this.canvasElement, e);
@@ -693,6 +696,10 @@ export class AppCanvas {
             await this.fileWriter.close();
           }, 'image/jpeg');
         }
+
+        setTimeout(() => {
+          this.saving = false;
+        }, 400);
 
       })
     });
@@ -881,6 +888,13 @@ export class AppCanvas {
   render() {
     return (
       <div>
+
+        {
+          this.saving ? <div id="savingSpinner">
+            <ion-spinner color="primary"></ion-spinner>
+          </div> : <div id="savingSpinner">Saved</div>
+        }
+
         {
           this.openContextMenu ?
             <div ref={(el) => this.contextElement = el as HTMLDivElement} id="customContextMenu">
