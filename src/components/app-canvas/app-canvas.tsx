@@ -45,12 +45,10 @@ export class AppCanvas {
   componentDidLoad() {
     console.log('Component has been rendered');
 
-    if (window.matchMedia("(min-width: 1200px)").matches === true) {
-      window.addEventListener('resize', () => {
-        console.log('resizing');
-        this.resizeCanvas();
-      })
-    }
+    window.addEventListener('resize', () => {
+      console.log('resizing');
+      this.resizeCanvas();
+    })
 
     this.setupCanvas();
 

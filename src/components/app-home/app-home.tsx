@@ -117,7 +117,8 @@ export class AppHome {
 
     const modal = await modalCtrl.create({
       component: 'app-images',
-      cssClass: 'imagesModal'
+      cssClass: 'imagesModal',
+      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await modal.present();
 
@@ -161,7 +162,8 @@ export class AppHome {
     const popover = await popoverCtrl.create({
       component: 'app-settings',
       event: ev,
-      cssClass: 'settingsPopover'
+      cssClass: 'settingsPopover',
+      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await popover.present();
   }

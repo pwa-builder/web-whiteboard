@@ -124,8 +124,20 @@ export class AppImages {
     }
   }
 
-  choose(url: string, name: string) {
+  async choose(url: string, name: string) {
     (this.el.closest('ion-modal') as any).dismiss({ url, name });
+  }
+
+  async openToSide(name: string, ev) {
+    ev.preventDefault();
+
+    const provider = (window as any).mgt.Providers.globalProvider;
+    const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
+    console.log(user);
+
+    window.open(`${location.href}image/${name}/${user.name}/sidecart`, "_blank");
+
+    ev.preventDefault();
   }
 
   async chooseCloudItem(id: number, name: string) {
@@ -486,7 +498,11 @@ export class AppImages {
                               <ion-card-title>{image.name}</ion-card-title>
                             </div>
 
-                            <div>
+                            <ion-buttons>
+                              <ion-button icon-only fill="clear" onClick={(event) => this.openToSide(image.name, event)}>
+                                <ion-icon name="eye"></ion-icon>
+                              </ion-button>
+
                               {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear">
                                 <ion-icon name="cloud-upload"></ion-icon>
                               </ion-button> :
@@ -494,7 +510,7 @@ export class AppImages {
                                   <ion-icon name="share"></ion-icon>
                                 </ion-button>
                               }
-                            </div>
+                            </ion-buttons>
                           </div>
                         </ion-card-header>
 

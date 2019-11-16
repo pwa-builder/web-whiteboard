@@ -50,3 +50,33 @@ export async function getSavedImages() {
     return data;
   }
 }
+
+export async function getSavedImage(name: string, user: any) {
+  console.log(user.username.includes('%20'));
+  if (user.username.includes('%20')) {
+    user.username = (user.username as string).replace('%20', ' ');
+  }
+
+  if (name.includes('%20')) {
+    name = name.replace('%20', ' ');
+  }
+
+  console.log(user.username);
+
+  if (user) {
+    const response = await fetch(`${url}/getImage`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user,
+        name: name
+      })
+    });
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+  }
+}

@@ -41,6 +41,10 @@ export namespace Components {
   interface InstallModal {
     'installEvent': any;
   }
+  interface SideCart {
+    'name': string;
+    'username': string;
+  }
 }
 
 declare global {
@@ -117,6 +121,12 @@ declare global {
     prototype: HTMLInstallModalElement;
     new (): HTMLInstallModalElement;
   };
+
+  interface HTMLSideCartElement extends Components.SideCart, HTMLStencilElement {}
+  var HTMLSideCartElement: {
+    prototype: HTMLSideCartElement;
+    new (): HTMLSideCartElement;
+  };
   interface HTMLElementTagNameMap {
     'ai-popover': HTMLAiPopoverElement;
     'app-canvas': HTMLAppCanvasElement;
@@ -130,6 +140,7 @@ declare global {
     'drive-preview': HTMLDrivePreviewElement;
     'image-popover': HTMLImagePopoverElement;
     'install-modal': HTMLInstallModalElement;
+    'side-cart': HTMLSideCartElement;
   }
 }
 
@@ -169,6 +180,10 @@ declare namespace LocalJSX {
   interface InstallModal {
     'installEvent'?: any;
   }
+  interface SideCart {
+    'name'?: string;
+    'username'?: string;
+  }
 
   interface IntrinsicElements {
     'ai-popover': AiPopover;
@@ -183,6 +198,7 @@ declare namespace LocalJSX {
     'drive-preview': DrivePreview;
     'image-popover': ImagePopover;
     'install-modal': InstallModal;
+    'side-cart': SideCart;
   }
 }
 
@@ -204,6 +220,7 @@ declare module "@stencil/core" {
       'drive-preview': LocalJSX.DrivePreview & JSXBase.HTMLAttributes<HTMLDrivePreviewElement>;
       'image-popover': LocalJSX.ImagePopover & JSXBase.HTMLAttributes<HTMLImagePopoverElement>;
       'install-modal': LocalJSX.InstallModal & JSXBase.HTMLAttributes<HTMLInstallModalElement>;
+      'side-cart': LocalJSX.SideCart & JSXBase.HTMLAttributes<HTMLSideCartElement>;
     }
   }
 }

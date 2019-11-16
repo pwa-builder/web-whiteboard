@@ -121,7 +121,8 @@ export class AppControls {
     const popover = await popoverCtrl.create({
       component: 'app-settings',
       event: ev,
-      cssClass: 'settingsPopover'
+      cssClass: 'settingsPopover',
+      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await popover.present();
   }
@@ -168,7 +169,8 @@ export class AppControls {
       const popover = await popoverCtrl.create({
         component: 'ai-popover',
         event: ev,
-        cssClass: "aiPopover"
+        cssClass: "aiPopover",
+        showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
       })
 
       await popover.present();
@@ -176,6 +178,7 @@ export class AppControls {
     else {
       const modal = await modalCtrl.create({
         component: 'ai-popover',
+        showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
       });
 
       await modal.present();
