@@ -100,6 +100,14 @@ export class AppCanvas {
 
       }
     });
+
+    (window as any).requestIdleCallback(() => {
+      document.addEventListener('keydown', (ev) => {
+        if (ev.key.toLowerCase() === "s".toLowerCase() && ev.ctrlKey) {
+          this.quickSave(ev);
+        }
+      })
+    });
   }
 
   async resizeCanvas() {
@@ -671,37 +679,7 @@ export class AppCanvas {
 
     this.canvasElement.addEventListener("pointerup", (e) => {
       console.log('pointerup');
-      this.canvasElement.releasePointerCapture(e.pointerId);
-
-      this.saving = true;
-
-      this.drawing = false;
-
-      // this.lastPos = this.getMousePos(this.canvasElement, e);
-      this.lastPos = null;
-
-      (window as any).requestIdleCallback(async () => {
-        let canvasState = this.canvasElement.toDataURL();
-        await set('canvasState', canvasState);
-
-        if ("chooseFileSystemEntries" in window && this.fileHandle) {
-          console.log('writing to file');
-          this.fileWriter = await this.fileHandle.createWriter();
-
-          console.log('this.fileWriter in pointer up', this.fileWriter);
-          console.log("chooseFileSystemEntries" in window);
-
-          this.canvasElement.toBlob(async (blob) => {
-            await this.fileWriter.write(0, blob);
-            await this.fileWriter.close();
-          }, 'image/jpeg');
-        }
-
-        setTimeout(() => {
-          this.saving = false;
-        }, 400);
-
-      })
+      this.quickSave(e);
     });
 
     if ((PointerEvent.prototype as any).getPredictedEvents) {
@@ -732,6 +710,40 @@ export class AppCanvas {
         }
       });
     }
+  }
+
+  quickSave(e) {
+    e.preventDefault();
+
+    this.saving = true;
+
+    this.drawing = false;
+
+    // this.lastPos = this.getMousePos(this.canvasElement, e);
+    this.lastPos = null;
+
+    (window as any).requestIdleCallback(async () => {
+      let canvasState = this.canvasElement.toDataURL();
+      await set('canvasState', canvasState);
+
+      if ("chooseFileSystemEntries" in window && this.fileHandle) {
+        console.log('writing to file');
+        this.fileWriter = await this.fileHandle.createWriter();
+
+        console.log('this.fileWriter in pointer up', this.fileWriter);
+        console.log("chooseFileSystemEntries" in window);
+
+        this.canvasElement.toBlob(async (blob) => {
+          await this.fileWriter.write(0, blob);
+          await this.fileWriter.close();
+        }, 'image/jpeg');
+      }
+
+      setTimeout(() => {
+        this.saving = false;
+      }, 400);
+
+    })
   }
 
   getMousePos(canvasDom, mouseEvent) {
