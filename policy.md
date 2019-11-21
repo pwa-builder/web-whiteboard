@@ -1,6 +1,6 @@
 Justin Willis Privacy Policy
 
-This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from https://wavex-app.firebaseapp.com (the “Site”).
+This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from https://webboard-app.web.app (the “Site”).
 
 PERSONAL INFORMATION WE COLLECT
 
