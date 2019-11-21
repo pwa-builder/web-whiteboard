@@ -24,7 +24,7 @@ export class AppCanvas {
   @Prop() savedDrawing: string | null = null;
   @Prop({ mutable: true }) dragMode: boolean = false;
 
-  @State() drawing: boolean = false;
+  @State() drawing: boolean = true;
   @State() copyingText: boolean = false;
   @State() openContextMenu: boolean = false;
   @State() doDrag: boolean = false;
@@ -66,16 +66,18 @@ export class AppCanvas {
     });
 
     (window as any).requestIdleCallback(async () => {
-      this.canvasElement.oncontextmenu = async (e: any) => {
-        e.preventDefault();
+      this.canvasElement.oncontextmenu = async (event: any) => {
+        event.preventDefault();
+
+        this.mode = 'stop';
 
         this.openContextMenu = true;
 
         setTimeout(() => {
-          console.log(e.clientY);
+          console.log(event.clientY);
           console.log(this.contextElement);
-          this.contextElement.style.top = `${e.clientY}px`;
-          this.contextElement.style.left = `${e.clientX}px`;
+          this.contextElement.style.top = `${event.clientY}px`;
+          this.contextElement.style.left = `${event.clientX}px`;
 
           this.contextAnimation = this.contextElement.animate([
             { transform: 'translateY(0)', opacity: 0 },
@@ -84,7 +86,7 @@ export class AppCanvas {
             duration: 100,
             fill: 'both'
           })
-        }, 20);
+        }, 40);
 
 
         let that = this;
@@ -93,6 +95,8 @@ export class AppCanvas {
 
           that.contextAnimation.onfinish = () => {
             that.openContextMenu = false;
+
+            that.mode = 'pen';
           }
 
           that.canvasElement.removeEventListener('click', handler);
@@ -470,11 +474,48 @@ export class AppCanvas {
           images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
         }
 
+        /*const activityObject = {
+          "appActivityId": 'uniqueIdInAppContext',
+          "activitySourceHost": "https://webboard-app.web.app",
+          "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "appDisplayName": "Webboard",
+          "activationUrl": "https://webboard-app.web.app",
+          "fallbackUrl": "https://webboard-app.firebaseapp.com",
+          "contentInfo": {
+            "@context": "http://schema.org",
+            "@type": "CreativeWork",
+            "author": "Jennifer Booth",
+            "name": "Graph Explorer User Activity"
+          },
+          "visualElements": {
+            "attribution": {
+              "iconUrl": "https://graphexplorer.blob.core.windows.net/explorerIcon.png",
+              "alternateText": "Microsoft Graph Explorer",
+              "addImageQuery": "false"
+            },
+            "description": "A user activity made through the Microsoft Graph Explorer",
+            "backgroundColor": "#008272",
+            "displayText": "You saved a new board",
+            "content": {
+              "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+              "type": "AdaptiveCard",
+              "body": [
+                {
+                  "type": "TextBlock",
+                  "text": "Always access your latest board here!"
+                }
+              ]
+            }
+          },
+        };*/
+
+        console.log('creating activity');
+
+        // await createActivity('uniqueIdInAppContext', activityObject);
+
         await set('images', images);
 
         let remoteImages = [];
-
-        console.log('going through images');
 
         images.forEach((image) => {
           console.log('image', image);
@@ -539,14 +580,14 @@ export class AppCanvas {
 
         /*if (images) {
           let remoteImages = [];
-
+ 
           images.forEach((image) => {
             if (image) {
               remoteImages.push(image);
             }
           });
-
-
+ 
+ 
           await this.saveImages(remoteImages);
         }*/
       }
@@ -659,27 +700,28 @@ export class AppCanvas {
     this.drawing = false;
 
     this.mousePos = { x: 0, y: 0 };
-    // this.lastPos = this.mousePos;
-    // this.lastPos = { x: 0, y: 0 };
 
     // handle mouse events
     this.canvasElement.addEventListener("pointerdown", (e) => {
-      console.log('pointerdown', e.ctrlKey);
+      console.log('pointerdown', e);
 
-      if (e.ctrlKey === true) {
-        this.doDrag = true;
-        return;
-      }
-      else {
-        this.doDrag = false;
+      if (e.button !== 2) {
+        if (e.ctrlKey === true) {
+          this.doDrag = true;
+          return;
+        }
+        else {
+          this.doDrag = false;
+        }
+
+        this.canvasElement.setPointerCapture(e.pointerId);
+        this.lastPos = this.getMousePos(this.canvasElement, e);
+
+        if (e.pointerType !== 'touch') {
+          this.drawing = true;
+        }
       }
 
-      this.canvasElement.setPointerCapture(e.pointerId);
-      this.lastPos = this.getMousePos(this.canvasElement, e);
-
-      if (e.pointerType !== 'touch') {
-        this.drawing = true;
-      }
     });
 
     this.canvasElement.addEventListener("pointerup", (e) => {
@@ -764,7 +806,7 @@ export class AppCanvas {
   }
 
   renderCanvas() {
-    if (this.drawing && this.mode === 'pen') {
+    if (this.drawing !== false && this.mode === 'pen') {
 
       if (this.lastPos) {
         this.context.globalCompositeOperation = 'source-over';
@@ -786,7 +828,7 @@ export class AppCanvas {
       this.lastPos = this.mousePos;
 
     }
-    else if (this.drawing && this.mode === 'erase') {
+    else if (this.drawing !== false && this.mode === 'erase') {
       this.context.globalCompositeOperation = 'destination-out';
       this.context.beginPath();
       this.context.moveTo(this.lastPos.x, this.lastPos.y);

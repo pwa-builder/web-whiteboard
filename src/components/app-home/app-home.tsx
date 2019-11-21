@@ -1,9 +1,11 @@
-import { Component, Element, Listen, State, h } from '@stencil/core';
+import { Component, Element, Prop, Listen, State, h } from '@stencil/core';
 import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl, toastController } from '@ionic/core';
 
 import { set, get } from 'idb-keyval';
 
 import '@pwabuilder/pwainstall';
+
+import { getSavedImage } from '../../services/api';
 
 declare var ga: any;
 
@@ -23,11 +25,12 @@ export class AppHome {
   @State() currentFileName: string | null = null;
   @State() canInstall: boolean = false;
 
+  @Prop() name: string;
+  @Prop() username: string;
+
   wakeLockController: any;
 
   async componentDidLoad() {
-    this.setupWakeLock();
-
     const test = await get('firstSeen');
 
     if (!test) {
@@ -52,6 +55,19 @@ export class AppHome {
         ga('send', 'event', ['Event'], ['Get Started'], ['Getting started modal closed']);
       });
     }
+
+    if (this.name && this.username) {
+      const data = await getSavedImage(this.name, { username: this.username });
+      console.log(data);
+
+      if (data) {
+        this.savedImage = data.url;
+      }
+    }
+
+    (window as any).requestIdleCallback(() => {
+      this.setupWakeLock();
+    });
   }
 
   @Listen('beforeinstallprompt', { target: 'window' })
@@ -266,7 +282,7 @@ export class AppHome {
             <ion-icon color="primary" name="settings"></ion-icon>
           </ion-button>
 
-          <mgt-msal-provider scopes="Notes.Create" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
+          <mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
           <mgt-login></mgt-login>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}

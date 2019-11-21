@@ -1,7 +1,7 @@
 // import { Providers } from '@microsoft/mgt';
 
-export async function getWindowsDevices(token: string) {
-  const headers = new Headers();
+export async function getWindowsDevices() {
+  /*const headers = new Headers();
   const bearer = "Bearer " + token;
   headers.append("Authorization", bearer);
   const options = {
@@ -13,17 +13,33 @@ export async function getWindowsDevices(token: string) {
   const response = await fetch(graphEndpoint, options);
   const data = await response.json();
 
-  return data;
+  return data;*/
+
+  const provider = (window as any).mgt.Providers.globalProvider;
+  let graphClient = provider.graph.client;
+  console.log(graphClient);
+
+  const data = await graphClient.api(`/me/devices`).version('beta').middlewareOptions((window as any).mgt.prepScopes('user.read', 'Device.Read')).get();
+
+  if (data) {
+    return data.value;
+  }
 }
 
-export async function sendCommand(token: string, id: string, url: string) {
+export async function sendCommand(id: string, url: string) {
+
+  const provider = (window as any).mgt.Providers.globalProvider;
+  const authProvider = provider.graph.client.config.middleware.authenticationProvider;
+
+  const token = await authProvider.getAccessToken();
+
   const headers = new Headers();
   const bearer = "Bearer " + token;
   headers.append("Authorization", bearer);
   headers.append("Content-Type", "application/json");
   const options = {
     method: "POST",
-    body: JSON.stringify({ "type": "LaunchUri", "payload": { "uri": url } }),
+    body: JSON.stringify({ "type": "LaunchUri", "payload": { "uri": new URL(url) } }),
     headers: headers
   };
   const graphEndpoint = `https://graph.microsoft.com/beta/me/devices/${id}/commands`;
@@ -38,15 +54,15 @@ export async function sendCommand(token: string, id: string, url: string) {
   }
 }
 
-export async function test(id: string, activityObject: any) {
+export async function createActivity(id: string, activityObject: any) {
   const provider = (window as any).mgt.Providers.globalProvider;
   let graphClient = provider.graph.client;
-  console.log(graphClient);
 
-  await graphClient.api(`/me/activities/${id}`).post(JSON.stringify(activityObject));
+
+  await graphClient.api(`/me/activities/${id}`).put(activityObject);
 }
 
-export async function createActivity(token: string, activityObject: any, id: string) {
+/*export async function createActivity(token: string, activityObject: any, id: string) {
   if (token) {
     const headers = new Headers();
     const bearer = "Bearer " + token;
@@ -73,7 +89,7 @@ export async function createActivity(token: string, activityObject: any, id: str
       for the Microsoft Graph API, check out https://github.com/AzureAD/microsoft-authentication-library-for-js.
     `);
   }
-}
+}*/
 
 export async function exportToOneNote(imageUrl: string, name: string) {
   if (imageUrl) {
@@ -84,8 +100,7 @@ export async function exportToOneNote(imageUrl: string, name: string) {
 
     const provider = (window as any).mgt.Providers.globalProvider;
     let graphClient = provider.graph.client;
-    console.log(graphClient);
-
+    console.log(graphClient)
     const data = await graphClient.api(`/me/onenote/pages`).header("Content-Type", "application/xhtml+xml").post(`
     <!DOCTYPE html>
     <html>

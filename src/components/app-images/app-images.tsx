@@ -3,12 +3,12 @@ import { loadingController, toastController as toastCtrl, actionSheetController 
 
 import { b64toBlob } from '../../helpers/utils';
 import { getFileHandle } from '../../helpers/files-api';
-// import { test } from '../../services/graph';
 
 import { get, set } from 'idb-keyval';
 // import * as comlink from 'https://unpkg.com/comlink@4.0.1';
 
 import { getSavedImages, saveImagesS } from '../../services/api';
+import { getWindowsDevices, sendCommand } from '../../services/graph';
 
 @Component({
   tag: 'app-images',
@@ -137,9 +137,60 @@ export class AppImages {
     const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
     console.log(user);
 
-    window.open(`${location.href}image/${name}/${user.name}/sidecart`, "_blank");
+    window.open(`${location.href}boards/${name}/${user.name}/board`, "_blank");
 
     ev.preventDefault();
+  }
+
+  async showDevices(name: string) {
+    const devices = await getWindowsDevices();
+    console.log(devices);
+
+    let deviceButtons = [];
+
+    devices.forEach((device) => {
+
+      let rightIcon = null;
+
+      switch(device.Kind) {
+        case "PC":
+          rightIcon = 'laptop'
+          break;
+        case "Tablet":
+          rightIcon = 'tablet-landscape'
+          break;
+        case "Phone":
+          rightIcon = 'phone-portrait'
+          break;
+        default:
+          rightIcon = 'laptop'
+      }
+
+      deviceButtons.push({
+        text: device.Model || device.Name,
+        icon: rightIcon,
+        handler: async () => {
+          const provider = (window as any).mgt.Providers.globalProvider;
+          const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
+
+          await sendCommand(device.id, `https://webboard-app.web.app/boards/${name}/${user.name}/board`);
+
+          const toast = await toastCtrl.create({
+            message: `Opened board on ${device.Model || device.Name}`,
+            duration: 1800
+          });
+          await toast.present();
+        }
+      })
+    })
+
+    if (deviceButtons) {
+      const sheet = await actionSheetCtrl.create({
+        header: 'Share to your devices',
+        buttons: deviceButtons
+      });
+      await sheet.present();
+    }
   }
 
   async chooseCloudItem(id: number, name: string) {
@@ -273,6 +324,8 @@ export class AppImages {
   }
 
   async share(id: number, image, event) {
+    event.preventDefault();
+
     (window as any).requestIdleCallback(async () => {
       let provider = (window as any).mgt.Providers.globalProvider;
       let graphClient = provider.graph.client;
@@ -373,8 +426,6 @@ export class AppImages {
     }, {
       timeout: 1200
     })
-
-    event.preventDefault();
   }
 
   async close() {
@@ -488,7 +539,11 @@ export class AppImages {
 
                             <ion-buttons>
                               <ion-button icon-only fill="clear" onClick={(event) => this.openToSide(image.name, event)}>
-                                <ion-icon name="eye"></ion-icon>
+                                <ion-icon name="swap"></ion-icon>
+                              </ion-button>
+
+                              <ion-button icon-only fill="clear" onClick={() => this.showDevices(image.name)}>
+                                <ion-icon name="tablet-portrait"></ion-icon>
                               </ion-button>
 
                               {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear">

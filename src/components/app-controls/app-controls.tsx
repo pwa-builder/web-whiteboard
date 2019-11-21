@@ -67,7 +67,7 @@ export class AppControls {
   }
 
   clear() {
-    const jumpAni = this.el.querySelector("#trashIcon").animate(
+    this.el.querySelector("#trashIcon").animate(
       {
         transform: ['translateY(0px)', 'translateY(-8px)', 'translateY(0px)']
       },
@@ -76,9 +76,7 @@ export class AppControls {
       }
     );
 
-    jumpAni.onfinish = () => {
-      this.clearCanvas.emit();
-    }
+    this.clearCanvas.emit();
   }
 
   async erase() {

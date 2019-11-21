@@ -26,7 +26,10 @@ export namespace Components {
     'writeNativeFile': (fileHandler: any) => Promise<void>;
   }
   interface AppControls {}
-  interface AppHome {}
+  interface AppHome {
+    'name': string;
+    'username': string;
+  }
   interface AppImages {}
   interface AppIntro {}
   interface AppProfile {
@@ -173,7 +176,10 @@ declare namespace LocalJSX {
     'onPenMode'?: (event: CustomEvent<any>) => void;
     'onSaveCanvas'?: (event: CustomEvent<any>) => void;
   }
-  interface AppHome {}
+  interface AppHome {
+    'name'?: string;
+    'username'?: string;
+  }
   interface AppImages {}
   interface AppIntro {}
   interface AppProfile {
