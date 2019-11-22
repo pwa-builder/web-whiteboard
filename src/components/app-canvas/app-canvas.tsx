@@ -801,7 +801,10 @@ export class AppCanvas {
       y: mouseEvent.clientY - rect.top,
       width: mouseEvent.width,
       type: mouseEvent.pointerType,
-      ctrlKey: mouseEvent.ctrlKey
+      ctrlKey: mouseEvent.ctrlKey,
+      pressure: mouseEvent.pressure,
+      button: mouseEvent.button,
+      buttons: mouseEvent.buttons
     };
   }
 
@@ -814,10 +817,30 @@ export class AppCanvas {
         this.context.moveTo(this.lastPos.x, this.lastPos.y);
         this.context.lineTo(this.mousePos.x, this.mousePos.y);
 
-        if (this.mousePos.type !== 'mouse') {
+        if (this.mousePos.type === 'pen') {
+          let tweakedPressure = this.mousePos.pressure * 6;
+          this.context.lineWidth = this.mousePos.width + tweakedPressure;
+
+          if (this.mousePos.buttons === 32 && this.mousePos.button === -1) {
+            // eraser
+
+            this.context.globalCompositeOperation = 'destination-out';
+            this.context.beginPath();
+            this.context.moveTo(this.lastPos.x, this.lastPos.y);
+            this.context.lineTo(this.mousePos.x, this.mousePos.y);
+
+            this.context.lineWidth = 60;
+
+            this.context.stroke();
+            this.context.closePath();
+
+            this.lastPos = this.mousePos;
+          }
+        }
+        else if (this.mousePos.type !== 'mouse' && this.mousePos.type !== 'pen') {
           this.context.lineWidth = this.mousePos.width - 20;
         }
-        else if (this.mousePos.type !== 'touch') {
+        else if (this.mousePos.type !== 'touch' && this.mousePos.type !== 'pen') {
           this.context.lineWidth = 10;
         }
 
