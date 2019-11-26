@@ -1,0 +1,11 @@
+#loginIntro {
+  padding: 1.6em;
+  text-align: center;
+}
+
+#msalBlock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #bbbbbb40;
+}

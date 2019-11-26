@@ -13,7 +13,7 @@ import { getWindowsDevices, sendCommand } from '../../services/graph';
 @Component({
   tag: 'app-images',
   styleUrl: 'app-images.css',
-  shadow: true
+  shadow: false
 })
 export class AppImages {
 

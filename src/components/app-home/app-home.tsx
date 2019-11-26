@@ -215,6 +215,15 @@ export class AppHome {
     await popover.present();
   }
 
+  async openLoginPop(ev: Event) {
+    const popover = await popoverCtrl.create({
+      component: 'login-pop',
+      event: ev,
+      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+    });
+    await popover.present();
+  }
+
   doDrag() {
     if (this.dragMode === true) {
       this.dragMode = false;
@@ -278,12 +287,17 @@ export class AppHome {
         <app-controls onDoShare={() => this.doShare()} onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
 
         <div id="settingsBlock">
-          <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(ev) => this.openSettings(ev)} fill="clear">
+          <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(event) => this.openSettings(event)} fill="clear">
             <ion-icon color="primary" name="settings"></ion-icon>
           </ion-button>
 
-          <mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
-          <mgt-login></mgt-login>
+          {/*<mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
+          <mgt-login></mgt-login>*/}
+
+          <ion-button fill="clear" onClick={(event) => this.openLoginPop(event)}>
+            <ion-icon slot="start" color="primary" name="person"></ion-icon>
+            Sign In
+          </ion-button>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
         </div>
