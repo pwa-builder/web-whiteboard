@@ -45,15 +45,6 @@ export class AppHome {
       toast.onDidDismiss().then(async () => {
         await set('firstSeen', true);
       });
-
-      const modal = await modalCtrl.create({
-        component: 'app-intro'
-      });
-      await modal.present();
-
-      modal.onDidDismiss().then(() => {
-        ga('send', 'event', ['Event'], ['Get Started'], ['Getting started modal closed']);
-      });
     }
 
     if (this.name && this.username) {
