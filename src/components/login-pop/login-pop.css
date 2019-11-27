@@ -9,3 +9,7 @@
   align-items: center;
   background: #bbbbbb40;
 }
+
+#signedInDiv {
+  text-align: center;
+}
