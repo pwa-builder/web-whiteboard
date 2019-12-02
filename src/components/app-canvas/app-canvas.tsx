@@ -49,9 +49,11 @@ export class AppCanvas {
     window.addEventListener('resize', () => {
       console.log('resizing');
       this.resizeCanvas();
-    })
+    });
 
-    this.setupCanvas();
+    (window as any).requestIdleCallback(() => {
+      this.setupCanvas();
+    });
 
     (window as any).requestIdleCallback(async () => {
       const canvasState = await (get('canvasState') as any);

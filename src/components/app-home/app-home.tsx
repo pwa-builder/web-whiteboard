@@ -31,30 +31,23 @@ export class AppHome {
   wakeLockController: any;
 
   async componentDidLoad() {
-    const test = await get('firstSeen');
+    (window as any).requestIdleCallback(async () => {
+      const test = await get('firstSeen');
 
-    if (!test) {
-      const toast = await toastController.create({
-        message: "Webboard currently uses analytics to measure usage. No personal or identifiable data is collected. By continuing to use this app you agree to this.",
-        showCloseButton: true,
-        closeButtonText: "Ok"
-      });
+      if (!test) {
+        const toast = await toastController.create({
+          message: "Webboard currently uses analytics to measure usage. No personal or identifiable data is collected. By continuing to use this app you agree to this.",
+          showCloseButton: true,
+          closeButtonText: "Ok"
+        });
 
-      await toast.present();
+        await toast.present();
 
-      toast.onDidDismiss().then(async () => {
-        await set('firstSeen', true);
-      });
-    }
-
-    if (this.name && this.username) {
-      const data = await getSavedImage(this.name, { username: this.username });
-      console.log(data);
-
-      if (data) {
-        this.savedImage = data.url;
+        toast.onDidDismiss().then(async () => {
+          await set('firstSeen', true);
+        });
       }
-    }
+    });
 
     (window as any).requestIdleCallback(() => {
       this.setupWakeLock();
@@ -62,6 +55,35 @@ export class AppHome {
 
     (window as any).requestIdleCallback(async () => {
       await import('../../mgt.js');
+    });
+
+    (window as any).requestIdleCallback(async () => {
+      if (this.name && this.username) {
+        const alert = await alertCtrl.create({
+          header: "Saved Image",
+          subHeader: "Open a saved image?",
+          buttons: [
+            {
+              text: 'Cancel',
+              role: 'cancel',
+              cssClass: 'secondary',
+              handler: () => {
+                console.log('Confirm Cancel: blah');
+              }
+            }, {
+              text: 'Confirm',
+              handler: async () => {
+                const data = await getSavedImage(this.name, { username: this.username });
+
+                if (data) {
+                  this.savedImage = data.url;
+                }
+              }
+            }
+          ]
+        });
+        await alert.present();
+      }
     });
   }
 
@@ -71,21 +93,12 @@ export class AppHome {
   }
 
   async setupWakeLock() {
-    if ('WakeLock' in window) {
-      this.wakeLockController = new AbortController();
-      const signal = this.wakeLockController.signal;
-
-      try {
-        await (window as any).WakeLock.request('screen', { signal })
-      }
-      catch (err) {
-        console.error(err);
-      }
+    if ('wakeLock' in navigator && 'request' in (navigator as any).wakeLock) {
+      this.wakeLockController = await (navigator as any).wakeLock.request('screen');
     }
   }
 
   changeColor(ev: CustomEvent) {
-    console.log(ev.detail);
     this.color = ev.detail;
   }
 
@@ -229,7 +242,6 @@ export class AppHome {
   }
 
   async exportToNote() {
-    console.log('exporting...');
     const appCanvas = this.el.querySelector('app-canvas');
     await appCanvas.exportToOneNote();
   }
@@ -251,7 +263,7 @@ export class AppHome {
 
   componentDidUnload() {
     if (this.wakeLockController) {
-      this.wakeLockController.abort();
+      this.wakeLockController.release();
     }
   }
 
