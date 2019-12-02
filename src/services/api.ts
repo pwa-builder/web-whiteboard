@@ -1,4 +1,5 @@
 const url = "https://webboard-server.azurewebsites.net";
+// const url = 'http://localhost:3000';
 
 export async function saveImagesS(images: any) {
   console.log(images);

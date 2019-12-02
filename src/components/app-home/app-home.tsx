@@ -59,6 +59,10 @@ export class AppHome {
     (window as any).requestIdleCallback(() => {
       this.setupWakeLock();
     });
+
+    (window as any).requestIdleCallback(async () => {
+      await import('../../mgt.js');
+    });
   }
 
   @Listen('beforeinstallprompt', { target: 'window' })
@@ -156,7 +160,7 @@ export class AppHome {
     const modal = await modalCtrl.create({
       component: 'app-images',
       cssClass: 'imagesModal',
-      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await modal.present();
 
@@ -201,7 +205,7 @@ export class AppHome {
       component: 'app-settings',
       event: ev,
       cssClass: 'settingsPopover',
-      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await popover.present();
   }
@@ -282,13 +286,8 @@ export class AppHome {
             <ion-icon color="primary" name="settings"></ion-icon>
           </ion-button>
 
-          {/*<mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
-          <mgt-login></mgt-login>*/}
-
-          <ion-button fill="clear" onClick={(event) => this.openLoginPop(event)}>
-            <ion-icon slot="start" color="primary" name="person"></ion-icon>
-            Sign In
-          </ion-button>
+          <mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
+          <mgt-login></mgt-login>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
         </div>

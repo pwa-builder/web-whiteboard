@@ -125,7 +125,7 @@ export class AppControls {
       component: 'app-settings',
       event: ev,
       cssClass: 'settingsPopover',
-      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await popover.present();
   }
@@ -162,7 +162,7 @@ export class AppControls {
       const modal = await modalCtrl.create({
         component: 'image-popover',
         cssClass: 'extImageModal',
-        showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
       });
       await modal.present();
     }
@@ -174,7 +174,7 @@ export class AppControls {
         component: 'ai-popover',
         event: ev,
         cssClass: "aiPopover",
-        showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
       })
 
       await popover.present();
@@ -182,7 +182,7 @@ export class AppControls {
     else {
       const modal = await modalCtrl.create({
         component: 'ai-popover',
-        showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
       });
 
       await modal.present();
