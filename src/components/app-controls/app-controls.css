@@ -165,10 +165,12 @@ ion-fab {
 }
 
 #customColor {
-  background: none;
+  background: #bbbbbbbf;
   border: none;
   height: 2em;
   width: 2em;
+  border-radius: 50%;
+  padding: 5px;
 }
 
 #colorInternalBlock #closeButton {
@@ -273,7 +275,7 @@ ion-fab {
   }
 }
 
-@media(min-width: 1200px) {
+@media (min-width: 1200px) {
   .extImageModal {
     --width: 56em !important;
   }
@@ -299,6 +301,10 @@ ion-fab {
 }
 
 @keyframes spin {
-  from {transform:rotate(0deg);}
-  to {transform:rotate(360deg);}
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

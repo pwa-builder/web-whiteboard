@@ -12,7 +12,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 export namespace Components {
   interface AiPopover {}
   interface AppCanvas {
-    'addImageToCanvas': (imageString: string) => Promise<unknown>;
+    'addImageToCanvas': (imageString: string, width: number, height: number) => Promise<unknown>;
     'clearCanvas': () => Promise<void>;
     'clearGrid': () => Promise<unknown>;
     'color': string;
@@ -44,11 +44,6 @@ export namespace Components {
   interface ImagePopover {}
   interface InstallModal {
     'installEvent': any;
-  }
-  interface LoginPop {}
-  interface SideCart {
-    'name': string;
-    'username': string;
   }
 }
 
@@ -132,18 +127,6 @@ declare global {
     prototype: HTMLInstallModalElement;
     new (): HTMLInstallModalElement;
   };
-
-  interface HTMLLoginPopElement extends Components.LoginPop, HTMLStencilElement {}
-  var HTMLLoginPopElement: {
-    prototype: HTMLLoginPopElement;
-    new (): HTMLLoginPopElement;
-  };
-
-  interface HTMLSideCartElement extends Components.SideCart, HTMLStencilElement {}
-  var HTMLSideCartElement: {
-    prototype: HTMLSideCartElement;
-    new (): HTMLSideCartElement;
-  };
   interface HTMLElementTagNameMap {
     'ai-popover': HTMLAiPopoverElement;
     'app-canvas': HTMLAppCanvasElement;
@@ -158,8 +141,6 @@ declare global {
     'drive-preview': HTMLDrivePreviewElement;
     'image-popover': HTMLImagePopoverElement;
     'install-modal': HTMLInstallModalElement;
-    'login-pop': HTMLLoginPopElement;
-    'side-cart': HTMLSideCartElement;
   }
 }
 
@@ -172,7 +153,6 @@ declare namespace LocalJSX {
     'savedDrawing'?: string | null;
   }
   interface AppControls {
-    'onAddImage'?: (event: CustomEvent<any>) => void;
     'onAllImages'?: (event: CustomEvent<any>) => void;
     'onClearCanvas'?: (event: CustomEvent<any>) => void;
     'onColorSelected'?: (event: CustomEvent<any>) => void;
@@ -203,11 +183,6 @@ declare namespace LocalJSX {
   interface InstallModal {
     'installEvent'?: any;
   }
-  interface LoginPop {}
-  interface SideCart {
-    'name'?: string;
-    'username'?: string;
-  }
 
   interface IntrinsicElements {
     'ai-popover': AiPopover;
@@ -223,8 +198,6 @@ declare namespace LocalJSX {
     'drive-preview': DrivePreview;
     'image-popover': ImagePopover;
     'install-modal': InstallModal;
-    'login-pop': LoginPop;
-    'side-cart': SideCart;
   }
 }
 
@@ -247,8 +220,6 @@ declare module "@stencil/core" {
       'drive-preview': LocalJSX.DrivePreview & JSXBase.HTMLAttributes<HTMLDrivePreviewElement>;
       'image-popover': LocalJSX.ImagePopover & JSXBase.HTMLAttributes<HTMLImagePopoverElement>;
       'install-modal': LocalJSX.InstallModal & JSXBase.HTMLAttributes<HTMLInstallModalElement>;
-      'login-pop': LocalJSX.LoginPop & JSXBase.HTMLAttributes<HTMLLoginPopElement>;
-      'side-cart': LocalJSX.SideCart & JSXBase.HTMLAttributes<HTMLSideCartElement>;
     }
   }
 }

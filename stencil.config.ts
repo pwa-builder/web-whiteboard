@@ -20,7 +20,7 @@ export const config: Config = {
         {
           src: "mgt.js"
         }
-      ]
+      ],
     }
   ],
   globalScript: 'src/global/app.ts',

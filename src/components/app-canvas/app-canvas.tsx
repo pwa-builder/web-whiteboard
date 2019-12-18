@@ -6,7 +6,7 @@ import { set, get, del } from 'idb-keyval';
 import { b64toBlob } from '../../helpers/utils';
 import { getNewFileHandle, readFile } from '../../helpers/files-api';
 
-import { exportToOneNote } from '../../services/graph';
+import { exportToOneNote, createActivity } from '../../services/graph';
 import { saveImagesS } from '../../services/api';
 
 declare var ClipboardItem;
@@ -42,10 +42,9 @@ export class AppCanvas {
   fileHandle: any;
   fileWriter: any;
   contextAnimation: Animation;
+  rect: any;
 
   componentDidLoad() {
-    console.log('Component has been rendered');
-
     window.addEventListener('resize', () => {
       console.log('resizing');
       this.resizeCanvas();
@@ -67,58 +66,56 @@ export class AppCanvas {
       }
     });
 
-    (window as any).requestIdleCallback(async () => {
-      this.canvasElement.oncontextmenu = async (event: any) => {
-        event.preventDefault();
+    this.setupEvents();
+  }
 
-        this.mode = 'stop';
+  setupEvents() {
+    this.canvasElement.oncontextmenu = async (event: any) => {
+      event.preventDefault();
 
-        this.openContextMenu = true;
+      this.mode = 'stop';
 
-        setTimeout(() => {
-          console.log(event.clientY);
-          console.log(this.contextElement);
-          this.contextElement.style.top = `${event.clientY}px`;
-          this.contextElement.style.left = `${event.clientX}px`;
+      this.openContextMenu = true;
 
-          this.contextAnimation = this.contextElement.animate([
-            { transform: 'translateY(0)', opacity: 0 },
-            { transform: 'translateY(20px)', opacity: 1 }
-          ], {
-            duration: 100,
-            fill: 'both'
-          })
-        }, 40);
+      setTimeout(() => {
+        this.contextElement.style.top = `${event.clientY}px`;
+        this.contextElement.style.left = `${event.clientX}px`;
+
+        this.contextAnimation = this.contextElement.animate([
+          { transform: 'translateY(0)', opacity: 0 },
+          { transform: 'translateY(20px)', opacity: 1 }
+        ], {
+          duration: 100,
+          fill: 'both'
+        })
+      }, 40);
 
 
-        let that = this;
-        this.canvasElement.addEventListener('click', async function handler() {
-          that.contextAnimation.reverse();
+      let that = this;
+      this.canvasElement.addEventListener('click', async function handler() {
+        that.contextAnimation.reverse();
 
-          that.contextAnimation.onfinish = () => {
-            that.openContextMenu = false;
+        that.contextAnimation.onfinish = () => {
+          that.openContextMenu = false;
 
-            that.mode = 'pen';
-          }
+          that.mode = 'pen';
+        }
 
-          that.canvasElement.removeEventListener('click', handler);
-        });
+        that.canvasElement.removeEventListener('click', handler);
+      });
 
+    }
+
+    document.addEventListener('keydown', async (ev) => {
+      if (ev.key.toLowerCase() === "s".toLowerCase() && ev.shiftKey && ev.ctrlKey) {
+        console.log('here');
+        await this.saveToFS();
       }
-    });
 
-    (window as any).requestIdleCallback(() => {
-      document.addEventListener('keydown', async (ev) => {
-        if (ev.key.toLowerCase() === "s".toLowerCase() && ev.shiftKey && ev.ctrlKey) {
-          console.log('here');
-          await this.saveToFS();
-        }
-
-        else if (ev.key.toLowerCase() === "s".toLowerCase() && ev.ctrlKey) {
-          this.quickSave(ev);
-        }
-      })
-    });
+      else if (ev.key.toLowerCase() === "s".toLowerCase() && ev.ctrlKey) {
+        this.quickSave(ev);
+      }
+    })
   }
 
   async resizeCanvas() {
@@ -135,6 +132,7 @@ export class AppCanvas {
     this.context.strokeStyle = this.color;
     this.context.lineWidth = 10;
 
+    this.rect = this.canvasElement.getBoundingClientRect();
 
     if (canvasState) {
       const tempImage = new Image();
@@ -208,6 +206,9 @@ export class AppCanvas {
       await this.clearCanvas();
 
       this.context.drawImage(tempImage, 0, 0);
+
+      let canvasState = this.canvasElement.toDataURL();
+      await set('canvasState', canvasState);
 
       tempImage = null
     }
@@ -428,9 +429,10 @@ export class AppCanvas {
 
   @Method()
   async saveCanvas(name: string) {
-
     const canvasImage = this.canvasElement.toDataURL();
     const images: any[] = await get('images');
+
+    const localImage = images.find((imageEntry) => { return imageEntry.name === name });
 
     // AI
     const aiToken = localStorage.getItem('ai');
@@ -469,51 +471,91 @@ export class AppCanvas {
 
         const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
 
-        if (handle) {
+        /*if (handle) {
           images.push({ name: handle.name, color: data.color, desc, tags: data.tags, url: canvasImage });
         }
         else {
           images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
+        }*/
+        if (localImage) {
+          localImage.color = data.color;
+          localImage.desc = desc;
+          localImage.tags = data.tags;
+          localImage.url = canvasImage;
+
+          console.log(images);
+        }
+        else {
+          if (handle) {
+            images.push({ name: handle.name, color: data.color, desc, tags: data.tags, url: canvasImage });
+          }
+          else {
+            images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
+          }
         }
 
-        /*const activityObject = {
-          "appActivityId": 'uniqueIdInAppContext',
-          "activitySourceHost": "https://webboard-app.web.app",
-          "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-          "appDisplayName": "Webboard",
-          "activationUrl": "https://webboard-app.web.app",
-          "fallbackUrl": "https://webboard-app.firebaseapp.com",
-          "contentInfo": {
-            "@context": "http://schema.org",
-            "@type": "CreativeWork",
-            "author": "Jennifer Booth",
-            "name": "Graph Explorer User Activity"
-          },
-          "visualElements": {
-            "attribution": {
-              "iconUrl": "https://graphexplorer.blob.core.windows.net/explorerIcon.png",
-              "alternateText": "Microsoft Graph Explorer",
-              "addImageQuery": "false"
+        try {
+          const provider = (window as any).mgt.Providers.globalProvider;
+          const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
+
+          //const appActivityId = `/board?name=${handle ? handle.name : name}&username=${user.name}`;
+
+          // weird format because graph
+          //const goodTime = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getUTCDate()}T${new Date().getUTCHours().toString().length > 1 ? null : 0}${new Date().getUTCHours()}:${new Date().getUTCMinutes().toString().length > 1 ? null : 0}${new Date().getUTCMinutes()}:${new Date().getUTCSeconds()}.${new Date().getUTCMilliseconds()}Z`;
+          //const goodTime2 = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getUTCDate()}T${new Date().getUTCHours().toString().length > 1 ? null : 0}${new Date().getUTCHours()}:${new Date().getUTCMinutes() + 3}:${new Date().getUTCSeconds()}.${new Date().getUTCMilliseconds()}Z`
+
+          const activityObject = {
+            "appActivityId": `/boards?${handle ? handle.name : name}`,
+            "activitySourceHost": 'https://webboard-app.web.app',
+            "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            "appDisplayName": "Webboard",
+            "activationUrl": `https://webboard-app.web.app/boards/${handle ? handle.name : name}/${user.name}/board`,
+            "fallbackUrl": "https://webboard-app.web.app",
+            "contentInfo": {
+              "@context": "http://schema.org",
+              "@type": "CreativeWork",
+              "author": user.name,
+              "name": "Webboard"
             },
-            "description": "A user activity made through the Microsoft Graph Explorer",
-            "backgroundColor": "#008272",
-            "displayText": "You saved a new board",
-            "content": {
-              "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-              "type": "AdaptiveCard",
-              "body": [
-                {
-                  "type": "TextBlock",
-                  "text": "Always access your latest board here!"
-                }
-              ]
-            }
-          },
-        };*/
+            "visualElements": {
+              "attribution": {
+                "iconUrl": "https://graphexplorer.blob.core.windows.net/explorerIcon.png",
+                "alternateText": "Microsoft Graph Explorer",
+                "addImageQuery": "false"
+              },
+              "description": "You can access your board here",
+              "backgroundColor": "#008272",
+              "displayText": `You saved a new board: ${handle ? handle.name : name}`,
+              "content": {
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "type": "AdaptiveCard",
+                "body": [
+                  {
+                    "type": "TextBlock",
+                    "text": "Always access your latest board here!"
+                  }
+                ]
+              }
+            },
 
-        console.log('creating activity');
 
-        // await createActivity('uniqueIdInAppContext', activityObject);
+            /*"historyItems": [
+              {
+                "userTimezone": "America/Los Angeles",
+                                    2019-12-18T09:05:48.401Z
+                "startedDateTime": "2019-12-18T07:44:23.299Z",
+                "lastActiveDateTime": "2019-12-18T08:44:23.299Z"
+              }
+            ]*/
+          };
+
+          console.log('activity object', activityObject);
+
+          await createActivity(handle ? handle.name : name, activityObject);
+        }
+        catch (err) {
+          console.error(err);
+        }
 
         await set('images', images);
 
@@ -550,11 +592,24 @@ export class AppCanvas {
       if (images) {
         const handle = await this.saveToFS();
         console.log(handle);
-        if (handle) {
+        /*if (handle) {
           images.push({ name: handle.name, url: canvasImage });
         }
         else {
           images.push({ name, url: canvasImage });
+        }*/
+
+        if (localImage) {
+          localImage.url = canvasImage;
+          console.log(images);
+        }
+        else {
+          if (handle) {
+            images.push({ name: handle.name, url: canvasImage });
+          }
+          else {
+            images.push({ name, url: canvasImage });
+          }
         }
 
         await set('images', images);
@@ -629,6 +684,8 @@ export class AppCanvas {
   setupCanvas() {
     this.canvasElement.height = window.innerHeight;
     this.canvasElement.width = window.innerWidth;
+
+    this.rect = this.canvasElement.getBoundingClientRect();
 
     this.context = (this.canvasElement.getContext('2d', {
       desynchronized: true
@@ -705,7 +762,6 @@ export class AppCanvas {
 
     // handle mouse events
     this.canvasElement.addEventListener("pointerdown", (e) => {
-      console.log('pointerdown', e);
 
       if (e.button !== 2) {
         if (e.ctrlKey === true) {
@@ -717,7 +773,7 @@ export class AppCanvas {
         }
 
         this.canvasElement.setPointerCapture(e.pointerId);
-        this.lastPos = this.getMousePos(this.canvasElement, e);
+        this.lastPos = this.getMousePos(e);
 
         if (e.pointerType !== 'touch') {
           this.drawing = true;
@@ -731,19 +787,19 @@ export class AppCanvas {
       this.quickSave(e);
     });
 
-    if ((PointerEvent.prototype as any).getPredictedEvents) {
+    if ((PointerEvent.prototype as any).getCoalescedEvents) {
       this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
-        this.mousePos = this.getMousePos(this.canvasElement, e);
+        this.mousePos = this.getMousePos(e);
 
         if (e.pointerType === "touch") {
           this.drawing = true;
         }
 
-        const allEvents = (e as any).getPredictedEvents();
+        const allEvents = (e as any).getCoalescedEvents();
         if (allEvents.length > 0) {
           for (let i = 0; i < allEvents.length; i++) {
             if (i === allEvents.length - 1) {
-              this.mousePos = this.getMousePos(this.canvasElement, e)
+              this.mousePos = this.getMousePos(allEvents[i]);
             }
           }
         }
@@ -752,7 +808,7 @@ export class AppCanvas {
     }
     else {
       this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
-        this.mousePos = this.getMousePos(this.canvasElement, e);
+        this.mousePos = this.getMousePos(e);
 
         if (e.pointerType === "touch") {
           this.drawing = true;
@@ -795,12 +851,11 @@ export class AppCanvas {
     })
   }
 
-  getMousePos(canvasDom, mouseEvent) {
-    const rect = canvasDom.getBoundingClientRect();
+  getMousePos(mouseEvent: PointerEvent) {
 
     return {
-      x: mouseEvent.clientX - rect.left,
-      y: mouseEvent.clientY - rect.top,
+      x: mouseEvent.clientX - this.rect.left,
+      y: mouseEvent.clientY - this.rect.top,
       width: mouseEvent.width,
       type: mouseEvent.pointerType,
       ctrlKey: mouseEvent.ctrlKey,
@@ -873,7 +928,7 @@ export class AppCanvas {
   }
 
   @Method()
-  addImageToCanvas(imageString: string) {
+  addImageToCanvas(imageString: string, width: number, height: number) {
     this.mode = "something";
 
     return new Promise(() => {
@@ -893,7 +948,14 @@ export class AppCanvas {
         // weirdness
         let that = this;
         this.canvasElement.addEventListener('click', async function handler(ev) {
-          context.drawImage(base_image, ev.clientX, ev.clientY, base_image.width - 400, base_image.height - 400);
+
+          if (window.matchMedia("(min-width: 1200px)").matches) {
+            context.drawImage(base_image, ev.clientX, ev.clientY, width / 2, height / 2);
+          }
+          else {
+            context.drawImage(base_image, ev.clientX, ev.clientY, width / 4, height / 4);
+          }
+
           await toast.dismiss();
 
           canvasElement.removeEventListener('click', handler);
@@ -905,6 +967,10 @@ export class AppCanvas {
 
   @Method()
   async exportToOneNote() {
+    if (this.contextAnimation) {
+      this.contextAnimation.reverse();
+    }
+
     const alert = await alertCtrl.create({
       header: "Name",
       message: "Your board will be uploaded to OneDrive first, what would you like to name it?",
@@ -982,8 +1048,17 @@ export class AppCanvas {
         {
           this.openContextMenu ?
             <div ref={(el) => this.contextElement = el as HTMLDivElement} id="customContextMenu">
-              <button onClick={(event) => this.pasteImage(event)}>Paste Image</button>
-              <button onClick={() => this.copyImage()}>Copy Image</button>
+              <button onClick={() => this.copyImage()}>
+                <ion-icon name="copy"></ion-icon>
+              </button>
+
+              <button onClick={(event) => this.pasteImage(event)}>
+                <ion-icon name="albums"></ion-icon>
+              </button>
+
+              <button onClick={() => this.exportToOneNote()}>
+                <ion-icon src="/assets/onenote.svg"></ion-icon>
+              </button>
             </div>
             : null
         }

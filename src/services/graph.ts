@@ -59,37 +59,19 @@ export async function createActivity(id: string, activityObject: any) {
   let graphClient = provider.graph.client;
 
 
-  await graphClient.api(`/me/activities/${id}`).put(activityObject);
+  await graphClient.api(`/me/activities/boards?${id}`).put(activityObject);
 }
 
-/*export async function createActivity(token: string, activityObject: any, id: string) {
-  if (token) {
-    const headers = new Headers();
-    const bearer = "Bearer " + token;
-    headers.append("Authorization", bearer);
-    headers.append("Content-Type", "application/json");
-    const options = {
-      method: "PUT",
-      body: JSON.stringify(activityObject),
-      headers: headers
-    };
-    const graphEndpoint = `https://graph.microsoft.com/v1.0/me/activities/${id}`;
+export async function getRecentActivities() {
+  const provider = (window as any).mgt.Providers.globalProvider;
+  let graphClient = provider.graph.client;
 
-    try {
-      const response = await fetch(graphEndpoint, options);
-      const data = await response.json();
 
-      return data;
-    } catch (err) {
-      console.error(`There was an error making the request: ${err}`)
-    }
-  } else {
-    console.error(`
-      An auth token must be passed in. To learn more about how to get an auth token
-      for the Microsoft Graph API, check out https://github.com/AzureAD/microsoft-authentication-library-for-js.
-    `);
-  }
-}*/
+  const activities = await graphClient.api(`/me/activities?$top=3`).get();
+  console.log(activities);
+
+  return activities.value;
+}
 
 export async function exportToOneNote(imageUrl: string, name: string) {
   if (imageUrl) {

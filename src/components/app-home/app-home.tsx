@@ -5,8 +5,6 @@ import { set, get } from 'idb-keyval';
 
 import '@pwabuilder/pwainstall';
 
-import { getSavedImage } from '../../services/api';
-
 declare var ga: any;
 
 @Component({
@@ -24,6 +22,8 @@ export class AppHome {
   @State() dragMode: boolean = false;
   @State() currentFileName: string | null = null;
   @State() canInstall: boolean = false;
+
+  @State() mgtLoaded: boolean = false;
 
   @Prop() name: string;
   @Prop() username: string;
@@ -49,12 +49,16 @@ export class AppHome {
       }
     });
 
-    (window as any).requestIdleCallback(() => {
-      this.setupWakeLock();
+    (window as any).requestIdleCallback(async () => {
+      const loginTest = await get('webboardLoggedIn');
+
+      if (loginTest && loginTest === true) {
+        await this.checkMGT();
+      }
     });
 
-    (window as any).requestIdleCallback(async () => {
-      await import('../../mgt.js');
+    (window as any).requestIdleCallback(() => {
+      this.setupWakeLock();
     });
 
     (window as any).requestIdleCallback(async () => {
@@ -73,7 +77,9 @@ export class AppHome {
             }, {
               text: 'Confirm',
               handler: async () => {
-                const data = await getSavedImage(this.name, { username: this.username });
+                const module = await import('../../services/api');
+
+                const data = await module.getSavedImage(this.name, { username: this.username });
 
                 if (data) {
                   this.savedImage = data.url;
@@ -85,6 +91,13 @@ export class AppHome {
         await alert.present();
       }
     });
+  }
+
+  async checkMGT() {
+    await import('../../mgt.js');
+    this.mgtLoaded = true;
+
+    await set('webboardLoggedIn', true);
   }
 
   @Listen('beforeinstallprompt', { target: 'window' })
@@ -121,7 +134,7 @@ export class AppHome {
     if ("chooseFileSystemEntries" in window) {
       appCanvas.saveCanvas('');
     }
-    else if (alertCtrl) {
+    else if (!this.currentFileName && alertCtrl) {
       const alert = await alertCtrl.create({
         header: 'File Name',
         subHeader: 'Enter a name for the file',
@@ -155,6 +168,15 @@ export class AppHome {
       });
       await alert.present();
     }
+    else if (this.currentFileName) {
+      await appCanvas.saveCanvas(this.currentFileName);
+
+      const toast = await toastController.create({
+        message: `${this.currentFileName} saved`,
+        duration: 1800
+      });
+      await toast.present();
+    }
   }
 
   erase() {
@@ -181,6 +203,7 @@ export class AppHome {
     console.log(data);
 
     if (data && data.url) {
+      console.log(data);
       if (data.name) {
         this.currentFileName = data.name;
       }
@@ -208,8 +231,8 @@ export class AppHome {
 
   async doImage(ev) {
     console.log(ev);
-    const appCanvas = this.el.querySelector('app-canvas');
-    await appCanvas.addImageToCanvas(ev.detail);
+   //  const appCanvas = this.el.querySelector('app-canvas');
+    // await appCanvas.addImageToCanvas(ev.detail);
   }
 
   async openSettings(ev: Event) {
@@ -270,9 +293,9 @@ export class AppHome {
   render() {
     return [
       <div class='app-home'>
-        <pwa-install></pwa-install>
+        <pwa-install usecustom></pwa-install>
 
-        {this.canInstall && (window.matchMedia("(min-width: 1200px)").matches) ? <ion-button id="pwaInstallButton" shape="round" size="small" onClick={() => this.openInstall()}>
+        {this.canInstall && (window.matchMedia("(min-width: 1200px)").matches) && window.matchMedia('(display-mode: standalone)').matches === false ? <ion-button id="pwaInstallButton" shape="round" size="small" onClick={() => this.openInstall()}>
           <ion-icon slot="start" name="download"></ion-icon>
           Install
          </ion-button> : null}
@@ -291,15 +314,20 @@ export class AppHome {
 
         <app-canvas savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
 
-        <app-controls onDoShare={() => this.doShare()} onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onAddImage={(ev) => this.doImage(ev)} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
+        <app-controls onDoShare={() => this.doShare()} onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
 
         <div id="settingsBlock">
           <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(event) => this.openSettings(event)} fill="clear">
             <ion-icon color="primary" name="settings"></ion-icon>
           </ion-button>
 
-          <mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
-          <mgt-login></mgt-login>
+          <div>
+
+            {this.mgtLoaded ? <div>
+              <mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
+              <mgt-login></mgt-login>
+            </div> : <div onClick={() => this.checkMGT()}><p id="signInText">Sign In</p></div>}
+          </div>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
         </div>

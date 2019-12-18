@@ -20,7 +20,6 @@ export class AppControls {
   @Event() saveCanvas: EventEmitter;
   @Event() allImages: EventEmitter;
   @Event() doGrid: EventEmitter;
-  @Event() addImage: EventEmitter;
   @Event() dragMode: EventEmitter;
   @Event() export: EventEmitter;
   @Event() doShare: EventEmitter;
@@ -128,18 +127,6 @@ export class AppControls {
       showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
     });
     await popover.present();
-  }
-
-  handleFileInput(ev: Event) {
-    console.log((ev.target as any).files);
-
-    if (FileReader && (ev.target as any).files && (ev.target as any).files.length) {
-      var fr = new FileReader();
-      fr.onload = () => {
-        this.addImage.emit(fr.result);
-      }
-      fr.readAsDataURL((ev.target as any).files[0]);
-    }
   }
 
   async addImagePop() {

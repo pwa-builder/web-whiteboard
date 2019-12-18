@@ -5,6 +5,16 @@
   right: 18em;
 }
 
+pwa-install {
+  --install-button-color: var(--ion-color-primary) !important;
+}
+
+#signInText {
+  color: var(--ion-color-primary);
+  margin-right: 2em;
+  font-weight: bold;
+}
+
 #mobileInstallButton {
   position: fixed;
   bottom: 4px;
@@ -33,7 +43,7 @@
   justify-content: space-around;
   background: white;
 
-  box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.37);
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.37);
   border-radius: 24px;
   min-width: 202px;
   z-index: -1;
@@ -65,6 +75,14 @@ app-canvas {
 @media (max-width: 500px) {
   #fileNameDiv {
     display: none;
+  }
+
+  #settingsButton {
+    display: none;
+  }
+
+  #settingsBlock {
+    min-width: 140px;
   }
 }
 

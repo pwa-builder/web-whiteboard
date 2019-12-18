@@ -6,7 +6,7 @@ self.addEventListener("message", ({ data }) => {
   }
 });
 
-const bgSyncPlugin = new workbox.backgroundSync.Plugin('postImages', {
+const bgSyncPlugin = new workbox.backgroundSync.Plugin('postImagesQueue', {
   maxRetentionTime: 24 * 60 // Retry for max of 24 Hours (specified in minutes)
 });
 
@@ -25,6 +25,11 @@ workbox.routing.registerRoute(
 
 workbox.routing.registerRoute(
   new RegExp('/assets/'),
+  new workbox.strategies.StaleWhileRevalidate()
+);
+
+workbox.routing.registerRoute(
+  new RegExp('/mgt.js'),
   new workbox.strategies.StaleWhileRevalidate()
 );
 

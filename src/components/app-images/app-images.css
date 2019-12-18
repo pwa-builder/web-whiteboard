@@ -93,6 +93,11 @@ h2 {
 #imageList img {
   max-height: 250px;
   object-fit: contain;
+  max-width: 372px;
+}
+
+#imageList ion-card {
+  max-width: 373px;
 }
 
 #imageBlock {
@@ -105,6 +110,10 @@ h2 {
   margin-bottom: 2em;
   animation-name: bounceInUp;
   animation-duration: 600ms;
+}
+
+#loadingContent {
+  height: 16em;
 }
 
 @keyframes bounceInUp {

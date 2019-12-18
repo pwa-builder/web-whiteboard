@@ -17,8 +17,8 @@ canvas {
   position: fixed;
   bottom: 10px;
   right: 16px;
-  background: #bbbbbb;
-  width: 9em;
+  background: #bbbbbb8c;
+  width: 6em;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -81,6 +81,11 @@ canvas {
   padding: 5px;
   border-radius: 8px;
   text-transform: uppercase;
+}
+
+#customContextMenu button ion-icon {
+  width: 1.6em;
+  height: 1.6em;
 }
 
 #customContextMenu button:hover {

@@ -17,7 +17,7 @@ import { getWindowsDevices, sendCommand } from '../../services/graph';
 })
 export class AppImages {
 
-  @State() images: any[] = [];
+  @State() images: any[] | null = null;
   @State() cloudImages: any;
   @State() showUpload: boolean = false;
   @State() imageSection: string = 'local';
@@ -36,17 +36,20 @@ export class AppImages {
       const images: any[] = await get('images');
 
       if (images) {
-        this.images = this.cleanImages(images);
+        setTimeout(() => {
+          this.images = this.cleanImages(images);
 
-        const imageWorker = new Worker('/assets/canvas-worker.js');
-        imageWorker.postMessage({ name: 'cloudImages', data: this.images });
+          const imageWorker = new Worker('/assets/canvas-worker.js');
+          imageWorker.postMessage({ name: 'cloudImages', data: this.images });
 
-        imageWorker.onmessage = (message) => {
-          console.log(message.data);
+          imageWorker.onmessage = (message) => {
+            console.log(message.data);
 
-          this.cloudImages = message.data;
-        }
+            this.cloudImages = message.data;
 
+            imageWorker.terminate();
+          }
+        }, 250);
       }
       else {
         const loading = await loadingController.create({
@@ -74,19 +77,7 @@ export class AppImages {
     }, {
       timeout: 2000
     })
-  }
-
-  async componentDidLoad() {
-    (window as any).requestIdleCallback(async () => {
-      console.log('updating local');
-      const data = await getSavedImages();
-      console.log('data', data);
-
-      if (data.images) {
-        await set('images', data.images);
-      }
-    });
-  }
+  };
 
   cleanImages(images: any[]) {
     let cleanImages = [];
@@ -130,6 +121,39 @@ export class AppImages {
     (this.el.closest('ion-modal') as any).dismiss({ url, name });
   }
 
+  async delete(event, imagePicked) {
+    event.preventDefault();
+
+    let imageToDelete = null;
+
+    this.images.forEach((image) => {
+      if (image.name === imagePicked.name) {
+        imageToDelete = image;
+      }
+    });
+
+    if (imageToDelete !== null) {
+      const indexOfImage = this.images.indexOf(imageToDelete);
+
+      if (indexOfImage > -1) {
+        this.images.splice(indexOfImage, 1);
+
+        const toast = await toastCtrl.create({
+          message: "deleting image",
+          duration: 1300
+        });
+        await toast.present();
+
+        this.images = [...this.images];
+
+        await set('images', this.images);
+        await saveImagesS(this.images);
+      }
+    }
+
+    event.preventDefault();
+  }
+
   async openToSide(name: string, ev) {
     ev.preventDefault();
 
@@ -152,7 +176,7 @@ export class AppImages {
 
       let rightIcon = null;
 
-      switch(device.Kind) {
+      switch (device.Kind) {
         case "PC":
           rightIcon = 'laptop'
           break;
@@ -247,6 +271,14 @@ export class AppImages {
               let graphClient = provider.graph.client;
               console.log(graphClient);
 
+              const loading = await loadingController.create({
+                message: "Uploading...",
+                showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+              });
+              await loading.present();
+
+              await sheet.dismiss();
+
               try {
                 const driveItem = await graphClient.api('/me/drive/root/children').middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).post({
                   "name": "webboard",
@@ -276,6 +308,8 @@ export class AppImages {
                 saveImages(remoteImages);*/
 
                 await saveImagesS(this.images);
+
+                await loading.dismiss();
 
                 const toast = await toastCtrl.create({
                   message: "Board uploaded to OneDrive",
@@ -378,51 +412,6 @@ export class AppImages {
         }
       }
 
-      /*try {
-        const shareURL = await graphClient.api(`/me/drive/items/${id}/createLink`).post({
-          "type": "view",
-          "scope": "anonymous"
-        });
-        console.log(shareURL);
-
-        if ((navigator as any).share) {
-          await (navigator as any).share({
-            title: 'webboard',
-            text: 'You have been shared a board, click the link to view!',
-            url: shareURL.link.webUrl,
-          })
-        }
-        else {
-          await navigator.clipboard.writeText(shareURL.link.webUrl);
-
-          const toast = await toastCtrl.create({
-            message: "Sharing URL saved to clipboard",
-            duration: 1800
-          });
-          await toast.present();
-        }
-      }
-      catch (err) {
-        const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
-        const file = new File([imageBlob], "default.jpg");
-
-        if ((navigator as any).canShare && (navigator as any).canShare(file)) {
-          (navigator as any).share({
-            files: [file],
-            title: 'Whiteboard',
-            text: 'Check out this board from Webboard https://webboard-app.web.app',
-          })
-            .then(() => console.log('Share was successful.'))
-            .catch((error) => console.log('Sharing failed', error));
-        } else {
-          const toast = await toastCtrl.create({
-            message: "You must be logged in to share",
-            duration: 1200
-          });
-          await toast.present();
-        }
-      }*/
-
     }, {
       timeout: 1200
     })
@@ -482,53 +471,56 @@ export class AppImages {
   }
 
   render() {
-    return (
-      <div id="mainDiv">
-        <ion-header id="imagesHeaderEl">
-          <ion-toolbar>
+    return [
+      <ion-header no-border id="imagesHeaderEl">
+        <ion-toolbar>
 
-            <ion-title>
-              Saved Boards
+          <ion-title color="primary">
+            Saved Boards
             </ion-title>
 
-            <ion-buttons slot="end">
-              <ion-button onClick={() => this.refreshImages()}>
-                <ion-icon name="refresh-circle"></ion-icon>
-              </ion-button>
+          <ion-buttons slot="end">
+            <ion-button onClick={() => this.refreshImages()}>
+              <ion-icon name="refresh-circle"></ion-icon>
+            </ion-button>
 
-              {"chooseFileSystemEntries" in window ? <ion-button onClick={() => this.openNativeFile()}>
-                <ion-icon name="folder"></ion-icon>
-              </ion-button> : null}
+            {"chooseFileSystemEntries" in window ? <ion-button onClick={() => this.openNativeFile()}>
+              <ion-icon name="folder"></ion-icon>
+            </ion-button> : null}
 
-              <ion-button onClick={() => this.close()}>
-                <ion-icon name='close'></ion-icon>
-              </ion-button>
-            </ion-buttons>
+            <ion-button onClick={() => this.close()}>
+              <ion-icon name='close'></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>,
+
+      <ion-content>
+
+
+        <div>
+
+          <ion-searchbar id="imageBar" onIonChange={(event) => this.searchImages(event)} debounce={250} animated placeholder="search"></ion-searchbar>
+
+          <ion-toolbar id="segmentToolbar">
+            <ion-segment value="local" onIonChange={(event) => this.segmentChange(event)}>
+              <ion-segment-button value="local">
+                <ion-label>All</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="cloud">
+                <ion-label>Cloud</ion-label>
+              </ion-segment-button>
+            </ion-segment>
           </ion-toolbar>
-        </ion-header>
 
-        {this.images && this.images.length > 0 ?
-          <div>
-
-            <ion-searchbar id="imageBar" onIonChange={(event) => this.searchImages(event)} debounce={250} animated placeholder="search"></ion-searchbar>
-
-            <ion-toolbar id="segmentToolbar">
-              <ion-segment value="local" onIonChange={(event) => this.segmentChange(event)}>
-                <ion-segment-button value="local">
-                  <ion-label>All</ion-label>
-                </ion-segment-button>
-                <ion-segment-button value="cloud">
-                  <ion-label>Cloud</ion-label>
-                </ion-segment-button>
-              </ion-segment>
-            </ion-toolbar>
+          {this.images ?
 
             <div id='imageList'>
               {
                 this.imageSection === 'local' ?
                   this.images.map((image) => {
                     return (
-                      <ion-card onClick={() => this.choose(image.url, image.name)}>
+                      <ion-card>
                         <ion-card-header>
 
                           <div id="buttonBar">
@@ -538,6 +530,10 @@ export class AppImages {
                             </div>
 
                             <ion-buttons>
+                              <ion-button icon-only fill="clear" onClick={($event) => this.delete($event, image)}>
+                                <ion-icon color="danger" name="trash"></ion-icon>
+                              </ion-button>
+
                               <ion-button icon-only fill="clear" onClick={(event) => this.openToSide(image.name, event)}>
                                 <ion-icon name="swap"></ion-icon>
                               </ion-button>
@@ -559,7 +555,7 @@ export class AppImages {
 
                         <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
 
-                        <ion-card-content>
+                        <ion-card-content onClick={() => this.choose(image.url, image.name)}>
                           <div id="imageTags">
                             {image.tags && image.tags.length > 0 ? <p id="tagsP">Tags: </p> : null}
                             {
@@ -629,11 +625,72 @@ export class AppImages {
                   })
               }
             </div>
-          </div> : <h2>No Saved Boards</h2>}
+            : <div id="imageList">
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-subtitle><ion-skeleton-text></ion-skeleton-text></ion-card-subtitle>
+                  <ion-card-title>
+                    <h2><ion-skeleton-text></ion-skeleton-text></h2>
+                  </ion-card-title>
+                </ion-card-header>
 
-      </div>
+                <ion-card-content>
+                  <div id="loadingContent">
+                    <ion-skeleton-text></ion-skeleton-text>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-subtitle><ion-skeleton-text></ion-skeleton-text></ion-card-subtitle>
+                  <ion-card-title>
+                    <h2><ion-skeleton-text></ion-skeleton-text></h2>
+                  </ion-card-title>
+                </ion-card-header>
+
+                <ion-card-content>
+                  <div id="loadingContent">
+                    <ion-skeleton-text></ion-skeleton-text>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-subtitle><ion-skeleton-text></ion-skeleton-text></ion-card-subtitle>
+                  <ion-card-title>
+                    <h2><ion-skeleton-text></ion-skeleton-text></h2>
+                  </ion-card-title>
+                </ion-card-header>
+
+                <ion-card-content>
+                  <div id="loadingContent">
+                    <ion-skeleton-text></ion-skeleton-text>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-subtitle><ion-skeleton-text></ion-skeleton-text></ion-card-subtitle>
+                  <ion-card-title>
+                    <h2><ion-skeleton-text></ion-skeleton-text></h2>
+                  </ion-card-title>
+                </ion-card-header>
+
+                <ion-card-content>
+                  <div id="loadingContent">
+                    <ion-skeleton-text></ion-skeleton-text>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </div>}
+        </div>
+      </ion-content>
 
 
-    );
+
+    ];
   }
 }

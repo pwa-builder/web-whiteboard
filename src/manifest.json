@@ -6,10 +6,10 @@
     "display": "standalone",
     "start_url": "/",
     "short_name": "Webboard",
-    "theme_color": "#1976d2",
+    "theme_color": "#FFFFFF",
     "description": "Enhance your work day and solve your cross platform whiteboarding needs with webboard! Draw text, shapes, attach images and more and share those whiteboards with anyone through OneDrive!",
     "orientation": "any",
-    "background_color": "#1976d2",
+    "background_color": "#FFFFFF",
     "related_applications": [],
     "prefer_related_applications": false,
     "screenshots": [
@@ -35,9 +35,9 @@
             "sizes": "64x64"
         },
         {
-            "src": "icons/android/android-launchericon-192-192.png",
+            "src": "icons/android/maskable_icon_192.png",
             "sizes": "192x192",
-            "purpose": "maskable any"
+            "purpose": "maskable"
         },
         {
             "src": "icons/android/android-launchericon-48-48.png",
@@ -45,8 +45,7 @@
         },
         {
             "src": "icons/android/android-launchericon-512-512.png",
-            "sizes": "512x512",
-            "purpose": "maskable"
+            "sizes": "512x512"
         },
         {
             "src": "icons/android/android-launchericon-28-28.png",
