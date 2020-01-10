@@ -116,6 +116,12 @@ h2 {
   height: 16em;
 }
 
+#imageFileList {
+  margin: 2em;
+  margin-left: 6em;
+  margin-right: 6em;
+}
+
 @keyframes bounceInUp {
   0% {
      opacity: 0;

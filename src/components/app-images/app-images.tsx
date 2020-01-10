@@ -518,6 +518,7 @@ export class AppImages {
             <div id='imageList'>
               {
                 this.imageSection === 'local' ?
+
                   this.images.map((image) => {
                     return (
                       <ion-card>
