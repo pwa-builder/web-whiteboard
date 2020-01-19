@@ -1,5 +1,5 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
-import { toastController as toastCtrl, alertController as alertCtrl } from '@ionic/core';
+import { toastController as toastCtrl, alertController as alertCtrl, modalController } from '@ionic/core';
 
 import { set, get, del } from 'idb-keyval';
 
@@ -339,6 +339,30 @@ export class AppCanvas {
     return await del('canvasState');
   }
 
+  @Method()
+  async liveConnect() {
+    const alert = await alertCtrl.create({
+      header: "Live Session",
+      message: "Start a live session and draw in real time with a teammate?",
+      buttons: [
+        {
+          text: "Cancel"
+        },
+        {
+          text: "Choose Teammates",
+          handler: async () => {
+            const modal = await modalController.create({
+              component: "contacts-modal"
+            });
+
+            await modal.present();
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   async doTextCopy() {
     this.copyingText = true;
 
@@ -519,12 +543,12 @@ export class AppCanvas {
             },
             "visualElements": {
               "attribution": {
-                "iconUrl": "https://graphexplorer.blob.core.windows.net/explorerIcon.png",
-                "alternateText": "Microsoft Graph Explorer",
+                "iconUrl": "https://webboard-app.web.app/icons/android/android-launchericon-64-64.png",
+                "alternateText": "Webboard",
                 "addImageQuery": "false"
               },
-              "description": "You can access your board here",
-              "backgroundColor": "#008272",
+              "description": "Access your saved board here",
+              "backgroundColor": "#1976d2",
               "displayText": `You saved a new board: ${handle ? handle.name : name}`,
               "content": {
                 "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",

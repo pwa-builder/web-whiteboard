@@ -19,6 +19,7 @@ export namespace Components {
     'dragMode': boolean;
     'drawGrid': () => Promise<unknown>;
     'exportToOneNote': () => Promise<void>;
+    'liveConnect': () => Promise<void>;
     'mode': string;
     'saveCanvas': (name: string) => Promise<void>;
     'savedDrawing': string | null;
@@ -28,6 +29,7 @@ export namespace Components {
   interface AppControls {}
   interface AppHome {
     'name': string;
+    'roomName': string;
     'username': string;
   }
   interface AppImages {}
@@ -38,6 +40,7 @@ export namespace Components {
   interface AppRoot {}
   interface AppSettings {}
   interface ColorModal {}
+  interface ContactsModal {}
   interface DrivePreview {
     'imageInfo': any;
   }
@@ -110,6 +113,12 @@ declare global {
     new (): HTMLColorModalElement;
   };
 
+  interface HTMLContactsModalElement extends Components.ContactsModal, HTMLStencilElement {}
+  var HTMLContactsModalElement: {
+    prototype: HTMLContactsModalElement;
+    new (): HTMLContactsModalElement;
+  };
+
   interface HTMLDrivePreviewElement extends Components.DrivePreview, HTMLStencilElement {}
   var HTMLDrivePreviewElement: {
     prototype: HTMLDrivePreviewElement;
@@ -138,6 +147,7 @@ declare global {
     'app-root': HTMLAppRootElement;
     'app-settings': HTMLAppSettingsElement;
     'color-modal': HTMLColorModalElement;
+    'contacts-modal': HTMLContactsModalElement;
     'drive-preview': HTMLDrivePreviewElement;
     'image-popover': HTMLImagePopoverElement;
     'install-modal': HTMLInstallModalElement;
@@ -161,11 +171,13 @@ declare namespace LocalJSX {
     'onDragMode'?: (event: CustomEvent<any>) => void;
     'onEraserMode'?: (event: CustomEvent<any>) => void;
     'onExport'?: (event: CustomEvent<any>) => void;
+    'onLive'?: (event: CustomEvent<any>) => void;
     'onPenMode'?: (event: CustomEvent<any>) => void;
     'onSaveCanvas'?: (event: CustomEvent<any>) => void;
   }
   interface AppHome {
     'name'?: string;
+    'roomName'?: string;
     'username'?: string;
   }
   interface AppImages {}
@@ -176,6 +188,7 @@ declare namespace LocalJSX {
   interface AppRoot {}
   interface AppSettings {}
   interface ColorModal {}
+  interface ContactsModal {}
   interface DrivePreview {
     'imageInfo'?: any;
   }
@@ -195,6 +208,7 @@ declare namespace LocalJSX {
     'app-root': AppRoot;
     'app-settings': AppSettings;
     'color-modal': ColorModal;
+    'contacts-modal': ContactsModal;
     'drive-preview': DrivePreview;
     'image-popover': ImagePopover;
     'install-modal': InstallModal;
@@ -217,6 +231,7 @@ declare module "@stencil/core" {
       'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
       'app-settings': LocalJSX.AppSettings & JSXBase.HTMLAttributes<HTMLAppSettingsElement>;
       'color-modal': LocalJSX.ColorModal & JSXBase.HTMLAttributes<HTMLColorModalElement>;
+      'contacts-modal': LocalJSX.ContactsModal & JSXBase.HTMLAttributes<HTMLContactsModalElement>;
       'drive-preview': LocalJSX.DrivePreview & JSXBase.HTMLAttributes<HTMLDrivePreviewElement>;
       'image-popover': LocalJSX.ImagePopover & JSXBase.HTMLAttributes<HTMLImagePopoverElement>;
       'install-modal': LocalJSX.InstallModal & JSXBase.HTMLAttributes<HTMLInstallModalElement>;

@@ -23,6 +23,7 @@ export class AppControls {
   @Event() dragMode: EventEmitter;
   @Event() export: EventEmitter;
   @Event() doShare: EventEmitter;
+  @Event() live: EventEmitter;
 
   @Element() el: HTMLElement;
 
@@ -227,6 +228,10 @@ export class AppControls {
     this.doShare.emit();
   }
 
+  doLive() {
+    this.live.emit();
+  }
+
   render() {
     return [
       <div id="main">
@@ -249,6 +254,10 @@ export class AppControls {
             { typeof((navigator as any).canShare) === "function" ? <button id="deskShareButton" onClick={() => this.deskShare()}>
               <ion-icon name="share"></ion-icon>
             </button> : null }
+
+            {/*<button id="liveButton" onClick={() => this.doLive()}>
+              <ion-icon name="share-alt"></ion-icon>
+        </button>*/}
 
           </div> :
 

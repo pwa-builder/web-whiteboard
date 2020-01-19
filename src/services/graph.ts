@@ -26,6 +26,65 @@ export async function getWindowsDevices() {
   }
 }
 
+export async function getPeople() {
+  const provider = (window as any).mgt.Providers.globalProvider;
+  let graphClient = provider.graph.client;
+  console.log(graphClient);
+
+  const data = await graphClient.api(`/me/people`).version('beta').middlewareOptions((window as any).mgt.prepScopes('people.read')).get();
+
+  if (data) {
+    return data.value;
+  }
+}
+
+export async function sendRoomInvite(chosenPeople: any[], roomName: string) {
+  if (!chosenPeople || chosenPeople.length < 0) {
+    return;
+  }
+
+  const provider = (window as any).mgt.Providers.globalProvider;
+  let graphClient = provider.graph.client;
+  console.log(graphClient);
+
+  let adds = [];
+  chosenPeople.forEach((person) => {
+    adds.push({ emailAddress: { address: person.emailAddresses[0].address } });
+  });
+
+  const mailToSend = {
+    message: {
+      subject: "Invitation to Collaborate",
+      body: {
+        contentType: "Text",
+        content: `Collaborate on a board with me here https://webboard-app.web.app/live/${roomName}.`
+      },
+      toRecipients: adds,
+    },
+  };
+
+  console.log(mailToSend);
+
+  try {
+    const data = await graphClient.api(`/me/sendMail`).version('beta').middlewareOptions((window as any).mgt.prepScopes('mail.send')).post(mailToSend);
+
+    if (data) {
+      return data.value;
+    }
+  }
+  catch (err) {
+    console.error(err);
+
+    let emailString = 'mailto:';
+
+    chosenPeople.forEach((person) => {
+      emailString = emailString + person.emailAddresses[0].address + ';'
+    })
+
+    window.location.href = `${emailString}?subject=Invitation To Collaborate &body=Collaborate on a board with me here https://webboard-app.web.app/live/${roomName}.`;
+  }
+}
+
 export async function sendCommand(id: string, url: string) {
 
   const provider = (window as any).mgt.Providers.globalProvider;

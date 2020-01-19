@@ -21,6 +21,7 @@ export class AppImages {
   @State() cloudImages: any;
   @State() showUpload: boolean = false;
   @State() imageSection: string = 'local';
+  @State() renderedCards: any[];
 
   @Element() el: HTMLElement;
 

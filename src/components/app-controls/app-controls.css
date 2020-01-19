@@ -222,6 +222,20 @@ ion-fab {
   margin-top: 18px;
 }
 
+#liveButton {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  font-size: 1.4em;
+  width: 2.4em;
+  height: 2.4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+}
+
 #tasksButton {
   background: white;
   border: none;
