@@ -240,24 +240,21 @@ export class AppCanvas {
 
   @Method()
   async shareCanvas() {
-    if ((navigator as any).canShare) {
-      this.canvasElement.toBlob(async (blob) => {
-        console.log(blob);
+    this.canvasElement.toBlob(async (blob) => {
+      console.log(blob);
 
-        const file = new File([blob], "default.jpg");
+      const file = new File([blob], "default.jpg");
 
-        if ((navigator as any).canShare && (navigator as any).canShare(file)) {
-          await (navigator as any).share({
-            files: [file],
-            title: 'Whiteboard',
-            text: 'Check out this whiteboard from WebBoard https://webboard-app.web.app',
-          })
-        } else {
-          console.log('Your system doesn\'t support sharing files.');
-        }
-      });
-    }
-
+      if ((navigator as any).canShare && (navigator as any).canShare(file)) {
+        await (navigator as any).share({
+          files: [file],
+          title: 'Whiteboard',
+          text: 'Check out this whiteboard from WebBoard https://webboard-app.web.app',
+        })
+      } else {
+        console.log('Your system doesn\'t support sharing files.');
+      }
+    });
   }
 
   @Watch('color')
@@ -925,9 +922,10 @@ export class AppCanvas {
         }
       })
     }
+    else {
 
-    if (data.recognitionUnits[0].recognizedObject === "rectangle" || data.recognitionUnits[0].recognizedObject === "square") {
-      this.drawSquare(data);
+      // if (data.recognitionUnits[0].recognizedObject === "rectangle" || data.recognitionUnits[0].recognizedObject === "square") {
+      this.drawShape(data);
 
       (window as any).requestIdleCallback(async () => {
         let canvasState = this.canvasElement.toDataURL();
@@ -957,7 +955,7 @@ export class AppCanvas {
     this.context.stroke();
   }
 
-  drawSquare(data) {
+  drawShape(data) {
     this.context.clearRect(data.recognitionUnits[0].boundingRectangle.topX - 20, data.recognitionUnits[0].boundingRectangle.topY - 20, data.recognitionUnits[0].boundingRectangle.width + 60, data.recognitionUnits[0].boundingRectangle.height + 60);
 
     this.context.globalCompositeOperation = 'source-over';
@@ -1016,7 +1014,6 @@ export class AppCanvas {
   }
 
   getMousePos(mouseEvent: PointerEvent) {
-
     return {
       x: mouseEvent.clientX - this.rect.left,
       y: mouseEvent.clientY - this.rect.top,
@@ -1219,14 +1216,20 @@ export class AppCanvas {
             <div ref={(el) => this.contextElement = el as HTMLDivElement} id="customContextMenu">
               <button onClick={() => this.copyImage()}>
                 <ion-icon name="copy"></ion-icon>
+
+                <span>Copy</span>
               </button>
 
               <button onClick={(event) => this.pasteImage(event)}>
                 <ion-icon name="albums"></ion-icon>
+
+                <span>Paste</span>
               </button>
 
               <button onClick={() => this.exportToOneNote()}>
                 <ion-icon src="/assets/onenote.svg"></ion-icon>
+
+                <span>Export</span>
               </button>
             </div>
             : null

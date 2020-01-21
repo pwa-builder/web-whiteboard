@@ -5,8 +5,8 @@
 
 #inkToShapeButton {
   position: fixed;
-  top: 18em;
-  left: 18px;
+  top: 2em;
+  left: 8em;
   background: var(--ion-color-primary);
   color: white;
   font-weight: bold;
@@ -21,8 +21,8 @@
 
 #inkToShapeButtonOff {
   position: fixed;
-  top: 18em;
-  left: 18px;
+  top: 2em;
+  left: 8em;
   background: var(--ion-color-danger);
   color: white;
   font-weight: bold;
@@ -123,11 +123,16 @@ canvas {
   padding: 5px;
   border-radius: 8px;
   text-transform: uppercase;
+
+  display: flex;
+  align-items: center;
 }
 
 #customContextMenu button ion-icon {
   width: 1.6em;
   height: 1.6em;
+
+  margin-right: 8px;
 }
 
 #customContextMenu button:hover {
