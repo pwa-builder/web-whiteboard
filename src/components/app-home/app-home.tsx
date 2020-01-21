@@ -27,7 +27,6 @@ export class AppHome {
 
   @Prop() name: string;
   @Prop() username: string;
-  @Prop() roomName: string;
 
   wakeLockController: any;
 
@@ -38,8 +37,12 @@ export class AppHome {
       if (!test) {
         const toast = await toastController.create({
           message: "Webboard currently uses analytics to measure usage. No personal or identifiable data is collected. By continuing to use this app you agree to this.",
-          showCloseButton: true,
-          closeButtonText: "Ok"
+          buttons: [
+            {
+              text: "accept",
+              side: "end"
+            }
+          ]
         });
 
         await toast.present();
@@ -92,12 +95,6 @@ export class AppHome {
         await alert.present();
       }
     });
-
-    (window as any).requestIdleCallback((async () => {
-      if (this.roomName) {
-        console.log('live session');
-      }
-    }))
   }
 
   async checkMGT() {
@@ -238,7 +235,7 @@ export class AppHome {
 
   async doImage(ev) {
     console.log(ev);
-   //  const appCanvas = this.el.querySelector('app-canvas');
+    //  const appCanvas = this.el.querySelector('app-canvas');
     // await appCanvas.addImageToCanvas(ev.detail);
   }
 

@@ -29,6 +29,7 @@ export class AppCanvas {
   @State() openContextMenu: boolean = false;
   @State() doDrag: boolean = false;
   @State() saving: boolean = false;
+  @State() inkShape: boolean = false;
 
   canvasElement: HTMLCanvasElement;
   gridCanvas: HTMLCanvasElement;
@@ -43,6 +44,7 @@ export class AppCanvas {
   fileWriter: any;
   contextAnimation: Animation;
   rect: any;
+  timerId: number;
 
   componentDidLoad() {
     window.addEventListener('resize', () => {
@@ -358,7 +360,8 @@ export class AppCanvas {
             await modal.present();
           }
         }
-      ]
+      ],
+      backdropDismiss: false
     });
     await alert.present();
   }
@@ -778,14 +781,30 @@ export class AppCanvas {
     })
   }
 
+  debounceFunction(func, delay) {
+    // Cancels the setTimeout method execution
+    console.log(this.timerId);
+    clearTimeout(this.timerId)
+
+    // Executes the func after delay time.
+    this.timerId = setTimeout(func, delay)
+  }
+
   async setupMouseEvents() {
     console.log('setting up mouse events');
     this.drawing = false;
 
     this.mousePos = { x: 0, y: 0 };
 
+    let points;
+
     // handle mouse events
     this.canvasElement.addEventListener("pointerdown", (e) => {
+
+      if (this.inkShape === true) {
+        points = [];
+        points.push({ x: e.clientX, y: e.clientY });
+      }
 
       if (e.button !== 2) {
         if (e.ctrlKey === true) {
@@ -802,18 +821,28 @@ export class AppCanvas {
         if (e.pointerType !== 'touch') {
           this.drawing = true;
         }
+
       }
 
     });
 
-    this.canvasElement.addEventListener("pointerup", (e) => {
-      console.log('pointerup');
+    this.canvasElement.addEventListener("pointerup", async (e) => {
+      console.log('pointerup', points);
       this.quickSave(e);
+
+      if (this.inkShape === true) {
+        this.debounceFunction(await this.sendInk(points), 1200);
+      }
+
     });
 
     if ((PointerEvent.prototype as any).getCoalescedEvents) {
       this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
         this.mousePos = this.getMousePos(e);
+
+        if (this.inkShape === true && points) {
+          points.push({ x: e.clientX, y: e.clientY });
+        }
 
         if (e.pointerType === "touch") {
           this.drawing = true;
@@ -834,11 +863,122 @@ export class AppCanvas {
       this.canvasElement.addEventListener("pointermove", (e: PointerEvent) => {
         this.mousePos = this.getMousePos(e);
 
+        if (this.inkShape && points) {
+          points.push({ x: e.clientX, y: e.clientY });
+        }
+
         if (e.pointerType === "touch") {
           this.drawing = true;
         }
+
       });
     }
+  }
+
+  async sendInk(points: any[]) {
+    console.log(points);
+
+    const inkObject = {
+      "language": "en-US",
+      "unit": "mm",
+      "version": 1,
+      "strokes": [
+        {
+          "id": Math.floor(Math.random() * Math.floor(100)),
+          "points": points
+        },
+      ]
+    };
+    console.log(inkObject);
+
+    const response = await fetch(`https://api.cognitive.microsoft.com/inkrecognizer/v1.0-preview/recognize`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": "4f0fef79672c4c7e90d92d282cc24ded"
+      },
+      method: "PUT",
+      body: JSON.stringify(inkObject)
+    });
+    const data = await response.json();
+
+    console.log(data.recognitionUnits);
+
+    if (data.recognitionUnits[0].recognizedObject === "cloud" || data.recognitionUnits[0].recognizedObject === "ellipse" || data.recognitionUnits[0].recognizedObject === "circle") {
+
+      this.drawCircle(data);
+
+      (window as any).requestIdleCallback(async () => {
+        let canvasState = this.canvasElement.toDataURL();
+        await set('canvasState', canvasState);
+
+        if ("chooseFileSystemEntries" in window && this.fileHandle) {
+          console.log('writing to file');
+          this.fileWriter = await this.fileHandle.createWriter();
+
+          console.log('this.fileWriter in pointer up', this.fileWriter);
+          console.log("chooseFileSystemEntries" in window);
+
+          this.canvasElement.toBlob(async (blob) => {
+            await this.fileWriter.write(0, blob);
+            await this.fileWriter.close();
+          }, 'image/jpeg');
+        }
+      })
+    }
+
+    if (data.recognitionUnits[0].recognizedObject === "rectangle" || data.recognitionUnits[0].recognizedObject === "square") {
+      this.drawSquare(data);
+
+      (window as any).requestIdleCallback(async () => {
+        let canvasState = this.canvasElement.toDataURL();
+        await set('canvasState', canvasState);
+
+        if ("chooseFileSystemEntries" in window && this.fileHandle) {
+          console.log('writing to file');
+          this.fileWriter = await this.fileHandle.createWriter();
+
+          console.log('this.fileWriter in pointer up', this.fileWriter);
+          console.log("chooseFileSystemEntries" in window);
+
+          this.canvasElement.toBlob(async (blob) => {
+            await this.fileWriter.write(0, blob);
+            await this.fileWriter.close();
+          }, 'image/jpeg');
+        }
+      })
+    }
+  }
+
+  drawCircle(data) {
+    this.context.clearRect(data.recognitionUnits[0].boundingRectangle.topX - 20, data.recognitionUnits[0].boundingRectangle.topY - 20, data.recognitionUnits[0].boundingRectangle.width + 60, data.recognitionUnits[0].boundingRectangle.height + 60);
+
+    this.context.beginPath();
+    this.context.ellipse(data.recognitionUnits[0].center.x, data.recognitionUnits[0].center.y, data.recognitionUnits[0].boundingRectangle.height - 100, data.recognitionUnits[0].boundingRectangle.width - 100, Math.PI / 4, 0, 2 * Math.PI);
+    this.context.stroke();
+  }
+
+  drawSquare(data) {
+    this.context.clearRect(data.recognitionUnits[0].boundingRectangle.topX - 20, data.recognitionUnits[0].boundingRectangle.topY - 20, data.recognitionUnits[0].boundingRectangle.width + 60, data.recognitionUnits[0].boundingRectangle.height + 60);
+
+    this.context.globalCompositeOperation = 'source-over';
+    this.context.beginPath();
+
+    let lastPoint = data.recognitionUnits[0].points[0];
+
+    data.recognitionUnits[0].points.forEach((point) => {
+      this.context.moveTo(lastPoint.x, lastPoint.y);
+
+
+      this.context.lineTo(point.x, point.y);
+
+      this.context.stroke();
+
+      lastPoint = point;
+    });
+
+    this.context.moveTo(lastPoint.x, lastPoint.y);
+    this.context.lineTo(data.recognitionUnits[0].points[0].x, data.recognitionUnits[0].points[0].y)
+    this.context.stroke();
   }
 
   quickSave(e) {
@@ -989,6 +1129,11 @@ export class AppCanvas {
     })
   }
 
+  inkToShape() {
+    this.inkShape = !this.inkShape;
+    this.setupMouseEvents();
+  }
+
   @Method()
   async exportToOneNote() {
     if (this.contextAnimation) {
@@ -1090,6 +1235,14 @@ export class AppCanvas {
         {window.matchMedia("(min-width: 1200px)").matches ? <button id="copyTextButton" onClick={() => this.doTextCopy()}>
           {this.copyingText ? <ion-spinner></ion-spinner> : <span>Copy Text</span>}
         </button> : null}
+
+        {this.inkShape === false ? <button id="inkToShapeButton" onClick={() => this.inkToShape()}>
+          <span>Ink To Shape</span>
+        </button> :
+          <button id="inkToShapeButtonOff" onClick={() => this.inkToShape()}>
+            <span>Turn Off</span>
+          </button>
+        }
 
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 

@@ -3,6 +3,48 @@
   z-index: 9999;
 }
 
+#inkToShapeButton {
+  position: fixed;
+  top: 18em;
+  left: 18px;
+  background: var(--ion-color-primary);
+  color: white;
+  font-weight: bold;
+  border-radius: 26px;
+  height: 34px;
+  padding-left: 16px;
+  padding-right: 16px;
+  cursor: pointer;
+  z-index: 1;
+  box-shadow: 0px 0px 14px 4px var(--ion-color-primary);
+}
+
+#inkToShapeButtonOff {
+  position: fixed;
+  top: 18em;
+  left: 18px;
+  background: var(--ion-color-danger);
+  color: white;
+  font-weight: bold;
+  border-radius: 26px;
+  height: 34px;
+  padding-left: 16px;
+  padding-right: 16px;
+  cursor: pointer;
+  z-index: 1;
+  box-shadow: 0px 0px 14px 4px var(--ion-color-danger);
+}
+
+@media(max-width: 1200px) {
+  #inkToShapeButton {
+    display: none;
+  }
+
+  #inkToShapeButtonOff {
+    display: none;
+  }
+}
+
 canvas {
   position: fixed;
   top: 0;
@@ -35,7 +77,7 @@ canvas {
   margin-right: 1em;
 }
 
-@media(max-width: 1200px) {
+@media (max-width: 1200px) {
   #savingSpinner {
     display: none;
   }

@@ -20,15 +20,19 @@ export class AppRoot {
 
     const toast = await toastCtrl.create({
       message: "New version available",
-      showCloseButton: true,
-      closeButtonText: "Reload"
+      buttons: [
+        {
+          side: "end",
+          text: "reload",
+          handler: () => {
+            registration.waiting.postMessage("skipWaiting");
+            window.location.reload();
+          }
+        }
+      ]
     });
 
     await toast.present();
-    await toast.onWillDismiss();
-
-    registration.waiting.postMessage("skipWaiting");
-    window.location.reload();
   }
 
   render() {

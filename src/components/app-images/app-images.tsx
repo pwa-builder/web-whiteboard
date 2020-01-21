@@ -536,9 +536,9 @@ export class AppImages {
                                 <ion-icon color="danger" name="trash"></ion-icon>
                               </ion-button>
 
-                              <ion-button icon-only fill="clear" onClick={(event) => this.openToSide(image.name, event)}>
+                              {/*<ion-button icon-only fill="clear" onClick={(event) => this.openToSide(image.name, event)}>
                                 <ion-icon name="swap"></ion-icon>
-                              </ion-button>
+                    </ion-button>*/}
 
                               <ion-button icon-only fill="clear" onClick={() => this.showDevices(image.name)}>
                                 <ion-icon name="tablet-portrait"></ion-icon>

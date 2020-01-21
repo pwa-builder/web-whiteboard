@@ -251,12 +251,12 @@ export class AppControls {
               <ion-icon name='save'></ion-icon>
             </button>
 
-            { typeof((navigator as any).canShare) === "function" ? <button id="deskShareButton" onClick={() => this.deskShare()}>
+            {typeof ((navigator as any).canShare) === "function" ? <button id="deskShareButton" onClick={() => this.deskShare()}>
               <ion-icon name="share"></ion-icon>
-            </button> : null }
+            </button> : null}
 
             {/*<button id="liveButton" onClick={() => this.doLive()}>
-              <ion-icon name="share-alt"></ion-icon>
+              <ion-icon name="people"></ion-icon>
         </button>*/}
 
           </div> :
@@ -275,7 +275,7 @@ export class AppControls {
                   <ion-icon name="save"></ion-icon>
                 </ion-fab-button>
 
-                {typeof((navigator as any).canShare) === "function" ? <ion-fab-button color="primary" onClick={() => this.deskShare()}>
+                {typeof ((navigator as any).canShare) === "function" ? <ion-fab-button color="primary" onClick={() => this.deskShare()}>
                   <ion-icon name="share"></ion-icon>
                 </ion-fab-button> : null}
 

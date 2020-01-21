@@ -29,7 +29,6 @@ export namespace Components {
   interface AppControls {}
   interface AppHome {
     'name': string;
-    'roomName': string;
     'username': string;
   }
   interface AppImages {}
@@ -177,7 +176,6 @@ declare namespace LocalJSX {
   }
   interface AppHome {
     'name'?: string;
-    'roomName'?: string;
     'username'?: string;
   }
   interface AppImages {}

@@ -51,6 +51,8 @@ export class ContactsModal {
             await modalController.dismiss();
             await sendRoomInvite(this.chosen, data.roomName);
 
+            sessionStorage.setItem('roomName', data.roomName);
+
             const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
             await navCtrl.push(`/live/${data.roomName}`);
           }
