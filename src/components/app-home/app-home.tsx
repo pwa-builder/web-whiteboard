@@ -173,7 +173,14 @@ export class AppHome {
       await alert.present();
     }
     else if (this.currentFileName) {
+      const firstToast = await toastController.create({
+        message: "saving...",
+      });
+      await firstToast.present();
+
       await appCanvas.saveCanvas(this.currentFileName);
+
+      await firstToast.dismiss();
 
       const toast = await toastController.create({
         message: `${this.currentFileName} saved`,

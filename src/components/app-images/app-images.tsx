@@ -3,6 +3,7 @@ import { loadingController, toastController as toastCtrl, actionSheetController 
 
 import { b64toBlob } from '../../helpers/utils';
 import { getFileHandle } from '../../helpers/files-api';
+import { cleanImages, search } from '../../images.worker';
 
 import { get, set } from 'idb-keyval';
 // import * as comlink from 'https://unpkg.com/comlink@4.0.1';
@@ -37,8 +38,8 @@ export class AppImages {
       const images: any[] = await get('images');
 
       if (images) {
-        setTimeout(() => {
-          this.images = this.cleanImages(images);
+        setTimeout(async () => {
+          this.images = await cleanImages(images);
 
           const imageWorker = new Worker('/assets/canvas-worker.js');
           imageWorker.postMessage({ name: 'cloudImages', data: this.images });
@@ -63,7 +64,7 @@ export class AppImages {
           const data = await getSavedImages();
           console.log(data);
 
-          this.images = this.cleanImages(data.images);
+          this.images = await cleanImages(data.images);
 
           await loading.dismiss();
 
@@ -80,7 +81,7 @@ export class AppImages {
     })
   };
 
-  cleanImages(images: any[]) {
+  /*cleanImages(images: any[]) {
     let cleanImages = [];
 
     images.forEach((image) => {
@@ -92,7 +93,7 @@ export class AppImages {
     if (cleanImages.length > 0) {
       return cleanImages;
     }
-  }
+  }*/
 
   async refreshImages() {
     const loading = await loadingController.create({
@@ -423,7 +424,7 @@ export class AppImages {
   }
 
   async searchImages(e) {
-    let searchImages = [];
+    /*let searchImages = [];
 
     if (e.target.value) {
       this.images.forEach((image) => {
@@ -450,8 +451,9 @@ export class AppImages {
     }
     else {
       this.images = await get('images');
-    }
-
+    }*/
+    const searchEvent = e.target.value;
+    this.images = await (search(searchEvent, this.images) as any);
   }
 
   segmentChange(event) {

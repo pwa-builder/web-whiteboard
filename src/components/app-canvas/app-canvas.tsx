@@ -1,6 +1,7 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
 import { toastController as toastCtrl, alertController as alertCtrl, modalController } from '@ionic/core';
 
+import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
 
 import { b64toBlob } from '../../helpers/utils';
@@ -8,6 +9,9 @@ import { getNewFileHandle, readFile } from '../../helpers/files-api';
 
 import { exportToOneNote, createActivity } from '../../services/graph';
 import { saveImagesS } from '../../services/api';
+
+import { findLocalImage, doAI, getInkInfo } from '../../canvas.worker';
+
 
 declare var ClipboardItem;
 
@@ -45,6 +49,8 @@ export class AppCanvas {
   contextAnimation: Animation;
   rect: any;
   timerId: number;
+  offscreen = null;
+  gridWorker = null;
 
   componentDidLoad() {
     window.addEventListener('resize', () => {
@@ -456,39 +462,13 @@ export class AppCanvas {
     const canvasImage = this.canvasElement.toDataURL();
     const images: any[] = await get('images');
 
-    const localImage = images.find((imageEntry) => { return imageEntry.name === name });
+    const localImage: any = await findLocalImage(images, name);
 
     // AI
     const aiToken = localStorage.getItem('ai');
     if (aiToken) {
-      const splitData = canvasImage.split(',')[1];
 
-      const bytes = window.atob(splitData);
-      const buf = new ArrayBuffer(bytes.length);
-      let byteArr = new Uint8Array(buf);
-
-      for (var i = 0; i < bytes.length; i++) {
-        byteArr[i] = bytes.charCodeAt(i);
-      }
-
-      let data = null;
-
-      try {
-        const response = await fetch(`https://westus2.api.cognitive.microsoft.com/vision/v2.0/analyze?visualFeatures=Tags,Color,Description`, {
-          headers: {
-            "Ocp-Apim-Subscription-Key": "d930861b5bba49e5939b843f9c4e5846",
-            "Content-Type": "application/octet-stream"
-          },
-          method: "POST",
-          body: byteArr
-        });
-        data = await response.json();
-
-      } catch (error) {
-        console.error(error);
-      }
-
-      console.log(data);
+      const data = await doAI(canvasImage);
 
       if (images) {
         const handle = await this.saveToFS();
@@ -502,12 +482,23 @@ export class AppCanvas {
           images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
         }*/
         if (localImage) {
+          console.log('setting local image', localImage);
           localImage.color = data.color;
           localImage.desc = desc;
           localImage.tags = data.tags;
           localImage.url = canvasImage;
+          // localImage.url = 'something';
 
-          console.log(images);
+          images.map((image) => {
+            if (image.name === name) {
+              image.color = localImage.color;
+              image.desc = localImage.desc;
+              image.tags = localImage.tags;
+              image.url = localImage.url;
+            }
+          });
+
+          console.log('images after change', images);
         }
         else {
           if (handle) {
@@ -626,6 +617,12 @@ export class AppCanvas {
         if (localImage) {
           localImage.url = canvasImage;
           console.log(images);
+
+          images.map((image) => {
+            if (image.name === name) {
+              image.url = localImage.url;
+            }
+          });
         }
         else {
           if (handle) {
@@ -743,48 +740,61 @@ export class AppCanvas {
 
   @Method()
   drawGrid() {
-    return new Promise(() => {
-      this.gridCanvas.height = window.innerHeight;
-      this.gridCanvas.width = window.innerWidth;
+    if (window.OffscreenCanvas) {
+      if (!this.offscreen) {
+        this.gridCanvas.height = window.innerHeight;
+        this.gridCanvas.width = window.innerWidth;
 
-      this.gridContext = this.gridCanvas.getContext("2d");
+        this.offscreen = this.gridCanvas.transferControlToOffscreen();
 
-      this.gridContext.globalAlpha = 0.6;
-
-      const bw = this.gridCanvas.width;
-      const bh = this.gridCanvas.height;
-      const p = 2;
-
-      for (let x = 0; x <= bw; x += 40) {
-        this.gridContext.moveTo(0.5 + x + p, p);
-        this.gridContext.lineTo(0.5 + x + p, bh + p);
+        this.gridWorker = new Worker('/assets/grid-canvas.js');
+        this.gridWorker.postMessage({ canvas: this.offscreen, draw: true }, [this.offscreen]);
+      }
+      else {
+        this.gridWorker.postMessage({ draw: true });
       }
 
-      for (let x = 0; x <= bh; x += 40) {
-        this.gridContext.moveTo(p, 0.5 + x + p);
-        this.gridContext.lineTo(bw + p, 0.5 + x + p);
-      }
+      // this.gridContext = this.gridCanvas.getContext("2d");
 
-      this.gridContext.lineWidth = 2;
-      this.gridContext.strokeStyle = "lightgrey";
-      this.gridContext.stroke();
-    })
+      // this.gridContext.globalAlpha = 0.6;
+    }
+    else {
+      return new Promise(() => {
+        this.gridCanvas.height = window.innerHeight;
+        this.gridCanvas.width = window.innerWidth;
+
+        this.gridContext = this.gridCanvas.getContext("2d");
+
+        this.gridContext.globalAlpha = 0.6;
+
+        const bw = this.gridCanvas.width;
+        const bh = this.gridCanvas.height;
+        const p = 2;
+
+        for (let x = 0; x <= bw; x += 40) {
+          this.gridContext.moveTo(0.5 + x + p, p);
+          this.gridContext.lineTo(0.5 + x + p, bh + p);
+        }
+
+        for (let x = 0; x <= bh; x += 40) {
+          this.gridContext.moveTo(p, 0.5 + x + p);
+          this.gridContext.lineTo(bw + p, 0.5 + x + p);
+        }
+
+        this.gridContext.lineWidth = 2;
+        this.gridContext.strokeStyle = "lightgrey";
+        this.gridContext.stroke();
+      })
+    }
+
   }
 
   @Method()
   clearGrid() {
     return new Promise(() => {
-      this.gridContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+      // this.gridContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+      this.gridWorker.postMessage({ draw: false });
     })
-  }
-
-  debounceFunction(func, delay) {
-    // Cancels the setTimeout method execution
-    console.log(this.timerId);
-    clearTimeout(this.timerId)
-
-    // Executes the func after delay time.
-    this.timerId = setTimeout(func, delay)
   }
 
   async setupMouseEvents() {
@@ -828,7 +838,7 @@ export class AppCanvas {
       this.quickSave(e);
 
       if (this.inkShape === true) {
-        this.debounceFunction(await this.sendInk(points), 1200);
+        await this.sendInk(points);
       }
 
     });
@@ -872,78 +882,39 @@ export class AppCanvas {
     }
   }
 
+  quickInkSave() {
+    (window as any).requestIdleCallback(async () => {
+      let canvasState = this.canvasElement.toDataURL();
+      await set('canvasState', canvasState);
+
+      if ("chooseFileSystemEntries" in window && this.fileHandle) {
+        console.log('writing to file');
+        this.fileWriter = await this.fileHandle.createWriter();
+
+        console.log('this.fileWriter in pointer up', this.fileWriter);
+        console.log("chooseFileSystemEntries" in window);
+
+        this.canvasElement.toBlob(async (blob) => {
+          await this.fileWriter.write(0, blob);
+          await this.fileWriter.close();
+        }, 'image/jpeg');
+      }
+    })
+  }
+
+  @debounce(1000)
   async sendInk(points: any[]) {
-    console.log(points);
-
-    const inkObject = {
-      "language": "en-US",
-      "unit": "mm",
-      "version": 1,
-      "strokes": [
-        {
-          "id": Math.floor(Math.random() * Math.floor(100)),
-          "points": points
-        },
-      ]
-    };
-    console.log(inkObject);
-
-    const response = await fetch(`https://api.cognitive.microsoft.com/inkrecognizer/v1.0-preview/recognize`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Ocp-Apim-Subscription-Key": "4f0fef79672c4c7e90d92d282cc24ded"
-      },
-      method: "PUT",
-      body: JSON.stringify(inkObject)
-    });
-    const data = await response.json();
+    const data = await getInkInfo(points);
 
     console.log(data.recognitionUnits);
 
     if (data.recognitionUnits[0].recognizedObject === "cloud" || data.recognitionUnits[0].recognizedObject === "ellipse" || data.recognitionUnits[0].recognizedObject === "circle") {
-
       this.drawCircle(data);
-
-      (window as any).requestIdleCallback(async () => {
-        let canvasState = this.canvasElement.toDataURL();
-        await set('canvasState', canvasState);
-
-        if ("chooseFileSystemEntries" in window && this.fileHandle) {
-          console.log('writing to file');
-          this.fileWriter = await this.fileHandle.createWriter();
-
-          console.log('this.fileWriter in pointer up', this.fileWriter);
-          console.log("chooseFileSystemEntries" in window);
-
-          this.canvasElement.toBlob(async (blob) => {
-            await this.fileWriter.write(0, blob);
-            await this.fileWriter.close();
-          }, 'image/jpeg');
-        }
-      })
+      this.quickInkSave();
     }
     else {
-
-      // if (data.recognitionUnits[0].recognizedObject === "rectangle" || data.recognitionUnits[0].recognizedObject === "square") {
       this.drawShape(data);
-
-      (window as any).requestIdleCallback(async () => {
-        let canvasState = this.canvasElement.toDataURL();
-        await set('canvasState', canvasState);
-
-        if ("chooseFileSystemEntries" in window && this.fileHandle) {
-          console.log('writing to file');
-          this.fileWriter = await this.fileHandle.createWriter();
-
-          console.log('this.fileWriter in pointer up', this.fileWriter);
-          console.log("chooseFileSystemEntries" in window);
-
-          this.canvasElement.toBlob(async (blob) => {
-            await this.fileWriter.write(0, blob);
-            await this.fileWriter.close();
-          }, 'image/jpeg');
-        }
-      })
+      this.quickInkSave();
     }
   }
 
@@ -1204,12 +1175,6 @@ export class AppCanvas {
   render() {
     return (
       <div>
-
-        {
-          this.saving ? <div id="savingSpinner">
-            <ion-spinner color="primary"></ion-spinner>
-          </div> : <div id="savingSpinner">Saved</div>
-        }
 
         {
           this.openContextMenu ?

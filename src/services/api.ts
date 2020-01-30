@@ -12,7 +12,7 @@ export async function saveImagesS(images: any) {
   const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
 
   if (images && user) {
-    
+
     console.log('making a request');
     const response = await fetch(`${url}/images`, {
       method: "POST",
@@ -80,4 +80,31 @@ export async function getSavedImage(name: string, user: any) {
     console.log(data);
     return data;
   }
+}
+
+export async function getInkInfo(points: any[]) {
+  const inkObject = {
+    "language": "en-US",
+    "unit": "mm",
+    "version": 1,
+    "strokes": [
+      {
+        "id": Math.floor(Math.random() * Math.floor(100)),
+        "points": points
+      },
+    ]
+  };
+  console.log(inkObject);
+
+  const response = await fetch(`https://api.cognitive.microsoft.com/inkrecognizer/v1.0-preview/recognize`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Ocp-Apim-Subscription-Key": "4f0fef79672c4c7e90d92d282cc24ded"
+    },
+    method: "PUT",
+    body: JSON.stringify(inkObject)
+  });
+  
+  const data = await response.json();
+  return data;
 }
