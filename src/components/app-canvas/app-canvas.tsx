@@ -1097,9 +1097,11 @@ export class AppCanvas {
     })
   }
 
-  inkToShape() {
+
+  @Method()
+  async inkToShape() {
     this.inkShape = !this.inkShape;
-    this.setupMouseEvents();
+    await this.setupMouseEvents();
   }
 
   @Method()
@@ -1180,13 +1182,13 @@ export class AppCanvas {
           this.openContextMenu ?
             <div ref={(el) => this.contextElement = el as HTMLDivElement} id="customContextMenu">
               <button onClick={() => this.copyImage()}>
-                <ion-icon name="copy"></ion-icon>
+                <ion-icon name="copy-outline"></ion-icon>
 
                 <span>Copy</span>
               </button>
 
               <button onClick={(event) => this.pasteImage(event)}>
-                <ion-icon name="albums"></ion-icon>
+                <ion-icon name="albums-outline"></ion-icon>
 
                 <span>Paste</span>
               </button>

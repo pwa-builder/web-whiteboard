@@ -24,6 +24,7 @@ export class AppControls {
   @Event() export: EventEmitter;
   @Event() doShare: EventEmitter;
   @Event() live: EventEmitter;
+  @Event() doInkToShape: EventEmitter<boolean>;
 
   @Element() el: HTMLElement;
 
@@ -156,25 +157,13 @@ export class AppControls {
     }
   }
 
-  async turnAI(ev) {
-    if (window.matchMedia("(min-width: 1200px)").matches) {
-      const popover = await popoverCtrl.create({
-        component: 'ai-popover',
-        event: ev,
-        cssClass: "aiPopover",
-        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
-      })
+  async turnAI() {
+    const modal = await modalCtrl.create({
+      component: 'ai-popover',
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+    });
 
-      await popover.present();
-    }
-    else {
-      const modal = await modalCtrl.create({
-        component: 'ai-popover',
-        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
-      });
-
-      await modal.present();
-    }
+    await modal.present();
   }
 
   async openColorVision() {
@@ -232,27 +221,51 @@ export class AppControls {
     this.live.emit();
   }
 
+  async moreTools(ev) {
+    const popover = await popoverCtrl.create({
+      component: "more-tools",
+      event: ev,
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+    })
+    await popover.present();
+
+    (popover.querySelector('more-tools') as HTMLElement).addEventListener('doInkToShape', (ev: any) => {
+      console.log(ev.detail);
+      this.doInkToShape.emit(ev.detail);
+    });
+
+    (popover.querySelector('more-tools') as HTMLElement).addEventListener('doAi', async (ev: any) => {
+      console.log(ev.detail);
+      await this.turnAI();
+    });
+
+    (popover.querySelector('more-tools') as HTMLElement).addEventListener('exportEV', async (ev: any) => {
+      console.log(ev.detail);
+      await this.exportToNote();
+    });
+
+    (popover.querySelector('more-tools') as HTMLElement).addEventListener('share', (ev: any) => {
+      console.log(ev.detail);
+      this.doShare.emit();
+    });
+  }
+
   render() {
     return [
       <div id="main">
-        <button id="aiButton" onClick={(event) => this.turnAI(event)}>
-          <ion-icon name="eye"></ion-icon>
-
-          <span id="aiSpan">AI</span>
-        </button>
 
         {
           window.matchMedia("(min-width: 800px)").matches ? <div id='saveButtonDiv'>
             <button id='allImagesButton' onClick={() => this.openAllImages()}>
-              <ion-icon name='images'></ion-icon>
+              <ion-icon name='images-outline'></ion-icon>
             </button>
 
             <button onClick={() => this.save()} id='saveButton'>
-              <ion-icon name='save'></ion-icon>
+              <ion-icon name='save-outline'></ion-icon>
             </button>
 
             {typeof ((navigator as any).canShare) === "function" ? <button id="deskShareButton" onClick={() => this.deskShare()}>
-              <ion-icon name="share"></ion-icon>
+              <ion-icon name="share-outline"></ion-icon>
             </button> : null}
 
             {/*<button id="liveButton" onClick={() => this.doLive()}>
@@ -267,25 +280,18 @@ export class AppControls {
               </ion-fab-button>
 
               <ion-fab-list side="bottom">
-                <ion-fab-button color="primary" onClick={() => this.openAllImages()}>
-                  <ion-icon name='images'></ion-icon>
+                <ion-fab-button onClick={() => this.openAllImages()}>
+                  <ion-icon name='images-outline'></ion-icon>
                 </ion-fab-button>
 
-                <ion-fab-button color="secondary" onClick={() => this.save()}>
-                  <ion-icon name="save"></ion-icon>
+                <ion-fab-button onClick={() => this.save()}>
+                  <ion-icon name="save-outline"></ion-icon>
                 </ion-fab-button>
 
-                {typeof ((navigator as any).canShare) === "function" ? <ion-fab-button color="primary" onClick={() => this.deskShare()}>
-                  <ion-icon name="share"></ion-icon>
+                {typeof ((navigator as any).canShare) === "function" ? <ion-fab-button onClick={() => this.deskShare()}>
+                  <ion-icon name="share-outline"></ion-icon>
                 </ion-fab-button> : null}
 
-                <ion-fab-button color="light" onClick={(event) => this.turnAI(event)}>
-                  ai
-                </ion-fab-button>
-
-                <ion-fab-button color="light" onClick={() => this.exportToNote()}>
-                  <ion-icon src="/assets/onenote.svg"></ion-icon>
-                </ion-fab-button>
               </ion-fab-list>
 
             </ion-fab>
@@ -294,15 +300,15 @@ export class AppControls {
         {!this.openColors ? <div id='controlsBlock'>
           <div id='buttonBlock'>
             <button onClick={() => this.changeColor()}>
-              <ion-icon name="color-palette"></ion-icon>
+              <ion-icon name="color-palette-outline"></ion-icon>
             </button>
 
             <button onClick={() => this.erase()}>
-              {!this.erasing ? <ion-icon id="eraseIcon" src="/assets/eraser-solid.svg"></ion-icon> : <ion-icon id="brushIcon" name="brush"></ion-icon>}
+              {!this.erasing ? <ion-icon id="eraseIcon" name="cut-outline"></ion-icon> : <ion-icon id="brushIcon" name="brush-outline"></ion-icon>}
             </button>
 
             <button onClick={() => this.openGrid()}>
-              <ion-icon name="grid"></ion-icon>
+              <ion-icon name="grid-outline"></ion-icon>
             </button>
 
             {/*<button onClick={() => this.openDrag()}>
@@ -315,15 +321,19 @@ export class AppControls {
     </label>*/}
 
             <button onClick={() => this.addImagePop()}>
-              <ion-icon id="imagesIcon" name="images"></ion-icon>
+              <ion-icon id="imagesIcon" name="images-outline"></ion-icon>
             </button>
 
             {window.matchMedia("(min-width: 1200px)").matches ? <button onClick={() => this.exportToNote()}>
               <ion-icon id="oneSvg" src="/assets/onenote.svg"></ion-icon>
             </button> : null}
 
+            <button onClick={(event) => this.moreTools(event)}>
+              <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+            </button>
+
             <button onClick={() => this.clear()}>
-              <ion-icon id="trashIcon" name="trash"></ion-icon>
+              <ion-icon id="trashIcon" name="trash-outline"></ion-icon>
             </button>
           </div>
         </div> : null}
@@ -340,7 +350,7 @@ export class AppControls {
             <input onChange={(event: any) => this.selectColor(event.target.value)} id="customColor" type="color" name="head"
               value="#e66465"></input>
             <button id="visionColorButton" onClick={() => this.openColorVision()}>
-              <ion-icon name="color-filter"></ion-icon>
+              <ion-icon name="color-filter-outline"></ion-icon>
             </button>
           </div>
         </div> : null}

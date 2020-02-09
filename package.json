@@ -14,7 +14,7 @@
     "test.watch": "stencil test --spec --e2e --watch"
   },
   "dependencies": {
-    "@ionic/core": "^5.0.0-rc.0",
+    "@ionic/core": "^5.0.0-rc.3",
     "@microsoft/mgt": "^0.1.1",
     "@pwabuilder/pwainstall": "^1.2.9",
     "adaptivecards": "^1.2.5",
@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-strip": "^1.3.1",
-    "@stencil/core": "^1.9.0-13",
+    "@stencil/core": "^1.9.0-15",
     "workbox-build": "4.3.1"
   }
 }
