@@ -235,11 +235,6 @@ export class AppControls {
   render() {
     return [
       <div id="main">
-        <button id="aiButton" onClick={(event) => this.turnAI(event)}>
-          <ion-icon name="eye"></ion-icon>
-
-          <span id="aiSpan">AI</span>
-        </button>
 
         {
           window.matchMedia("(min-width: 800px)").matches ? <div id='saveButtonDiv'>

@@ -126,11 +126,13 @@ export class AppCanvas {
     })
   }
 
-  async resizeCanvas() {
+  @Method()
+  async resizeCanvas(width?: number, height?: number) {
+    console.log('resizing canvas');
     const canvasState = await (get('canvasState') as any);
 
-    this.context.canvas.width = window.innerWidth;
-    this.context.canvas.height = window.innerHeight;
+    this.context.canvas.width = width || window.innerWidth;
+    this.context.canvas.height = height || window.innerHeight;
 
     this.context.fillStyle = 'white';
     this.context.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);

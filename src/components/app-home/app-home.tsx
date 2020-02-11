@@ -22,6 +22,7 @@ export class AppHome {
   @State() dragMode: boolean = false;
   @State() currentFileName: string | null = null;
   @State() canInstall: boolean = false;
+  @State() spanned: boolean = false;
 
   @State() mgtLoaded: boolean = false;
 
@@ -95,6 +96,106 @@ export class AppHome {
         await alert.present();
       }
     });
+
+    if ((window as any).getWindowSegments) {
+      this.handleSegments();
+
+      window.onresize = () => {
+        console.log('resize')
+        this.handleSegments();
+      }
+    }
+  }
+
+  handleSegments() {
+    console.log((window as any).getWindowSegments());
+
+    const segments = (window as any).getWindowSegments();
+
+    if (segments.length === 2) {
+      this.spanned = true;
+      // const controls: HTMLElement = this.el.querySelector('app-controls #controlsBlock');
+      // controls.style.backgroundColor = 'blue';
+      const sheet = new CSSStyleSheet();
+      (sheet as any).replaceSync(`
+        #controlsBlock, #colorsBlock {
+          bottom: 0;
+          top: initial;
+          display: flex;
+          width: 4em;
+          height: 4em;
+          align-items: center;
+
+          width: 48%;
+          right: 0;
+          position: absolute;
+          left: initial;
+          z-index: 9999;
+        }
+
+        #allImagesButton {
+          display: none;
+        }
+
+        #saveButtonDiv {
+          top: 10px;
+        }
+
+        /*#buttonBlock, #colorInternalBlock {
+          display: flex;
+          flex-direction: column;
+          height: 22em;
+        }*/
+
+        #spannedImages {
+          width: 49vw;
+          position: fixed;
+          right: 0;
+          bottom: 0;
+          top: 0;
+          background: white;
+        }
+
+        #settingsBlock {
+          z-index: 9999;
+          top: 8px;
+          height: 2.6em;
+          box-shadow: none;
+        }
+
+        ion-alert, ion-modal, ion-toast {
+          width: 50vw !important;
+          padding: 2em;
+          right: 0 !important;
+          left: initial !important;
+        }
+
+        ion-toast {
+          width: 49vw !important;
+          padding: initial;
+        }
+
+        #fileNameDiv {
+          width: 50%;
+        }
+
+        #saveButtonDiv {
+          left: initial;
+          right: 16px;
+          bottom: 16px;
+          top: initial;
+          z-index: 1;
+        }
+      `);
+
+      // Combine existing sheets with our new one:
+      (document as any).adoptedStyleSheets = [...(document as any).adoptedStyleSheets, sheet];
+
+      this.el.querySelector('app-canvas').resizeCanvas(window.innerWidth / 2, window.innerHeight);
+    }
+    else {
+      this.spanned = false;
+    }
   }
 
   async checkMGT() {
@@ -299,6 +400,17 @@ export class AppHome {
     this.el.querySelector('app-canvas').liveConnect();
   }
 
+  spanCanvas() {
+    if (this.spanned === true) {
+      this.spanned = false;
+      this.el.querySelector('app-canvas').resizeCanvas();
+    }
+    else {
+      this.el.querySelector('app-canvas').resizeCanvas(window.innerWidth / 2, window.innerHeight);
+      this.spanned = true;
+    }
+  }
+
   componentDidUnload() {
     if (this.wakeLockController) {
       this.wakeLockController.release();
@@ -333,7 +445,6 @@ export class AppHome {
 
         <div id="settingsBlock">
           <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(event) => this.openSettings(event)} fill="clear">
-            <ion-icon color="primary" name="settings"></ion-icon>
           </ion-button>
 
           <div>
@@ -350,6 +461,10 @@ export class AppHome {
         {/*<ion-button onClick={() => this.openSettings()} id="settingsButton" fill="clear">
           <ion-icon name="settings"></ion-icon>
     </ion-button>*/}
+
+        <ion-fab horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab>
+
+        {this.spanned ? <div id="spannedImages"><foldable-images></foldable-images></div> : null}
       </div>
     ];
   }
