@@ -1,0 +1,18 @@
+#moreToolsContent {
+    min-width: 16em;
+}
+
+#moreToolsContent ion-item {
+    margin-right: 12px;
+}
+
+#toolsActions ion-buttons {
+    height: 6em;
+    display: flex;
+    flex-direction: column;
+}
+
+#toolsActions ion-buttons ion-button {
+    margin-top: 8px;
+    width: 190px;
+}

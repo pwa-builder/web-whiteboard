@@ -484,11 +484,11 @@ export class AppImages {
 
           <ion-buttons slot="end">
             <ion-button onClick={() => this.refreshImages()}>
-              <ion-icon name="refresh-circle"></ion-icon>
+              <ion-icon name="refresh-circle-outline"></ion-icon>
             </ion-button>
 
             {"chooseFileSystemEntries" in window ? <ion-button onClick={() => this.openNativeFile()}>
-              <ion-icon name="folder"></ion-icon>
+              <ion-icon name="folder-outline"></ion-icon>
             </ion-button> : null}
 
             <ion-button onClick={() => this.close()}>
@@ -535,7 +535,7 @@ export class AppImages {
 
                             <ion-buttons>
                               <ion-button icon-only fill="clear" onClick={($event) => this.delete($event, image)}>
-                                <ion-icon color="danger" name="trash"></ion-icon>
+                                <ion-icon color="danger" name="trash-outline"></ion-icon>
                               </ion-button>
 
                               {/*<ion-button icon-only fill="clear" onClick={(event) => this.openToSide(image.name, event)}>
@@ -543,14 +543,14 @@ export class AppImages {
                     </ion-button>*/}
 
                               <ion-button icon-only fill="clear" onClick={() => this.showDevices(image.name)}>
-                                <ion-icon name="tablet-portrait"></ion-icon>
+                                <ion-icon name="tablet-portrait-outline"></ion-icon>
                               </ion-button>
 
                               {!image.id && this.showUpload ? <ion-button onClick={(event) => this.uploadToDrive(image, event)} icon-only fill="clear">
-                                <ion-icon name="cloud-upload"></ion-icon>
+                                <ion-icon name="cloud-upload-outline"></ion-icon>
                               </ion-button> :
                                 <ion-button onClick={(event) => this.share(image.id, image, event)} icon-only fill="clear">
-                                  <ion-icon name="share"></ion-icon>
+                                  <ion-icon name="share-outline"></ion-icon>
                                 </ion-button>
                               }
                             </ion-buttons>
@@ -617,11 +617,11 @@ export class AppImages {
 
                         <ion-buttons slot="end">
                           <ion-button onClick={(event) => this.share(image.id, image, event)} fill="clear" slot="end">
-                            <ion-icon name="share"></ion-icon>
+                            <ion-icon name="share-outline"></ion-icon>
                           </ion-button>
 
                           <ion-button onClick={() => this.downloadImage(image.id)} fill="clear" slot="end">
-                            <ion-icon name="download"></ion-icon>
+                            <ion-icon name="download-outline"></ion-icon>
                           </ion-button>
                         </ion-buttons>
                       </ion-item>

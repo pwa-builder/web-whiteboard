@@ -119,7 +119,7 @@ export class ImagePopover {
           <ion-buttons id="fileButton" slot='end'>
             <input onChange={(ev) => this.handleFileInput(ev)} accept="image/png, image/jpeg" type="file" name="file" id="file" class="inputfile" />
             <label id="fileLabel" htmlFor="file">
-              <ion-icon name="folder"></ion-icon>
+              <ion-icon name="folder-outline"></ion-icon>
             </label>
           </ion-buttons>
         </ion-toolbar>

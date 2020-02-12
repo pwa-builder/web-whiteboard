@@ -19,6 +19,7 @@ export namespace Components {
     'dragMode': boolean;
     'drawGrid': () => Promise<unknown>;
     'exportToOneNote': () => Promise<void>;
+    'inkToShape': () => Promise<void>;
     'liveConnect': () => Promise<void>;
     'mode': string;
     'resizeCanvas': (width?: number, height?: number) => Promise<void>;
@@ -49,6 +50,7 @@ export namespace Components {
   interface InstallModal {
     'installEvent': any;
   }
+  interface MoreTools {}
 }
 
 declare global {
@@ -143,6 +145,12 @@ declare global {
     prototype: HTMLInstallModalElement;
     new (): HTMLInstallModalElement;
   };
+
+  interface HTMLMoreToolsElement extends Components.MoreTools, HTMLStencilElement {}
+  var HTMLMoreToolsElement: {
+    prototype: HTMLMoreToolsElement;
+    new (): HTMLMoreToolsElement;
+  };
   interface HTMLElementTagNameMap {
     'ai-popover': HTMLAiPopoverElement;
     'app-canvas': HTMLAppCanvasElement;
@@ -159,6 +167,7 @@ declare global {
     'foldable-images': HTMLFoldableImagesElement;
     'image-popover': HTMLImagePopoverElement;
     'install-modal': HTMLInstallModalElement;
+    'more-tools': HTMLMoreToolsElement;
   }
 }
 
@@ -175,6 +184,7 @@ declare namespace LocalJSX {
     'onClearCanvas'?: (event: CustomEvent<any>) => void;
     'onColorSelected'?: (event: CustomEvent<any>) => void;
     'onDoGrid'?: (event: CustomEvent<any>) => void;
+    'onDoInkToShape'?: (event: CustomEvent<boolean>) => void;
     'onDoShare'?: (event: CustomEvent<any>) => void;
     'onDragMode'?: (event: CustomEvent<any>) => void;
     'onEraserMode'?: (event: CustomEvent<any>) => void;
@@ -204,6 +214,12 @@ declare namespace LocalJSX {
   interface InstallModal {
     'installEvent'?: any;
   }
+  interface MoreTools {
+    'onDoAi'?: (event: CustomEvent<any>) => void;
+    'onDoInkToShape'?: (event: CustomEvent<any>) => void;
+    'onExportEV'?: (event: CustomEvent<any>) => void;
+    'onShare'?: (event: CustomEvent<any>) => void;
+  }
 
   interface IntrinsicElements {
     'ai-popover': AiPopover;
@@ -221,6 +237,7 @@ declare namespace LocalJSX {
     'foldable-images': FoldableImages;
     'image-popover': ImagePopover;
     'install-modal': InstallModal;
+    'more-tools': MoreTools;
   }
 }
 
@@ -245,6 +262,7 @@ declare module "@stencil/core" {
       'foldable-images': LocalJSX.FoldableImages & JSXBase.HTMLAttributes<HTMLFoldableImagesElement>;
       'image-popover': LocalJSX.ImagePopover & JSXBase.HTMLAttributes<HTMLImagePopoverElement>;
       'install-modal': LocalJSX.InstallModal & JSXBase.HTMLAttributes<HTMLInstallModalElement>;
+      'more-tools': LocalJSX.MoreTools & JSXBase.HTMLAttributes<HTMLMoreToolsElement>;
     }
   }
 }

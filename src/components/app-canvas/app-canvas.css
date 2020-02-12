@@ -35,7 +35,7 @@
   box-shadow: 0px 0px 14px 4px var(--ion-color-danger);
 }
 
-@media(max-width: 1200px) {
+@media(max-width: 600px) {
   #inkToShapeButton {
     display: none;
   }

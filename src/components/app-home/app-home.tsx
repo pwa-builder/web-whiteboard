@@ -410,6 +410,11 @@ export class AppHome {
       this.spanned = true;
     }
   }
+  
+  async handleInkToShape(ev) {
+    console.log('home inkshape', ev.detail);
+    await this.el.querySelector('app-canvas').inkToShape(); 
+  }
 
   componentDidUnload() {
     if (this.wakeLockController) {
@@ -441,7 +446,7 @@ export class AppHome {
 
         <app-canvas savedDrawing={this.savedImage} mode={this.drawingMode} color={this.color}></app-canvas>
 
-        <app-controls onLive={() => this.handleLive()} onDoShare={() => this.doShare()} onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
+        <app-controls onDoInkToShape={(ev) => this.handleInkToShape(ev)} onLive={() => this.handleLive()} onDoShare={() => this.doShare()} onExport={() => this.exportToNote()} onDragMode={() => this.doDrag()} onDoGrid={() => this.doGrid()} onAllImages={() => this.allImages()} onSaveCanvas={() => this.save()} onPenMode={() => this.pen()} onEraserMode={() => this.erase()} onClearCanvas={() => this.clear()} onColorSelected={ev => this.changeColor(ev)}></app-controls>
 
         <div id="settingsBlock">
           <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(event) => this.openSettings(event)} fill="clear">
