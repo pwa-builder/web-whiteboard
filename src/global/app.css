@@ -44,6 +44,20 @@ ion-icon svg {
   height: 25px;
 }
 
+ion-alert .alert-wrapper, ion-popover .popover-content {
+  border-radius: 14px !important;
+}
+
+ion-popover .popover-content {
+  overflow: hidden !important;
+}
+
+@media(min-width: 1200px) {
+  ion-modal .modal-wrapper {
+    border-radius: 14px !important;
+  }
+}
+
 :root {
   --ion-color-primary: #1976d2;
   --ion-color-primary-rgb: 25,118,210;

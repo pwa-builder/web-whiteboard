@@ -14,9 +14,9 @@
     "test.watch": "stencil test --spec --e2e --watch"
   },
   "dependencies": {
-    "@ionic/core": "^5.0.0-rc.3",
+    "@ionic/core": "^5.0.0",
     "@microsoft/mgt": "^0.1.1",
-    "@pwabuilder/pwainstall": "^1.2.9",
+    "@pwabuilder/pwainstall": "^1.2.11",
     "adaptivecards": "^1.2.5",
     "comlink": "^4.0.1",
     "idb-keyval": "^3.2.0",

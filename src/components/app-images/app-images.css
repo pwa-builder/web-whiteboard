@@ -221,7 +221,16 @@ h2 {
 
 @media (max-width: 600px) {
   #imageList {
-    display: initial;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+
+  #imageList ion-card {
+    width: 100%;
   }
 
   #imageBlock {

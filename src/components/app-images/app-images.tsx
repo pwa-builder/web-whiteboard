@@ -1,5 +1,5 @@
 import { Component, Element, State, h } from '@stencil/core';
-import { loadingController, toastController as toastCtrl, actionSheetController as actionSheetCtrl } from '@ionic/core';
+import { loadingController, toastController as toastCtrl, alertController } from '@ionic/core';
 
 import { b64toBlob } from '../../helpers/utils';
 import { getFileHandle } from '../../helpers/files-api';
@@ -175,26 +175,8 @@ export class AppImages {
     let deviceButtons = [];
 
     devices.forEach((device) => {
-
-      let rightIcon = null;
-
-      switch (device.Kind) {
-        case "PC":
-          rightIcon = 'laptop'
-          break;
-        case "Tablet":
-          rightIcon = 'tablet-landscape'
-          break;
-        case "Phone":
-          rightIcon = 'phone-portrait'
-          break;
-        default:
-          rightIcon = 'laptop'
-      }
-
       deviceButtons.push({
         text: device.Model || device.Name,
-        icon: rightIcon,
         handler: async () => {
           const provider = (window as any).mgt.Providers.globalProvider;
           const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
@@ -211,8 +193,9 @@ export class AppImages {
     })
 
     if (deviceButtons) {
-      const sheet = await actionSheetCtrl.create({
-        header: 'Share to your devices',
+      const sheet = await alertController.create({
+        header: "Share",
+        subHeader: 'Share to your devices',
         buttons: deviceButtons
       });
       await sheet.present();
@@ -259,12 +242,12 @@ export class AppImages {
   async uploadToDrive(image, ev) {
     ev.preventDefault();
 
-    const sheet = await actionSheetCtrl.create({
+    const sheet = await alertController.create({
       header: "Share",
+      subHeader: "sharing",
       buttons: [
         {
           text: "Upload to OneDrive",
-          icon: 'cloud',
           handler: async (): Promise<any> => {
             const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
 
@@ -333,7 +316,6 @@ export class AppImages {
         },
         {
           text: "Share",
-          icon: "share",
           handler: async (): Promise<any> => {
             console.log('hello');
 
@@ -496,7 +478,7 @@ export class AppImages {
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
-      </ion-header>,
+    </ion-header>,
 
       <ion-content>
 
@@ -506,11 +488,11 @@ export class AppImages {
           <ion-searchbar id="imageBar" onIonChange={(event) => this.searchImages(event)} debounce={250} animated placeholder="search"></ion-searchbar>
 
           <ion-toolbar id="segmentToolbar">
-            <ion-segment value="local" onIonChange={(event) => this.segmentChange(event)}>
-              <ion-segment-button value="local">
+            <ion-segment mode="ios" value="local" onIonChange={(event) => this.segmentChange(event)}>
+              <ion-segment-button mode="ios" value="local">
                 <ion-label>All</ion-label>
               </ion-segment-button>
-              <ion-segment-button value="cloud">
+              <ion-segment-button mode="ios" value="cloud">
                 <ion-label>Cloud</ion-label>
               </ion-segment-button>
             </ion-segment>
