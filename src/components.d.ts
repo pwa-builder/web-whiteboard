@@ -22,6 +22,7 @@ export namespace Components {
     'inkToShape': () => Promise<void>;
     'liveConnect': () => Promise<void>;
     'mode': string;
+    'resizeCanvas': (width?: number, height?: number) => Promise<void>;
     'saveCanvas': (name: string) => Promise<void>;
     'savedDrawing': string | null;
     'shareCanvas': () => Promise<void>;
@@ -44,6 +45,7 @@ export namespace Components {
   interface DrivePreview {
     'imageInfo': any;
   }
+  interface FoldableImages {}
   interface ImagePopover {}
   interface InstallModal {
     'installEvent': any;
@@ -126,6 +128,12 @@ declare global {
     new (): HTMLDrivePreviewElement;
   };
 
+  interface HTMLFoldableImagesElement extends Components.FoldableImages, HTMLStencilElement {}
+  var HTMLFoldableImagesElement: {
+    prototype: HTMLFoldableImagesElement;
+    new (): HTMLFoldableImagesElement;
+  };
+
   interface HTMLImagePopoverElement extends Components.ImagePopover, HTMLStencilElement {}
   var HTMLImagePopoverElement: {
     prototype: HTMLImagePopoverElement;
@@ -156,6 +164,7 @@ declare global {
     'color-modal': HTMLColorModalElement;
     'contacts-modal': HTMLContactsModalElement;
     'drive-preview': HTMLDrivePreviewElement;
+    'foldable-images': HTMLFoldableImagesElement;
     'image-popover': HTMLImagePopoverElement;
     'install-modal': HTMLInstallModalElement;
     'more-tools': HTMLMoreToolsElement;
@@ -200,6 +209,7 @@ declare namespace LocalJSX {
   interface DrivePreview {
     'imageInfo'?: any;
   }
+  interface FoldableImages {}
   interface ImagePopover {}
   interface InstallModal {
     'installEvent'?: any;
@@ -224,6 +234,7 @@ declare namespace LocalJSX {
     'color-modal': ColorModal;
     'contacts-modal': ContactsModal;
     'drive-preview': DrivePreview;
+    'foldable-images': FoldableImages;
     'image-popover': ImagePopover;
     'install-modal': InstallModal;
     'more-tools': MoreTools;
@@ -248,6 +259,7 @@ declare module "@stencil/core" {
       'color-modal': LocalJSX.ColorModal & JSXBase.HTMLAttributes<HTMLColorModalElement>;
       'contacts-modal': LocalJSX.ContactsModal & JSXBase.HTMLAttributes<HTMLContactsModalElement>;
       'drive-preview': LocalJSX.DrivePreview & JSXBase.HTMLAttributes<HTMLDrivePreviewElement>;
+      'foldable-images': LocalJSX.FoldableImages & JSXBase.HTMLAttributes<HTMLFoldableImagesElement>;
       'image-popover': LocalJSX.ImagePopover & JSXBase.HTMLAttributes<HTMLImagePopoverElement>;
       'install-modal': LocalJSX.InstallModal & JSXBase.HTMLAttributes<HTMLInstallModalElement>;
       'more-tools': LocalJSX.MoreTools & JSXBase.HTMLAttributes<HTMLMoreToolsElement>;

@@ -126,11 +126,13 @@ export class AppCanvas {
     })
   }
 
-  async resizeCanvas() {
+  @Method()
+  async resizeCanvas(width?: number, height?: number) {
+    console.log('resizing canvas');
     const canvasState = await (get('canvasState') as any);
 
-    this.context.canvas.width = window.innerWidth;
-    this.context.canvas.height = window.innerHeight;
+    this.context.canvas.width = width || window.innerWidth;
+    this.context.canvas.height = height || window.innerHeight;
 
     this.context.fillStyle = 'white';
     this.context.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height);
@@ -1205,14 +1207,6 @@ export class AppCanvas {
         {window.matchMedia("(min-width: 1200px)").matches ? <button id="copyTextButton" onClick={() => this.doTextCopy()}>
           {this.copyingText ? <ion-spinner></ion-spinner> : <span>Copy Text</span>}
         </button> : null}
-
-        {this.inkShape === false ? <button id="inkToShapeButton" onClick={() => this.inkToShape()}>
-          <span>Ink To Shape</span>
-        </button> :
-          <button id="inkToShapeButtonOff" onClick={() => this.inkToShape()}>
-            <span>Turn Off</span>
-          </button>
-        }
 
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 

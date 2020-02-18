@@ -22,6 +22,7 @@ export class AppHome {
   @State() dragMode: boolean = false;
   @State() currentFileName: string | null = null;
   @State() canInstall: boolean = false;
+  @State() spanned: boolean = false;
 
   @State() mgtLoaded: boolean = false;
 
@@ -95,6 +96,25 @@ export class AppHome {
         await alert.present();
       }
     });
+
+    if ((window as any).getWindowSegments) {
+      this.handleSegments();
+
+      window.onresize = () => {
+        console.log('resize')
+        this.handleSegments();
+      }
+    }
+  }
+
+  handleSegments() {
+    const segments = (window as any).getWindowSegments();
+    if (segments.length === 2 ) {
+      this.spanned = true;
+    }
+    else {
+      this.spanned = false;
+    }
   }
 
   async checkMGT() {
@@ -299,6 +319,17 @@ export class AppHome {
     this.el.querySelector('app-canvas').liveConnect();
   }
 
+  spanCanvas() {
+    if (this.spanned === true) {
+      this.spanned = false;
+      this.el.querySelector('app-canvas').resizeCanvas();
+    }
+    else {
+      this.el.querySelector('app-canvas').resizeCanvas(window.innerWidth / 2, window.innerHeight);
+      this.spanned = true;
+    }
+  }
+  
   async handleInkToShape(ev) {
     console.log('home inkshape', ev.detail);
     await this.el.querySelector('app-canvas').inkToShape(); 
@@ -338,7 +369,6 @@ export class AppHome {
 
         <div id="settingsBlock">
           <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(event) => this.openSettings(event)} fill="clear">
-            <ion-icon color="primary" name="settings-outline"></ion-icon>
           </ion-button>
 
           <div>
@@ -355,6 +385,10 @@ export class AppHome {
         {/*<ion-button onClick={() => this.openSettings()} id="settingsButton" fill="clear">
           <ion-icon name="settings"></ion-icon>
     </ion-button>*/}
+
+        <ion-fab horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab>
+
+        {this.spanned ? <div id="spannedImages"><foldable-images></foldable-images></div> : null}
       </div>
     ];
   }
