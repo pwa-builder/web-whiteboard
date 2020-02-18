@@ -1208,14 +1208,6 @@ export class AppCanvas {
           {this.copyingText ? <ion-spinner></ion-spinner> : <span>Copy Text</span>}
         </button> : null}
 
-        {this.inkShape === false ? <button id="inkToShapeButton" onClick={() => this.inkToShape()}>
-          <span>Ink To Shape</span>
-        </button> :
-          <button id="inkToShapeButtonOff" onClick={() => this.inkToShape()}>
-            <span>Turn Off</span>
-          </button>
-        }
-
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 
         <canvas id="regCanvas" ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>

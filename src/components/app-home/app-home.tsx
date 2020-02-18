@@ -108,7 +108,7 @@ export class AppHome {
   }
 
   handleSegments() {
-    console.log((window as any).getWindowSegments());
+    /*console.log((window as any).getWindowSegments());
 
     const segments = (window as any).getWindowSegments();
 
@@ -147,7 +147,7 @@ export class AppHome {
           height: 22em;
         }*/
 
-        #spannedImages {
+        /*#spannedImages {
           width: 49vw;
           position: fixed;
           right: 0;
@@ -192,6 +192,15 @@ export class AppHome {
       (document as any).adoptedStyleSheets = [...(document as any).adoptedStyleSheets, sheet];
 
       this.el.querySelector('app-canvas').resizeCanvas(window.innerWidth / 2, window.innerHeight);
+    }
+    else {
+      this.spanned = false;
+    }*/
+
+    
+    const segments = (window as any).getWindowSegments();
+    if (segments.length === 2 ) {
+      this.spanned = true;
     }
     else {
       this.spanned = false;
