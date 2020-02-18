@@ -11,6 +11,12 @@
   z-index: -2;
 }
 
+@media (spanning: single-fold-vertical) {
+  #controlsBlock {
+    bottom: 6px !important;
+  }
+}
+
 ion-fab {
   z-index: -1;
 }
