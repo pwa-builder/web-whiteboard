@@ -44,77 +44,6 @@ ion-icon svg {
   height: 25px;
 }
 
-@media (spanning: single-fold-vertical) { 
-  #controlsBlock, #colorsBlock {
-    bottom: 0;
-    top: initial;
-    display: flex;
-    width: 4em;
-    height: 4em;
-    align-items: center;
-  
-    width: 48%;
-    right: 0;
-    position: absolute;
-    left: initial;
-    z-index: 9999;
-  }
-  
-  #allImagesButton {
-    display: none;
-  }
-  
-  #saveButtonDiv {
-    top: 10px;
-  }
-  
-  /*#buttonBlock, #colorInternalBlock {
-    display: flex;
-    flex-direction: column;
-    height: 22em;
-  }*/
-  
-  #spannedImages {
-    width: 49vw;
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    background: white;
-  }
-  
-  #settingsBlock {
-    z-index: 9999;
-    top: 8px;
-    height: 2.6em;
-    box-shadow: none;
-  }
-  
-  ion-alert, ion-modal, ion-toast {
-    width: 50vw !important;
-    padding: 2em;
-    right: 0 !important;
-    left: initial !important;
-  }
-  
-  ion-toast {
-    width: 49vw !important;
-    padding: initial;
-  }
-  
-  #fileNameDiv {
-    width: 50%;
-  }
-  
-  #saveButtonDiv {
-    left: initial;
-    right: 16px;
-    bottom: 16px;
-    top: initial;
-    z-index: 1;
-  }
-}
-
 :root {
   --ion-color-primary: #1976d2;
   --ion-color-primary-rgb: 25,118,210;
@@ -178,4 +107,69 @@ ion-icon svg {
   --ion-color-light-contrast-rgb: 0,0,0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+}
+
+@media (spanning: single-fold-vertical) { 
+  #controlsBlock, #colorsBlock {
+    bottom: 0;
+    top: initial;
+    display: flex;
+    width: 4em;
+    height: 4em;
+    align-items: center;
+  
+    width: 48%;
+    right: 0;
+    position: absolute;
+    left: initial;
+    z-index: 9999;
+  }
+  
+  #allImagesButton {
+    display: none;
+  }
+  
+  #saveButtonDiv {
+    top: 10px;
+  }
+  
+  #spannedImages {
+    width: 49vw;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background: white;
+  }
+  
+  #settingsBlock {
+    z-index: 9999;
+    top: 8px;
+    height: 2.6em;
+    box-shadow: none;
+  }
+  
+  ion-alert, ion-modal, ion-toast {
+    width: 50vw !important;
+    padding: 2em;
+    right: 0 !important;
+    left: initial !important;
+  }
+  
+  ion-toast {
+    width: 49vw !important;
+    padding: initial;
+  }
+  
+  #fileNameDiv {
+    width: 50%;
+  }
+  
+  #saveButtonDiv {
+    left: initial;
+    right: 16px;
+    bottom: 16px;
+    top: initial;
+    z-index: 1;
+  }
 }
