@@ -1,6 +1,10 @@
 import { Component, h, State } from '@stencil/core';
+import { loadingController } from '@ionic/core';
 
-import { get } from 'idb-keyval';
+import { cleanImages } from '../../images.worker';
+import { getSavedImages } from '../../services/api';
+
+import { set } from 'idb-keyval';
 
 @Component({
   tag: 'foldable-images',
@@ -11,11 +15,25 @@ export class FoldableImages {
   @State() images: any[];
 
   async componentDidLoad() {
-    const images: any[] = await get('images');
+    const loading = await loadingController.create({
+      message: "Loading images from the cloud...",
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
+    });
+    await loading.present();
 
-    if (images) {
-      console.log(images);
-      this.images = images;
+    try {
+      const data = await getSavedImages();
+      console.log(data);
+
+      this.images = await cleanImages(data.images);
+
+      await loading.dismiss();
+
+      await set('images', this.images);
+    }
+    catch (err) {
+      console.error(err);
+      await loading.dismiss();
     }
   }
 

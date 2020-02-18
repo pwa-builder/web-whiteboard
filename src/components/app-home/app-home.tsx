@@ -226,7 +226,7 @@ export class AppHome {
     const modal = await modalCtrl.create({
       component: 'app-images',
       cssClass: 'imagesModal',
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
     });
     await modal.present();
 
@@ -272,7 +272,7 @@ export class AppHome {
       component: 'app-settings',
       event: ev,
       cssClass: 'settingsPopover',
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
     });
     await popover.present();
   }
@@ -281,7 +281,7 @@ export class AppHome {
     const popover = await popoverCtrl.create({
       component: 'login-pop',
       event: ev,
-      showBackdrop: window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: window.matchMedia("(min-width: 1450px)").matches ? false : true
     });
     await popover.present();
   }

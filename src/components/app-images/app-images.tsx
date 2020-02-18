@@ -56,7 +56,7 @@ export class AppImages {
       else {
         const loading = await loadingController.create({
           message: "Loading images from the cloud...",
-          showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+          showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
         });
         await loading.present();
 
@@ -98,7 +98,7 @@ export class AppImages {
   async refreshImages() {
     const loading = await loadingController.create({
       message: "Loading images from the cloud...",
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
     });
     await loading.present();
 
@@ -258,7 +258,7 @@ export class AppImages {
 
               const loading = await loadingController.create({
                 message: "Uploading...",
-                showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+                showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
               });
               await loading.present();
 

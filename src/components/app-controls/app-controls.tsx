@@ -126,7 +126,7 @@ export class AppControls {
       component: 'app-settings',
       event: ev,
       cssClass: 'settingsPopover',
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
     });
     await popover.present();
   }
@@ -151,7 +151,7 @@ export class AppControls {
       const modal = await modalCtrl.create({
         component: 'image-popover',
         cssClass: 'extImageModal',
-        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
       });
       await modal.present();
     }
@@ -160,7 +160,7 @@ export class AppControls {
   async turnAI() {
     const modal = await modalCtrl.create({
       component: 'ai-popover',
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
     });
 
     await modal.present();
@@ -225,7 +225,7 @@ export class AppControls {
     const popover = await popoverCtrl.create({
       component: "more-tools",
       event: ev,
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
     })
     await popover.present();
 

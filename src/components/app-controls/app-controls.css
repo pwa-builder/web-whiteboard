@@ -12,7 +12,7 @@
 }
 
 @media (spanning: single-fold-vertical) {
-  #controlsBlock {
+  #controlsBlock, #colorsBlock {
     bottom: 6px !important;
   }
 }

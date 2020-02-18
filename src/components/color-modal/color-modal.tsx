@@ -31,7 +31,7 @@ export class ColorModal {
   async grabColor() {
     const loading = await loadingCtrl.create({
       message: "Analyzing...",
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1200px)").matches ? false : true
+      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
     });
     await loading.present();
 

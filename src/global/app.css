@@ -149,7 +149,7 @@ ion-icon svg {
     box-shadow: none;
   }
   
-  ion-alert, ion-modal, ion-toast {
+  ion-alert, ion-modal, ion-toast, ion-loading {
     width: 50vw !important;
     padding: 2em;
     right: 0 !important;
