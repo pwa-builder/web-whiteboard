@@ -369,6 +369,7 @@ export class AppHome {
 
         <div id="settingsBlock">
           <ion-button shape="round" size="small" id="settingsButton" color="primary" onClick={(event) => this.openSettings(event)} fill="clear">
+            <ion-icon color="primary" name="settings-outline"></ion-icon>
           </ion-button>
 
           <div>
@@ -386,7 +387,7 @@ export class AppHome {
           <ion-icon name="settings"></ion-icon>
     </ion-button>*/}
 
-        <ion-fab horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab>
+        {this.spanned ? <ion-fab horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab> : null}
 
         {this.spanned ? <div id="spannedImages"><foldable-images></foldable-images></div> : null}
       </div>
