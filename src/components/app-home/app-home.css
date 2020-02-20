@@ -1,3 +1,7 @@
+#spanFab {
+  display: none;
+}
+
 #pwaInstallButton {
   position: fixed;
   z-index: -1;
@@ -115,5 +119,11 @@ app-canvas {
 @media (min-width: 1200px) {
   .imagesModal {
     --width: 56em !important;
+  }
+}
+
+@media(spanning: single-fold-vertical) {
+  #spanFab {
+    display: initial;
   }
 }

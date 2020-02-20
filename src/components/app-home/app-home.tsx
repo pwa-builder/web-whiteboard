@@ -387,7 +387,7 @@ export class AppHome {
           <ion-icon name="settings"></ion-icon>
     </ion-button>*/}
 
-        {this.spanned ? <ion-fab horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab> : null}
+        <ion-fab id="spanFab" horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab>
 
         {this.spanned ? <div id="spannedImages"><foldable-images></foldable-images></div> : null}
       </div>
