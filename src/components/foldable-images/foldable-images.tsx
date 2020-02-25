@@ -1,10 +1,8 @@
 import { Component, h, State } from '@stencil/core';
 import { loadingController } from '@ionic/core';
 
-import { cleanImages } from '../../images.worker';
 import { getSavedImages } from '../../services/api';
 
-import { set } from 'idb-keyval';
 
 @Component({
   tag: 'foldable-images',
@@ -25,11 +23,11 @@ export class FoldableImages {
       const data = await getSavedImages();
       console.log(data);
 
-      this.images = await cleanImages(data.images);
+      if (data) {
+        this.images = data.images;
+      }
 
       await loading.dismiss();
-
-      await set('images', this.images);
     }
     catch (err) {
       console.error(err);

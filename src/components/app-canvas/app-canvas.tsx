@@ -1,5 +1,5 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
-import { toastController as toastCtrl, alertController as alertCtrl, modalController } from '@ionic/core';
+import { toastController as toastCtrl, alertController as alertCtrl, modalController, toastController } from '@ionic/core';
 
 import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
@@ -51,6 +51,7 @@ export class AppCanvas {
   timerId: number;
   offscreen = null;
   gridWorker = null;
+  dragToast: HTMLIonToastElement;
 
   componentDidLoad() {
     window.addEventListener('resize', () => {
@@ -1176,8 +1177,69 @@ export class AppCanvas {
     console.log(data);
   }
 
+  async handleDragEnter() {
+    this.dragToast = await toastController.create({
+      message: "Drop image to add it to your board..."
+    });
+    await this.dragToast.present();
+  }
+
+  handleDragOver(event: DragEvent) {
+    console.log('dragOver');
+    event.preventDefault();
+  }
+
+  handleDrop(event: DragEvent) {
+    console.log('drop');
+    event.preventDefault();
+
+    this.dragToast.dismiss();
+
+    if (event.dataTransfer.items) {
+      console.log('have items', event.dataTransfer.items.length);
+      // Use DataTransferItemList interface to access the file(s)
+      for (var i = 0; i < event.dataTransfer.items.length; i++) {
+        // If dropped items aren't files, reject them
+        console.log('farther', event.dataTransfer.items[i].kind);
+        if (event.dataTransfer.items[i].kind === 'file') {
+          const file: any = event.dataTransfer.items[i].getAsFile();
+          console.log('... file[' + i + '].name = ' + file.name);
+
+          let fr = new FileReader();
+
+          fr.onload = async () => {
+            console.log(fr.result);
+          console.log(file);
+
+            await this.addImageToCanvas((fr.result as string), 400, 400);
+          }
+          fr.readAsDataURL(file);
+        }
+      }
+    } else {
+      // Use DataTransfer interface to access the file(s)
+      for (let i = 0; i < event.dataTransfer.files.length; i++) {
+        console.log('... file[' + i + '].name = ' + event.dataTransfer.files[i].name);
+
+        const file: any = event.dataTransfer.items[i].getAsFile();
+        console.log('... file[' + i + '].name = ' + file.name);
+
+        let fr = new FileReader();
+
+        fr.onload = async () => {
+
+          console.log(fr.result);
+          console.log(file);
+
+          await this.addImageToCanvas((fr.result as string), file.width, file.height);
+        }
+        fr.readAsDataURL(file);
+      }
+    }
+  }
+
   render() {
-    return (
+    return [
       <div>
 
         {
@@ -1210,8 +1272,8 @@ export class AppCanvas {
 
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 
-        <canvas id="regCanvas" ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>
+        <canvas id="regCanvas" onDragEnter={() => this.handleDragEnter()} onDrop={(event) => this.handleDrop(event)} onDragOver={(event) => this.handleDragOver(event)} ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>
       </div >
-    );
+    ];
   }
 }

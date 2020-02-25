@@ -23,6 +23,7 @@ export class AppHome {
   @State() currentFileName: string | null = null;
   @State() canInstall: boolean = false;
   @State() spanned: boolean = false;
+  // @State() spanned: boolean = true;
 
   @State() mgtLoaded: boolean = false;
 
