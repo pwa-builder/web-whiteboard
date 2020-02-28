@@ -266,7 +266,9 @@ export class AppControls {
 
             {typeof ((navigator as any).canShare) === "function" ? <button id="deskShareButton" onClick={() => this.deskShare()}>
               <ion-icon name="share-outline"></ion-icon>
-            </button> : null}
+            </button> : <button id="deskShareButton" onClick={() => this.deskShare()}>
+              <ion-icon name="copy-outline"></ion-icon>
+            </button>}
 
             {/*<button id="liveButton" onClick={() => this.doLive()}>
               <ion-icon name="people"></ion-icon>

@@ -82,7 +82,9 @@ export class ImagePopover {
     const imageCanvas = document.querySelector('app-canvas');
     console.log(imageCanvas);
     await (this.el.closest('ion-modal') as HTMLIonModalElement).dismiss();
+
     await imageCanvas.addImageToCanvas(imageURL, width, height);
+    
   }
 
   handleFileInput(ev: Event) {
@@ -130,7 +132,7 @@ export class ImagePopover {
           {
             this.images ? this.images.map((image) => {
               return (
-                <ion-item onClick={() => this.addImage(image.contentUrl, image.width, image.height)} class="imageItem">
+                <ion-item onClick={() => this.addImage(image.thumbnailUrl, image.thumbnail.width, image.thumbnail.height)} class="imageItem">
                   <img src={image.contentUrl}></img>
                 </ion-item>
               )
