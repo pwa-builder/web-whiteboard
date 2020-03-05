@@ -361,7 +361,7 @@ export class AppCanvas {
         });
         await toast.present();
       }
-      
+
     });
   }
 
@@ -1028,6 +1028,7 @@ export class AppCanvas {
     this.context.beginPath();
     this.context.ellipse(data.recognitionUnits[0].center.x, data.recognitionUnits[0].center.y, data.recognitionUnits[0].boundingRectangle.height - 100, data.recognitionUnits[0].boundingRectangle.width - 100, Math.PI / 4, 0, 2 * Math.PI);
     this.context.stroke();
+    this.context.closePath();
   }
 
   drawShape(data) {
@@ -1097,7 +1098,9 @@ export class AppCanvas {
       ctrlKey: mouseEvent.ctrlKey,
       pressure: mouseEvent.pressure,
       button: mouseEvent.button,
-      buttons: mouseEvent.buttons
+      buttons: mouseEvent.buttons,
+      mouseX: mouseEvent.x,
+      mouseY: mouseEvent.y
     };
   }
 

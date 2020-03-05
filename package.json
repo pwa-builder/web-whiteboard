@@ -16,7 +16,7 @@
   "dependencies": {
     "@ionic/core": "^5.0.0",
     "@microsoft/mgt": "^0.1.1",
-    "@pwabuilder/pwainstall": "^1.2.11",
+    "@pwabuilder/pwainstall": "^1.4.1",
     "adaptivecards": "^1.2.5",
     "comlink": "^4.0.1",
     "idb-keyval": "^3.2.0",
