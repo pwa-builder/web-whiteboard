@@ -333,7 +333,7 @@ export class AppCanvas {
 
       if ((navigator as any).canShare && (navigator as any).canShare(file)) {
         await (navigator as any).share({
-          files: [file],
+          file: file,
           title: 'Whiteboard',
           text: 'Check out this whiteboard from WebBoard https://webboard-app.web.app',
         })
