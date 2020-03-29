@@ -1,5 +1,5 @@
 import { Component, Listen, h } from '@stencil/core';
-import { toastController as toastCtrl } from '@ionic/core';
+// import { toastController as toastCtrl } from '@ionic/core';
 
 @Component({
   tag: 'app-root',
@@ -18,7 +18,7 @@ export class AppRoot {
       return;
     }
 
-    const toast = await toastCtrl.create({
+    /*const toast = await toastCtrl.create({
       message: "New version available",
       buttons: [
         {
@@ -32,7 +32,7 @@ export class AppRoot {
       ]
     });
 
-    await toast.present();
+    await toast.present();*/
   }
 
   render() {

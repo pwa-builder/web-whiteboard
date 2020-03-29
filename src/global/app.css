@@ -44,6 +44,10 @@ ion-icon svg {
   height: 25px;
 }
 
+.header-md::after {
+  background-image: none;
+}
+
 :root {
   --ion-color-primary: #1976d2;
   --ion-color-primary-rgb: 25,118,210;
