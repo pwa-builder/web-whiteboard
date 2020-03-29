@@ -4,12 +4,6 @@ import { toastController as toastCtrl, alertController as alertCtrl, modalContro
 import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
 
-import { b64toBlob } from '../../helpers/utils';
-import { getNewFileHandle, readFile } from '../../helpers/files-api';
-
-import { exportToOneNote, createActivity } from '../../services/graph';
-import { saveImagesS } from '../../services/api';
-
 import { findLocalImage, doAI, getInkInfo } from '../../canvas.worker';
 
 
@@ -110,7 +104,6 @@ export class AppCanvas {
 
         that.canvasElement.removeEventListener('click', handler);
       });
-
     }
 
     document.addEventListener('keydown', async (ev) => {
@@ -315,8 +308,8 @@ export class AppCanvas {
     this.fileHandle = fileHandler;
 
     if (this.fileHandle) {
-      const fileContents: any = await readFile(this.fileHandle);
-      console.log(fileContents);
+      const module = await import('../../helpers/files-api');
+      const fileContents: any = await module.readFile(this.fileHandle);
 
       let tempImage = new Image();
       tempImage.onload = async () => {
@@ -666,7 +659,8 @@ export class AppCanvas {
 
           console.log('activity object', activityObject);
 
-          await createActivity(handle ? handle.name : name, activityObject);
+          const module = await import('../../services/graph');
+          await module.createActivity(handle ? handle.name : name, activityObject);
         }
         catch (err) {
           console.error(err);
@@ -777,12 +771,15 @@ export class AppCanvas {
 
   async saveImages(images: any[]) {
     console.log('images before cloudSave', images);
-    await saveImagesS(images);
+    
+    const module = await import('../../services/api');
+    await module.saveImagesS(images);
   }
 
   async saveToFS() {
     if ("chooseFileSystemEntries" in window) {
-      this.fileHandle = await getNewFileHandle();
+      const module = await import('../../helpers/files-api');
+      this.fileHandle = await module.getNewFileHandle();
 
       console.log(this.fileHandle);
 
@@ -925,7 +922,7 @@ export class AppCanvas {
 
         if (that.inkShape === true) {
           points = [];
-          points.push({ x: pointer.clientX, y: pointer.clientY });
+          points.push({ x: event.clientX, y: event.clientY });
         }
 
         if (event.pointerType !== 'touch') {
@@ -947,6 +944,10 @@ export class AppCanvas {
 
           changedPointers.forEach((pointer) => {
             const previous = previousPointers.find(p => p.id === pointer.id);
+
+            if (that.inkShape === true) {
+              points.push({ x: pointer.clientX, y: pointer.clientY });
+            }
 
             if ((pointer.nativePointer as PointerEvent).pointerType === 'pen') {
               let tweakedPressure = (pointer.nativePointer as PointerEvent).pressure * 6;
@@ -1226,7 +1227,9 @@ export class AppCanvas {
             await this.saveCanvas(name);
 
             const imageUrl = this.canvasElement.toDataURL();
-            const imageBlob = b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
+            
+            const module = await import('../../helpers/utils');
+            const imageBlob = module.b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
 
             console.log(imageBlob);
 
@@ -1245,9 +1248,8 @@ export class AppCanvas {
                 const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
                 console.log(fileUpload);
 
-
-
-                await exportToOneNote(fileUpload.webUrl, name);
+                const module = await import('../../services/graph');
+                await module.exportToOneNote(fileUpload.webUrl, name);
 
               }
               catch (err) {

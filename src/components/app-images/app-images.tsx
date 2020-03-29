@@ -1,15 +1,15 @@
 import { Component, Element, State, h } from '@stencil/core';
 import { loadingController, toastController as toastCtrl, alertController } from '@ionic/core';
 
-import { b64toBlob } from '../../helpers/utils';
-import { getFileHandle } from '../../helpers/files-api';
+// import { b64toBlob } from '../../helpers/utils';
+// import { getFileHandle } from '../../helpers/files-api';
 import { cleanImages, search } from '../../images.worker';
 
 import { get, set } from 'idb-keyval';
 // import * as comlink from 'https://unpkg.com/comlink@4.0.1';
 
-import { getSavedImages, saveImagesS } from '../../services/api';
-import { getWindowsDevices, sendCommand } from '../../services/graph';
+// import { getSavedImages, saveImagesS } from '../../services/api';
+// import { getWindowsDevices, sendCommand } from '../../services/graph';
 
 @Component({
   tag: 'app-images',
@@ -61,7 +61,8 @@ export class AppImages {
         await loading.present();
 
         try {
-          const data = await getSavedImages();
+          const module = await import('../../services/api');
+          const data = await module.getSavedImages();
           console.log(data);
 
           this.images = await cleanImages(data.images);
@@ -104,7 +105,8 @@ export class AppImages {
 
     console.log('trying to get images from the cloud');
     try {
-      const data = await getSavedImages();
+      const module = await import('../../services/api');
+      const data = await module.getSavedImages();
       console.log(data);
 
       this.images = data.images
@@ -149,7 +151,8 @@ export class AppImages {
         this.images = [...this.images];
 
         await set('images', this.images);
-        await saveImagesS(this.images);
+        const module = await import('../../services/api');
+        await module.saveImagesS(this.images);
       }
     }
 
@@ -169,7 +172,8 @@ export class AppImages {
   }
 
   async showDevices(name: string) {
-    const devices = await getWindowsDevices();
+    const module = await import('../../services/graph');
+    const devices = await module.getWindowsDevices();
     console.log(devices);
 
     let deviceButtons = [];
@@ -181,7 +185,7 @@ export class AppImages {
           const provider = (window as any).mgt.Providers.globalProvider;
           const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
 
-          await sendCommand(device.id, `https://webboard-app.web.app/boards/${name}/${user.name}/board`);
+          await module.sendCommand(device.id, `https://webboard-app.web.app/boards/${name}/${user.name}/board`);
 
           const toast = await toastCtrl.create({
             message: `Opened board on ${device.Model || device.Name}`,
@@ -249,7 +253,8 @@ export class AppImages {
         {
           text: "Upload to OneDrive",
           handler: async (): Promise<any> => {
-            const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+            const module = await import('../../helpers/utils');
+            const imageBlob = module.b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
 
             let provider = (window as any).mgt.Providers.globalProvider;
             if (provider) {
@@ -292,7 +297,8 @@ export class AppImages {
 
                 saveImages(remoteImages);*/
 
-                await saveImagesS(this.images);
+                const module = await import('../../services/api');
+                await module.saveImagesS(this.images);
 
                 await loading.dismiss();
 
@@ -319,7 +325,8 @@ export class AppImages {
           handler: async (): Promise<any> => {
             console.log('hello');
 
-            const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+            const module = await import('../../helpers/utils');
+            const imageBlob = module.b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
             const file = new File([imageBlob], "default.jpg");
 
             if ((navigator as any).canShare && (navigator as any).canShare(file)) {
@@ -349,7 +356,8 @@ export class AppImages {
       let graphClient = provider.graph.client;
 
       if ((navigator as any).canShare) {
-        const imageBlob = b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
+        const module = await import('../../helpers/utils');
+        const imageBlob = module.b64toBlob(image.url.replace("data:image/png;base64,", ""), 'image/jpg');
         const file = new File([imageBlob], "default.jpg");
 
         if ((navigator as any).canShare(file)) {
@@ -445,7 +453,8 @@ export class AppImages {
   }
 
   async openNativeFile() {
-    const file_handle = await getFileHandle();
+    const module = await import('../../helpers/files-api');
+    const file_handle = await module.getFileHandle();
     console.log(file_handle);
 
     if (file_handle) {
@@ -478,7 +487,7 @@ export class AppImages {
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
-    </ion-header>,
+      </ion-header>,
 
       <ion-content>
 

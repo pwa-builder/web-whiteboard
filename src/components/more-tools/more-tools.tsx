@@ -29,7 +29,7 @@ export class MoreTools {
     else {
       this.doInkToShape.emit(false);
 
-      sessionStorage.setItem('inkToShape', 'true');
+      sessionStorage.setItem('inkToShape', 'false');
     }
   }
 
@@ -42,7 +42,7 @@ export class MoreTools {
     else {
       this.doAi.emit(false);
 
-      localStorage.setItem('ai', 'true');
+      localStorage.setItem('ai', 'false');
     }
   }
 
