@@ -55,14 +55,6 @@ export class AppHome {
       }
     });
 
-    (window as any).requestIdleCallback(async () => {
-      const loginTest = await get('webboardLoggedIn');
-
-      if (loginTest && loginTest === true) {
-        await this.checkMGT();
-      }
-    });
-
     (window as any).requestIdleCallback(() => {
       this.setupWakeLock();
     });
@@ -110,19 +102,12 @@ export class AppHome {
 
   handleSegments() {
     const segments = (window as any).getWindowSegments();
-    if (segments.length === 2 ) {
+    if (segments.length === 2) {
       this.spanned = true;
     }
     else {
       this.spanned = false;
     }
-  }
-
-  async checkMGT() {
-    await import('../../mgt.js');
-    this.mgtLoaded = true;
-
-    await set('webboardLoggedIn', true);
   }
 
   @Listen('beforeinstallprompt', { target: 'window' })
@@ -330,10 +315,10 @@ export class AppHome {
       this.spanned = true;
     }
   }
-  
+
   async handleInkToShape(ev) {
     console.log('home inkshape', ev.detail);
-    await this.el.querySelector('app-canvas').inkToShape(); 
+    await this.el.querySelector('app-canvas').inkToShape();
   }
 
   componentDidUnload() {
@@ -375,18 +360,14 @@ export class AppHome {
 
           <div>
 
-            {this.mgtLoaded ? <div>
+            {/*<div>
               <mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
               <mgt-login></mgt-login>
-            </div> : <div onClick={() => this.checkMGT()}><p id="signInText">Sign In</p></div>}
+            </div>*/}
           </div>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
         </div>
-
-        {/*<ion-button onClick={() => this.openSettings()} id="settingsButton" fill="clear">
-          <ion-icon name="settings"></ion-icon>
-    </ion-button>*/}
 
         <ion-fab id="spanFab" horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab>
 

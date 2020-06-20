@@ -10,6 +10,12 @@
   z-index: 999;
 }
 
+#noImages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 #imagesHeaderEl ion-toolbar {
   --background: #ffffff70;
   backdrop-filter: blur(10px);
