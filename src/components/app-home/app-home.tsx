@@ -180,7 +180,9 @@ export class AppHome {
       this.currentFileHandle = await appCanvas.saveCanvas("", this.currentFileHandle);
       console.log(this.currentFileHandle);
 
-      this.currentFileName = this.currentFileHandle.name;
+      if (this.currentFileHandle && this.currentFileHandle.name) {
+        this.currentFileName = this.currentFileHandle.name;
+      }
 
       await firstToast.dismiss();
 
