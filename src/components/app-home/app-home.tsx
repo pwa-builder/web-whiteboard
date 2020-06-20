@@ -161,7 +161,7 @@ export class AppHome {
       await firstToast.present();
 
       console.log("this.currentFileHandle", this.currentFileHandle);
-      appCanvas.saveCanvas(this.currentFileName, this.currentFileHandle);
+      await appCanvas.saveCanvas(this.currentFileName, this.currentFileHandle);
 
       await firstToast.dismiss();
 
