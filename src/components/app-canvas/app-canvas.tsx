@@ -648,7 +648,7 @@ export class AppCanvas {
     return new Promise((resolve, reject) => {
       const options: any = {
         // Suggested file name to use, defaults to `''`.
-        fileName: 'webboard.jpeg',
+        fileName: 'webboard',
         extensions: [".jpeg"]
       };
 

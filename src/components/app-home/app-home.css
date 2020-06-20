@@ -5,8 +5,8 @@
 #pwaInstallButton {
   position: fixed;
   z-index: -1;
-  top: 20px;
-  right: 18em;
+  top: 18px;
+  right: 6em;
 }
 
 pwa-install {
