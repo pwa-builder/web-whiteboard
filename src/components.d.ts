@@ -15,15 +15,13 @@ export namespace Components {
         "color": string;
         "dragMode": boolean;
         "drawGrid": () => Promise<unknown>;
-        "exportToOneNote": () => Promise<void>;
         "inkToShape": () => Promise<void>;
         "liveConnect": () => Promise<void>;
         "mode": string;
         "resizeCanvas": (width?: number, height?: number) => Promise<void>;
-        "saveCanvas": (name: string) => Promise<void>;
+        "saveCanvas": (name: string, fileHandle?: any) => Promise<any>;
         "savedDrawing": string | null;
         "shareCanvas": () => Promise<void>;
-        "writeNativeFile": (fileHandler: any) => Promise<void>;
     }
     interface AppControls {
     }

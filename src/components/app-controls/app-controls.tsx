@@ -1,5 +1,5 @@
 import { Component, Element, Event, EventEmitter, State, h } from '@stencil/core';
-import { modalController as modalCtrl, alertController as alertCtrl, popoverController as popoverCtrl, toastController as toastCtrl } from '@ionic/core';
+import { modalController as modalCtrl, popoverController as popoverCtrl, toastController as toastCtrl } from '@ionic/core';
 
 declare var ga: any;
 
@@ -188,31 +188,6 @@ export class AppControls {
     }
   }
 
-  async exportToNote() {
-    const alert = await alertCtrl.create({
-      header: 'Confirm',
-      subHeader: 'export to onenote',
-      message: 'Export to OneNote?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Confirm Cancel: blah');
-          }
-        }, {
-          text: 'Yes',
-          handler: () => {
-            console.log('Confirm Okay');
-            this.export.emit();
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
   deskShare() {
     this.doShare.emit();
   }
@@ -239,11 +214,6 @@ export class AppControls {
       await this.turnAI();
     });
 
-    (popover.querySelector('more-tools') as HTMLElement).addEventListener('exportEV', async (ev: any) => {
-      console.log(ev.detail);
-      await this.exportToNote();
-    });
-
     (popover.querySelector('more-tools') as HTMLElement).addEventListener('share', (ev: any) => {
       console.log(ev.detail);
       this.doShare.emit();
@@ -257,7 +227,7 @@ export class AppControls {
         {
           window.matchMedia("(min-width: 800px)").matches ? <div id='saveButtonDiv'>
             <button id='allImagesButton' onClick={() => this.openAllImages()}>
-              <ion-icon name='images-outline'></ion-icon>
+              <ion-icon name="document-outline"></ion-icon>
             </button>
 
             <button onClick={() => this.save()} id='saveButton'>
@@ -283,7 +253,7 @@ export class AppControls {
 
               <ion-fab-list side="bottom">
                 <ion-fab-button onClick={() => this.openAllImages()}>
-                  <ion-icon name='images-outline'></ion-icon>
+                  <ion-icon name="document-outline"></ion-icon>
                 </ion-fab-button>
 
                 <ion-fab-button onClick={() => this.save()}>
@@ -325,10 +295,6 @@ export class AppControls {
             <button onClick={() => this.addImagePop()}>
               <ion-icon id="imagesIcon" name="images-outline"></ion-icon>
             </button>
-
-            {window.matchMedia("(min-width: 1200px)").matches ? <button onClick={() => this.exportToNote()}>
-              <ion-icon id="oneSvg" src="/assets/onenote.svg"></ion-icon>
-            </button> : null}
 
             <button onClick={(event) => this.moreTools(event)}>
               <ion-icon name="ellipsis-vertical-outline"></ion-icon>

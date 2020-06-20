@@ -80,8 +80,8 @@ export class AppImages {
     }
   }
 
-  async choose(url: string, name: string) {
-    (this.el.closest('ion-modal') as any).dismiss({ url, name });
+  async choose(url: string, name: string, handle) {
+    (this.el.closest('ion-modal') as any).dismiss({ url, name, handle });
   }
 
   async delete(event, imagePicked) {
@@ -178,9 +178,9 @@ export class AppImages {
       console.log(response);
       const data = await response.blob();
 
-      console.log(data);
+      console.log(data, name);
 
-      this.choose(URL.createObjectURL(data), name);
+      // this.choose(URL.createObjectURL(data), name);
     }
     catch (err) {
       console.log(err, err.message);
@@ -411,18 +411,6 @@ export class AppImages {
     this.imageSection = event.target.value;
   }
 
-  async openNativeFile() {
-    const module = await import('../../helpers/files-api');
-    const file_handle = await module.getFileHandle();
-    console.log(file_handle);
-
-    if (file_handle) {
-      document.querySelector('app-canvas').writeNativeFile(file_handle);
-    }
-
-    this.close();
-  }
-
   render() {
     return [
       <ion-header no-border id="imagesHeaderEl">
@@ -436,10 +424,6 @@ export class AppImages {
             <ion-button onClick={() => this.refreshImages()}>
               <ion-icon name="refresh-circle-outline"></ion-icon>
             </ion-button>
-
-            {"chooseFileSystemEntries" in window ? <ion-button onClick={() => this.openNativeFile()}>
-              <ion-icon name="folder-outline"></ion-icon>
-            </ion-button> : null}
 
             <ion-button onClick={() => this.close()}>
               <ion-icon name='close'></ion-icon>
@@ -495,9 +479,9 @@ export class AppImages {
                           </div>
                         </ion-card-header>
 
-                        <img loading="lazy" onClick={() => this.choose(image.url, image.name)} src={image.url} alt={image.name}></img>
+                        <img loading="lazy" onClick={() => this.choose(image.url, image.name, image.handle)} src={image.url} alt={image.name}></img>
 
-                        <ion-card-content onClick={() => this.choose(image.url, image.name)}>
+                        <ion-card-content onClick={() => this.choose(image.url, image.name, image.handle)}>
                           <div id="imageTags">
                             {image.tags && image.tags.length > 0 ? <p id="tagsP">Tags: </p> : null}
                             {

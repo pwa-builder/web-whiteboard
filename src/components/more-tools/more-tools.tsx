@@ -46,10 +46,6 @@ export class MoreTools {
     }
   }
 
-  export() {
-    this.exportEV.emit();
-  }
-
   handleShare() {
     this.share.emit();
   }
@@ -69,9 +65,6 @@ export class MoreTools {
 
         <div id="toolsActions">
           <ion-buttons>
-            <ion-button onClick={() => this.export()} color="primary" shape="round" fill="outline">
-              Export to OneNote
-            </ion-button>
 
             <ion-button color="warning" shape="round" fill="outline" onClick={() => this.handleShare()}>
               <ion-icon slot="start" name="share-outline"></ion-icon>

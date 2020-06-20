@@ -3,6 +3,7 @@ import { toastController as toastCtrl, alertController as alertCtrl, modalContro
 
 import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
+import { fileSave } from 'browser-nativefs';
 
 import { findLocalImage, doAI, getInkInfo } from '../../canvas.worker';
 
@@ -55,18 +56,6 @@ export class AppCanvas {
       this.setupCanvas();
     });
 
-    (window as any).requestIdleCallback(async () => {
-      const canvasState = await (get('canvasState') as any);
-
-      if (canvasState && !this.savedDrawing) {
-        const tempImage = new Image();
-        tempImage.onload = () => {
-          this.context.drawImage(tempImage, 0, 0);
-        }
-        tempImage.src = canvasState;
-      }
-    });
-
     this.setupEvents();
   }
 
@@ -105,17 +94,6 @@ export class AppCanvas {
         that.canvasElement.removeEventListener('click', handler);
       });
     }
-
-    document.addEventListener('keydown', async (ev) => {
-      if (ev.key.toLowerCase() === "s".toLowerCase() && ev.shiftKey && ev.ctrlKey) {
-        console.log('here');
-        await this.saveToFS();
-      }
-
-      else if (ev.key.toLowerCase() === "s".toLowerCase() && ev.ctrlKey) {
-        this.quickSave(ev);
-      }
-    })
   }
 
   @Method()
@@ -301,27 +279,6 @@ export class AppCanvas {
       tempImage = null
     }
     tempImage.src = this.savedDrawing;
-  }
-
-  @Method()
-  async writeNativeFile(fileHandler) {
-    this.fileHandle = fileHandler;
-
-    if (this.fileHandle) {
-      const module = await import('../../helpers/files-api');
-      const fileContents: any = await module.readFile(this.fileHandle);
-
-      let tempImage = new Image();
-      tempImage.onload = async () => {
-        console.log('image loaded');
-
-        this.context.drawImage(tempImage, 0, 0);
-        this.setupMouseEvents();
-
-        tempImage = null
-      }
-      tempImage.src = fileContents;
-    }
   }
 
   @Method()
@@ -551,11 +508,13 @@ export class AppCanvas {
   }
 
   @Method()
-  async saveCanvas(name: string) {
+  async saveCanvas(name: string, fileHandle?) {
     const canvasImage = this.canvasElement.toDataURL();
     const images: any[] = await get('images');
 
     const localImage: any = await findLocalImage(images, name);
+
+    let handle = null;
 
     // AI
     const aiToken = localStorage.getItem('ai');
@@ -564,7 +523,7 @@ export class AppCanvas {
       const data = await doAI(canvasImage);
 
       if (images) {
-        const handle = await this.saveToFS();
+        const handle = await this.saveToFS(fileHandle);
 
         const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
 
@@ -595,102 +554,26 @@ export class AppCanvas {
         }
         else {
           if (handle) {
-            images.push({ name: handle.name, color: data.color, desc, tags: data.tags, url: canvasImage });
+            images.push({ name: handle.name, handle: handle, color: data.color, desc, tags: data.tags, url: canvasImage });
           }
           else {
-            images.push({ name, color: data.color, desc, tags: data.tags, url: canvasImage });
+            images.push({ name, color: data.color, handle: handle, desc, tags: data.tags, url: canvasImage });
           }
-        }
-
-        try {
-          const provider = (window as any).mgt.Providers.globalProvider;
-          const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
-
-          //const appActivityId = `/board?name=${handle ? handle.name : name}&username=${user.name}`;
-
-          // weird format because graph
-          //const goodTime = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getUTCDate()}T${new Date().getUTCHours().toString().length > 1 ? null : 0}${new Date().getUTCHours()}:${new Date().getUTCMinutes().toString().length > 1 ? null : 0}${new Date().getUTCMinutes()}:${new Date().getUTCSeconds()}.${new Date().getUTCMilliseconds()}Z`;
-          //const goodTime2 = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getUTCDate()}T${new Date().getUTCHours().toString().length > 1 ? null : 0}${new Date().getUTCHours()}:${new Date().getUTCMinutes() + 3}:${new Date().getUTCSeconds()}.${new Date().getUTCMilliseconds()}Z`
-
-          const activityObject = {
-            "appActivityId": `/boards?${handle ? handle.name : name}`,
-            "activitySourceHost": 'https://webboard-app.web.app',
-            "userTimezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-            "appDisplayName": "Webboard",
-            "activationUrl": `https://webboard-app.web.app/boards/${handle ? handle.name : name}/${user.name}/board`,
-            "fallbackUrl": "https://webboard-app.web.app",
-            "contentInfo": {
-              "@context": "http://schema.org",
-              "@type": "CreativeWork",
-              "author": user.name,
-              "name": "Webboard"
-            },
-            "visualElements": {
-              "attribution": {
-                "iconUrl": "https://webboard-app.web.app/icons/android/android-launchericon-64-64.png",
-                "alternateText": "Webboard",
-                "addImageQuery": "false"
-              },
-              "description": "Access your saved board here",
-              "backgroundColor": "#1976d2",
-              "displayText": `You saved a new board: ${handle ? handle.name : name}`,
-              "content": {
-                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                "type": "AdaptiveCard",
-                "body": [
-                  {
-                    "type": "TextBlock",
-                    "text": "Always access your latest board here!"
-                  }
-                ]
-              }
-            },
-
-
-            /*"historyItems": [
-              {
-                "userTimezone": "America/Los Angeles",
-                                    2019-12-18T09:05:48.401Z
-                "startedDateTime": "2019-12-18T07:44:23.299Z",
-                "lastActiveDateTime": "2019-12-18T08:44:23.299Z"
-              }
-            ]*/
-          };
-
-          console.log('activity object', activityObject);
-
-          const module = await import('../../services/graph');
-          await module.createActivity(handle ? handle.name : name, activityObject);
-        }
-        catch (err) {
-          console.error(err);
         }
 
         await set('images', images);
-
-        let remoteImages = [];
-
-        images.forEach((image) => {
-          console.log('image', image);
-          if (image) {
-            remoteImages.push(image);
-          }
-        });
-
-
-        await this.saveImages(remoteImages);
       }
       else {
-        const handle = await this.saveToFS();
+        const handle = await this.saveToFS(fileHandle);
 
 
         const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
 
         if (handle) {
-          await set('images', [{ name: handle.name, color: data.color, tags: data.tags, url: canvasImage, desc }]);
+          await set('images', [{ name: handle.name, handle: handle, color: data.color, tags: data.tags, url: canvasImage, desc }]);
         }
         else {
-          await set('images', [{ name, color: data.color, tags: data.tags, url: canvasImage, desc }]);
+          await set('images', [{ name, color: data.color, handle: handle, tags: data.tags, url: canvasImage, desc }]);
         }
 
         // await this.saveImages(remoteImages);
@@ -699,7 +582,7 @@ export class AppCanvas {
     }
     else {
       if (images) {
-        const handle = await this.saveToFS();
+        handle = await this.saveToFS(fileHandle);
         console.log(handle);
         /*if (handle) {
           images.push({ name: handle.name, url: canvasImage });
@@ -720,34 +603,23 @@ export class AppCanvas {
         }
         else {
           if (handle) {
-            images.push({ name: handle.name, url: canvasImage });
+            images.push({ name: handle.name, handle: handle, url: canvasImage });
           }
           else {
-            images.push({ name, url: canvasImage });
+            images.push({ name, url: canvasImage, handle: handle });
           }
         }
 
         await set('images', images);
-
-        let remoteImages = [];
-
-        images.forEach((image) => {
-          console.log(image);
-          if (image) {
-            remoteImages.push(image);
-          }
-        });
-
-        await this.saveImages(remoteImages);
       }
       else {
-        const handle = await this.saveToFS();
+        handle = await this.saveToFS(fileHandle);
 
         if (handle) {
-          await set('images', [{ name: handle.name, url: canvasImage }]);
+          await set('images', [{ name: handle.name, handle: handle, url: canvasImage }]);
         }
         else {
-          await set('images', [{ name, url: canvasImage }]);
+          await set('images', [{ name, url: canvasImage, handle: handle }]);
         }
 
         /*if (images) {
@@ -767,36 +639,37 @@ export class AppCanvas {
 
     URL.revokeObjectURL(canvasImage);
 
+    return fileHandle || handle;
+
   }
 
-  async saveImages(images: any[]) {
-    console.log('images before cloudSave', images);
-    
-    const module = await import('../../services/api');
-    await module.saveImagesS(images);
-  }
+  async saveToFS(fileHandle?): Promise<any> {
 
-  async saveToFS() {
-    if ("chooseFileSystemEntries" in window) {
-      const module = await import('../../helpers/files-api');
-      this.fileHandle = await module.getNewFileHandle();
+    return new Promise((resolve, reject) => {
+      const options: any = {
+        // Suggested file name to use, defaults to `''`.
+        fileName: 'webboard.jpeg',
+        extensions: [".jpeg"]
+      };
 
-      console.log(this.fileHandle);
-
-      if (this.fileHandle) {
-        this.fileWriter = await this.fileHandle.createWriter();
-        console.log(this.fileWriter);
-
+      try {
         this.canvasElement.toBlob(async (blob) => {
-          await this.fileWriter.write(0, blob);
-          await this.fileWriter.close();
-        }, 'image/jpeg');
+          if (fileHandle) {
+            this.fileHandle = await fileSave(blob, options, fileHandle);
+          }
+          else {
+            this.fileHandle = await fileSave(blob, options);
+          }
 
-        this.setupMouseEvents();
+          console.log('fileHandle', this.fileHandle);
+  
+          resolve(this.fileHandle);
+        });
       }
-
-      return this.fileHandle;
-    }
+      catch(err) {
+        reject(err);
+      }
+    });
   }
 
   setupCanvas() {
@@ -806,7 +679,6 @@ export class AppCanvas {
     this.rect = this.canvasElement.getBoundingClientRect();
 
     this.context = (this.canvasElement.getContext('2d', {
-      desynchronized: true
     }) as CanvasRenderingContext2D);
 
     this.context.fillStyle = 'white';
@@ -1034,8 +906,6 @@ export class AppCanvas {
         // cancelled - True if the event was cancelled.  Actions are cancelled when the OS takes over
         //   pointer events, for actions such as scrolling.
 
-        that.quickSave(event);
-
         if (that.inkShape === true) {
           await that.sendInk(points);
         }
@@ -1114,40 +984,6 @@ export class AppCanvas {
     this.context.stroke();
   }
 
-  quickSave(e) {
-    e.preventDefault();
-
-    this.saving = true;
-
-    this.drawing = false;
-
-    // this.lastPos = this.getMousePos(this.canvasElement, e);
-    // this.lastPos = null;
-
-    (window as any).requestIdleCallback(async () => {
-      let canvasState = this.canvasElement.toDataURL();
-      await set('canvasState', canvasState);
-
-      if ("chooseFileSystemEntries" in window && this.fileHandle) {
-        console.log('writing to file');
-        this.fileWriter = await this.fileHandle.createWriter();
-
-        console.log('this.fileWriter in pointer up', this.fileWriter);
-        console.log("chooseFileSystemEntries" in window);
-
-        this.canvasElement.toBlob(async (blob) => {
-          await this.fileWriter.write(0, blob);
-          await this.fileWriter.close();
-        }, 'image/jpeg');
-      }
-
-      setTimeout(() => {
-        this.saving = false;
-      }, 400);
-
-    })
-  }
-
   @Method()
   addImageToCanvas(imageString: string, width: number, height: number) {
     this.mode = "something";
@@ -1194,7 +1030,7 @@ export class AppCanvas {
     await this.setupMouseEvents();
   }
 
-  @Method()
+  /*@Method()
   async exportToOneNote() {
     if (this.contextAnimation) {
       this.contextAnimation.reverse();
@@ -1227,7 +1063,7 @@ export class AppCanvas {
             await this.saveCanvas(name);
 
             const imageUrl = this.canvasElement.toDataURL();
-            
+
             const module = await import('../../helpers/utils');
             const imageBlob = module.b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
 
@@ -1263,7 +1099,7 @@ export class AppCanvas {
     await alert.present();
     const data = await alert.onDidDismiss();
     console.log(data);
-  }
+  }*/
 
   async handleDragEnter() {
     this.dragToast = await toastController.create({
@@ -1335,12 +1171,6 @@ export class AppCanvas {
                 <ion-icon name="albums-outline"></ion-icon>
 
                 <span>Paste</span>
-              </button>
-
-              <button onClick={() => this.exportToOneNote()}>
-                <ion-icon src="/assets/onenote.svg"></ion-icon>
-
-                <span>Export</span>
               </button>
 
               <button onClick={(event) => this.insertText(event)}>
