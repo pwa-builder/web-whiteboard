@@ -777,7 +777,7 @@ export class AppCanvas {
     let points;
 
     // import PointerTracker from 'pointer-tracker';
-    const PointerTracker = await import('pointer-tracker');
+    const PointerTracker = await import('../../helpers/PointerTracker');
 
     let that = this;
 
@@ -827,6 +827,8 @@ export class AppCanvas {
 
               if ((pointer.nativePointer as PointerEvent).buttons === 32 && (pointer.nativePointer as PointerEvent).button === -1) {
                 // eraser
+
+                that.context.lineWidth = 15;
 
                 that.context.globalCompositeOperation = 'destination-out';
                 that.context.beginPath();
