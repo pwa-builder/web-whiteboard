@@ -1,14 +1,16 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
-import { toastController as toastCtrl, alertController as alertCtrl, modalController, toastController, alertController } from '@ionic/core';
+import { toastController as toastCtrl, alertController as alertCtrl, toastController, alertController } from '@ionic/core';
 
 import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
 import { fileSave } from 'browser-nativefs';
 
 import { findLocalImage, doAI, getInkInfo } from '../../canvas.worker';
+import { randoRoom } from '../../helpers/utils';
 
 
 declare var ClipboardItem;
+declare var io: any;
 
 @Component({
   tag: 'app-canvas',
@@ -29,6 +31,9 @@ export class AppCanvas {
   @State() doDrag: boolean = false;
   @State() saving: boolean = false;
   @State() inkShape: boolean = false;
+  @State() room: string | null = null;
+
+  @Prop({ connect: 'ion-router' }) nav: HTMLIonRouterElement;
 
   canvasElement: HTMLCanvasElement;
   gridCanvas: HTMLCanvasElement;
@@ -45,15 +50,16 @@ export class AppCanvas {
   offscreen = null;
   gridWorker = null;
   dragToast: HTMLIonToastElement;
+  socket: any = null;
 
-  componentDidLoad() {
+  async componentDidLoad() {
     window.addEventListener('resize', () => {
       console.log('resizing');
       this.resizeCanvas();
     });
 
-    (window as any).requestIdleCallback(() => {
-      this.setupCanvas();
+    (window as any).requestIdleCallback(async () => {
+      await this.setupCanvas();
     });
 
     this.setupEvents();
@@ -404,19 +410,71 @@ export class AppCanvas {
           text: "Cancel"
         },
         {
-          text: "Choose Teammates",
+          text: "Start",
           handler: async () => {
-            const modal = await modalController.create({
-              component: "contacts-modal"
-            });
 
-            await modal.present();
+            const room = randoRoom();
+
+            const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
+            await navCtrl.push(`/live/${room}`);
+
           }
         }
       ],
       backdropDismiss: false
     });
     await alert.present();
+  }
+
+  socket_connect(room: any) {
+    return io('https://live-canvas-server.azurewebsites.net/', {
+      query: 'r_var=' + room
+    });
+  }
+
+  setupLiveEvents() {
+    /*const thirdCanvas: HTMLCanvasElement | null | undefined = this.el.querySelector('#thirdCanvas');
+    const thirdContext = thirdCanvas?.getContext("2d");*/
+
+    const thirdContext = this.context;
+
+    this.socket.on('drawing', (data: any) => {
+      console.log(data);
+      console.log('thirdContext', thirdContext);
+      if (thirdContext) {
+        thirdContext.strokeStyle = data.color;
+
+        thirdContext.globalCompositeOperation = data.globalCompositeOperation;
+
+        if (data.pointerType === 'pen') {
+          let tweakedPressure = data.pressure * 6;
+          thirdContext.lineWidth = data.width + tweakedPressure;
+        }
+
+        else if (data.pointerType === 'touch') {
+          thirdContext.lineWidth = data.width - 20;
+        }
+        else if (data.pointerType === 'mouse') {
+          thirdContext.lineWidth = 4;
+        }
+
+        if (data.globalCompositeOperation === 'destination-out') {
+          thirdContext.lineWidth = 18;
+        }
+
+
+        thirdContext.beginPath();
+
+        thirdContext.moveTo(data.x0, data.y0);
+
+
+        thirdContext.lineTo(data.x1, data.y1);
+
+
+        thirdContext.stroke();
+      }
+
+    });
   }
 
   async doTextCopy() {
@@ -662,17 +720,17 @@ export class AppCanvas {
           }
 
           console.log('fileHandle', this.fileHandle);
-  
+
           resolve(this.fileHandle);
         });
       }
-      catch(err) {
+      catch (err) {
         reject(err);
       }
     });
   }
 
-  setupCanvas() {
+  async setupCanvas() {
     this.canvasElement.height = window.innerHeight;
     this.canvasElement.width = window.innerWidth;
 
@@ -701,8 +759,8 @@ export class AppCanvas {
 
     console.log(this.color);
 
-    (window as any).requestIdleCallback(() => {
-      this.setupMouseEvents();
+    (window as any).requestIdleCallback(async () => {
+      await this.setupMouseEvents();
     })
     // this.setupMouseEvents();
 
@@ -873,6 +931,20 @@ export class AppCanvas {
                 that.context.stroke();
               });
             }
+
+            if (that.socket) {
+              that.socket.emit('drawing', {
+                x0: previous.clientX,
+                y0: previous.clientY,
+                x1: (event as PointerEvent).clientX,
+                y1: (event as PointerEvent).clientY,
+                color: that.color,
+                pointerType: (event as PointerEvent).pointerType,
+                pressure: (event as PointerEvent).pressure,
+                width: (event as PointerEvent).width,
+                globalCompositeOperation: 'source-over',
+              });
+            }
           })
         }
         else if (that.mode === 'erase') {
@@ -897,6 +969,20 @@ export class AppCanvas {
               that.context.lineTo(point.clientX, point.clientY);
             }
             that.context.stroke();
+
+            if (that.socket) {
+              that.socket.emit('drawing', {
+                x0: previous.clientX,
+                y0: previous.clientY,
+                x1: (event as PointerEvent).clientX,
+                y1: (event as PointerEvent).clientY,
+                color: that.color,
+                pointerType: (event as PointerEvent).pointerType,
+                pressure: (event as PointerEvent).pressure,
+                width: (event as PointerEvent).width,
+                globalCompositeOperation: 'source-over'
+              });
+            }
           });
         }
       },
@@ -915,6 +1001,29 @@ export class AppCanvas {
         console.log(pointer, event, cancelled);
       },
     });
+
+    const roomNumber = location.pathname.split("/").pop();
+    this.room = roomNumber;
+
+    if (roomNumber) {
+      this.socket = this.socket_connect(roomNumber);
+      this.setupLiveEvents();
+
+      const toast = await toastController.create({
+        message: "You have joined a live session",
+        position: "top",
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'cancel',
+            handler: async () => {
+              await toast.dismiss();
+            }
+          }
+        ]
+      });
+      await toast.present();
+    }
   }
 
   quickInkSave() {
@@ -1156,6 +1265,42 @@ export class AppCanvas {
     }
   }
 
+  async endSession() {
+    const alert = await alertController.create({
+      header: "End Session?",
+      message: "Would you like to end this live session?",
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel: blah');
+          }
+        }, {
+          text: 'End',
+          handler: async () => {
+            const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
+            await navCtrl.push(`/`);
+
+            this.room = null;
+          }
+        }
+      ]
+    })
+    await alert.present();
+  }
+
+  async invite() {
+    if (navigator.share) {
+      await navigator.share({
+        title: 'Webboard',
+        text: "Join me on this board",
+        url: location.href,
+      })
+    }
+  }
+
   render() {
     return [
       <div>
@@ -1187,6 +1332,13 @@ export class AppCanvas {
         {window.matchMedia("(min-width: 1200px)").matches ? <button id="copyTextButton" onClick={() => this.doTextCopy()}>
           {this.copyingText ? <ion-spinner></ion-spinner> : <span>Copy Text</span>}
         </button> : null}
+
+        {
+          this.room ? <ion-button id="endButton" shape="round" color="danger" onClick={() => this.endSession()}>End Session <ion-icon slot="end" name="close"></ion-icon></ion-button> : null
+        }
+        {
+          this.room ? <ion-button id="inviteButton" shape="round" color="primary" onClick={() => this.invite()}>Invite <ion-icon slot="end" name="share"></ion-icon></ion-button> : null
+        }
 
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 
