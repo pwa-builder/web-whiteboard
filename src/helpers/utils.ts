@@ -38,3 +38,7 @@ export function debounce(func, wait, immediate) {
 		if (callNow) func.apply(context, args);
 	};
 };
+
+export const randoRoom = () => {
+  return  Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}

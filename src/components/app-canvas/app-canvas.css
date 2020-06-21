@@ -19,6 +19,20 @@
   box-shadow: 0px 0px 14px 4px var(--ion-color-primary);
 }
 
+#endButton {
+  z-index: 9999;
+  position: fixed;
+  top: 14px;
+  right: 6em;
+}
+
+#inviteButton {
+  z-index: 9999;
+  position: fixed;
+  top: 14px;
+  right: 19.4em;
+}
+
 #inkToShapeButtonOff {
   position: fixed;
   top: 2em;
@@ -39,7 +53,6 @@
   #inkToShapeButton {
     display: none;
   }
-
   #inkToShapeButtonOff {
     display: none;
   }
@@ -59,7 +72,6 @@ canvas {
   position: fixed;
   bottom: 8px;
   right: 20px;
-
   background: black;
   color: white;
   border-radius: 20px;
@@ -68,7 +80,6 @@ canvas {
   box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.37);
   height: 34px;
   width: 96px;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,7 +105,6 @@ canvas {
   padding: 5px;
   border-radius: 8px;
   text-transform: uppercase;
-
   display: flex;
   align-items: center;
 }
@@ -102,7 +112,6 @@ canvas {
 #customContextMenu button ion-icon {
   width: 1.6em;
   height: 1.6em;
-
   margin-right: 8px;
 }
 
