@@ -30,6 +30,16 @@ export class AppControls {
 
   penWidth: number;
 
+  componentDidLoad() {
+    document.addEventListener('pendockchange', (event: any) => {
+      if (!event.docked) {
+        // the pen is un-docked, handle it
+
+        this.changeColor();
+      }
+    });
+  }
+
   changeColor() {
     this.penMode.emit();
     this.openColors = true;
