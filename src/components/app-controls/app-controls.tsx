@@ -32,6 +32,7 @@ export class AppControls {
 
   componentDidLoad() {
     document.addEventListener('pendockchange', (event: any) => {
+      console.log('dockEvent', event);
       if (!event.docked) {
         // the pen is un-docked, handle it
 

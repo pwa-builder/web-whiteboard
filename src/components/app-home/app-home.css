@@ -13,6 +13,22 @@ pwa-install {
   --install-button-color: var(--ion-color-primary) !important;
 }
 
+pwa-auth {
+  position: absolute;
+  right: 5em;
+  top: 14px;
+}
+
+pwa-auth::part(signInButton) {
+  background: var(--ion-color-primary);
+  color: white;
+  padding: 10px;
+  text-transform: uppercase;
+  border-radius: 22px;
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
 #signInText {
   color: var(--ion-color-primary);
   margin-right: 2em;
@@ -84,6 +100,10 @@ app-canvas {
 
   #settingsBlock {
     min-width: 140px;
+  }
+
+  pwa-auth {
+    display: none;
   }
 }
 
