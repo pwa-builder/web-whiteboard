@@ -16,6 +16,7 @@
   "dependencies": {
     "@ionic/core": "^5.2.2",
     "@microsoft/mgt": "^1.1.1",
+    "@pwabuilder/pwaauth": "^0.9.7",
     "@pwabuilder/pwainstall": "^1.6.4",
     "@pwabuilder/pwaupdate": "^0.1.0",
     "adaptivecards": "^1.2.5",
