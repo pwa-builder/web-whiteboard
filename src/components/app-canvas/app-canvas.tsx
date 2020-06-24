@@ -404,20 +404,32 @@ export class AppCanvas {
   async liveConnect() {
     const alert = await alertCtrl.create({
       header: "Live Session",
-      message: "Start a live session and draw in real time with a teammate?",
+      message: "Start a live session and draw in real time with a teammate? If you already have a session ID you can input it below to join.",
+      inputs: [
+        {
+          name: 'sessionID',
+          type: 'text',
+          placeholder: 'Enter your session ID'
+        },
+      ],
       buttons: [
         {
           text: "Cancel"
         },
         {
           text: "Start",
-          handler: async () => {
+          handler: async (data) => {
 
-            const room = randoRoom();
+            if (data.sessionID) {
+              const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
+              await navCtrl.push(`/live/${data.sessionID}`);
+            }
+            else {
+              const room = randoRoom();
 
-            const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
-            await navCtrl.push(`/live/${room}`);
-
+              const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
+              await navCtrl.push(`/live/${room}`);
+            }
           }
         }
       ],
@@ -1301,6 +1313,18 @@ export class AppCanvas {
     }
   }
 
+  async copySession() {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(this.room);
+
+      const toast = await toastController.create({
+        message: "Session ID copied to clipboard",
+        duration: 1300
+      });
+      await toast.present();
+    }
+  }
+
   render() {
     return [
       <div>
@@ -1337,7 +1361,16 @@ export class AppCanvas {
           this.room ? <ion-button id="endButton" shape="round" color="danger" onClick={() => this.endSession()}>End Session <ion-icon slot="end" name="close"></ion-icon></ion-button> : null
         }
         {
-          this.room ? <ion-button id="inviteButton" shape="round" color="primary" onClick={() => this.invite()}>Invite <ion-icon slot="end" name="share"></ion-icon></ion-button> : null
+          this.room ?
+            <ion-button id="inviteButton" shape="round" color="primary" onClick={() => this.invite()}>Invite
+              <ion-icon slot="end" name="share"></ion-icon>
+            </ion-button> : null
+        }
+
+        {
+          this.room ?
+            <span id="sessionLink">Session ID: {this.room} <ion-button size="small" onClick={() => this.copySession()} fill="outline" shape="round" color="light">Copy</ion-button></span>
+           : null
         }
 
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>

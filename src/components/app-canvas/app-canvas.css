@@ -33,6 +33,24 @@
   right: 19.4em;
 }
 
+#sessionLink {
+  cursor: pointer;
+  position: fixed;
+  z-index: 999;
+  background: #1976d2d1;
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 8px;
+  border-radius: 6px;
+  top: 16px;
+  left: 6em;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 22.4em;
+}
+
 #inkToShapeButtonOff {
   position: fixed;
   top: 2em;
@@ -91,7 +109,7 @@ canvas {
   position: absolute;
   background: white;
   opacity: 0;
-  box-shadow: 0 0 14px 4px #00000075;
+  box-shadow: 0 0 14px 1px #00000075;
   border-radius: 3px;
   padding: 4px;
   display: flex;
