@@ -96,7 +96,7 @@ ion-fab {
   display: flex;
   justify-content: space-around;
   width: 20em;
-  border-radius: 22px;
+  border-radius: 40px;
 }
 
 #controlsBlock #buttonBlock button {
@@ -139,7 +139,7 @@ ion-fab {
   justify-content: space-around;
   width: 20em;
   align-items: center;
-  border-radius: 22px;
+  border-radius: 40px;
 
   animation-name: slideUp;
   animation-duration: 250ms;

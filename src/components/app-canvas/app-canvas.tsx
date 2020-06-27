@@ -883,6 +883,7 @@ export class AppCanvas {
         // event - The event related to the pointer changes.
 
         if (that.mode === 'pen') {
+          that.context.globalCompositeOperation = 'source-over';
 
           changedPointers.forEach((pointer) => {
             const previous = previousPointers.find(p => p.id === pointer.id);
@@ -922,6 +923,8 @@ export class AppCanvas {
             else if ((pointer.nativePointer as PointerEvent).pointerType === 'touch') {
               that.context.lineWidth = (pointer.nativePointer as PointerEvent).width - 20;
 
+              that.context.globalCompositeOperation = 'source-over';
+
               changedPointers.forEach((pointer) => {
                 that.context.beginPath();
                 that.context.moveTo(previous.clientX, previous.clientY);
@@ -933,6 +936,8 @@ export class AppCanvas {
             }
             else if ((pointer.nativePointer as PointerEvent).pointerType === 'mouse') {
               that.context.lineWidth = 4;
+
+              that.context.globalCompositeOperation = 'source-over';
 
               changedPointers.forEach((pointer) => {
                 that.context.beginPath();

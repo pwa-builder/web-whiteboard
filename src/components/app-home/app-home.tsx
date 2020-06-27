@@ -152,7 +152,6 @@ export class AppHome {
   async save() {
     const appCanvas = this.el.querySelector('app-canvas');
 
-    ga('send', 'event', ['Button'], ['Save'], ['Saving Canvas']);
 
     if (this.currentFileHandle) {
       const firstToast = await toastController.create({
