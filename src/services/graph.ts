@@ -61,7 +61,12 @@ export async function sendRoomInvite(chosenPeople: any[]) {
   let emailString = 'mailto:';
 
   chosenPeople.forEach((person) => {
-    emailString = emailString + person.scoredEmailAddresses[0].address + ';'
+    if (person.scoredEmailAddresses) {
+      emailString = emailString + person.scoredEmailAddresses[0].address + ';'
+    }
+    else {
+      emailString = emailString + person.email[0] + ';'
+    }
   })
 
   window.location.href = `${emailString}?subject=Invitation To Collaborate &body=Collaborate on a board with me here ${location.href}.`;

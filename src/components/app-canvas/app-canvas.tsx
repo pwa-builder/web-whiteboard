@@ -8,6 +8,7 @@ import { fileSave } from 'browser-nativefs';
 import { findLocalImage, doAI, getInkInfo } from '../../canvas.worker';
 import { randoRoom } from '../../helpers/utils';
 import { getAccount } from '../../services/auth';
+import { sendRoomInvite } from '../../services/graph';
 
 
 declare var ClipboardItem;
@@ -1266,14 +1267,6 @@ export class AppCanvas {
   }
 
   async invite() {
-    /*if (navigator.share) {
-      await navigator.share({
-        title: 'Webboard',
-        text: "Join me on this board",
-        url: location.href,
-      })
-    }*/
-
     const user = await getAccount();
 
     if (user) {
@@ -1281,6 +1274,18 @@ export class AppCanvas {
         component: 'contacts-modal'
       });
       await modal.present();
+    }
+    else if ('contacts' in navigator && 'ContactsManager' in window) {
+      const props = ['name', 'email'];
+      const opts = { multiple: true };
+
+      try {
+        const contacts = await (navigator as any).contacts.select(props, opts);
+        sendRoomInvite(contacts);
+      } catch (err) {
+        // Handle any errors here.
+        console.error(err);
+      }
     }
     else {
       if (navigator.share) {

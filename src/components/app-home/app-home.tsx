@@ -5,7 +5,6 @@ import { set, get } from 'idb-keyval';
 import { fileOpen } from 'browser-nativefs';
 
 import '@pwabuilder/pwainstall';
-import '@pwabuilder/pwaauth';
 
 declare var ga: any;
 
@@ -337,7 +336,7 @@ export class AppHome {
     console.log('home inkshape', ev.detail);
     await this.el.querySelector('app-canvas').inkToShape();
   }
-  
+
 
   componentDidUnload() {
     if (this.wakeLockController) {
@@ -378,9 +377,9 @@ export class AppHome {
 
           <div>
 
-            <div>
-               <app-login></app-login>
-            </div>
+            {(window.matchMedia("(min-width: 800px)").matches) ? <div>
+              <app-login></app-login>
+            </div> : null}
           </div>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}

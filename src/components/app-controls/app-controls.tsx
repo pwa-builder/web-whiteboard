@@ -273,6 +273,10 @@ export class AppControls {
                   <ion-icon name="share-outline"></ion-icon>
                 </ion-fab-button> : null}
 
+                <ion-fab-button onClick={() => this.doLive()}>
+                  <ion-icon name="people-outline"></ion-icon>
+                </ion-fab-button>
+
               </ion-fab-list>
 
             </ion-fab>
