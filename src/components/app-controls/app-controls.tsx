@@ -45,7 +45,6 @@ export class AppControls {
     this.penMode.emit();
     this.openColors = true;
 
-    ga('send', 'event', ['Button'], ['Change Color'], ['Changing Color']);
   }
 
   handleWidth(event) {
@@ -92,7 +91,6 @@ export class AppControls {
   }
 
   async erase() {
-    ga('send', 'event', ['Button'], ['Erase'], ['Erasing']);
 
     if (!this.erasing) {
       this.eraserMode.emit();
@@ -274,6 +272,10 @@ export class AppControls {
                 {typeof ((navigator as any).canShare) === "function" ? <ion-fab-button onClick={() => this.deskShare()}>
                   <ion-icon name="share-outline"></ion-icon>
                 </ion-fab-button> : null}
+
+                <ion-fab-button onClick={() => this.doLive()}>
+                  <ion-icon name="people-outline"></ion-icon>
+                </ion-fab-button>
 
               </ion-fab-list>
 

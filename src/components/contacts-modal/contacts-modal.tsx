@@ -1,7 +1,7 @@
 import { Component, h, State, Prop } from '@stencil/core';
 
 import { getPeople, sendRoomInvite } from "../../services/graph";
-import { alertController, modalController } from '@ionic/core';
+import { modalController } from '@ionic/core';
 
 @Component({
   tag: 'contacts-modal',
@@ -28,46 +28,52 @@ export class ContactsModal {
     console.log(this.chosen);
   }
 
-  async send() {
-    const alert = await alertController.create({
-      header: "Send Invite",
-      message: "Before you send an invite you must choose a room name. Once you have chosen a room name hit send when you are ready to connect.",
-      inputs: [
-        {
-          type: 'text',
-          placeholder: "Room Name",
-          name: "roomName"
-        }
-      ],
-      buttons: [
-        {
-          text: "Cancel"
-        },
-        {
-          text: "Send Invite",
-          handler: async (data) => {
-            console.log(data);
-
-            await modalController.dismiss();
-            await sendRoomInvite(this.chosen, data.roomName);
-
-            sessionStorage.setItem('roomName', data.roomName);
-
-            const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
-            await navCtrl.push(`/live/${data.roomName}`);
-          }
-        }
-      ]
+  removePerson(personToFind) {
+    const index = this.chosen.findIndex((person) => {
+      return person.id === personToFind.id
     });
+    
+    this.chosen.splice(index, 1);
 
-    await alert.present();
+    this.chosen = [...this.chosen];
+  }
+
+  async send() {
+    await modalController.dismiss();
+    await sendRoomInvite(this.chosen);
+  }
+
+  async share() {
+    if (navigator.share) {
+      await navigator.share({
+        title: 'Webboard',
+        text: "Join me on this board",
+        url: location.href,
+      })
+    }
+  }
+
+  async close() {
+    await modalController.dismiss();
   }
 
   render() {
     return [
       <ion-header no-border>
         <ion-toolbar>
-          <ion-title>Choose Teammates</ion-title>
+          <ion-buttons slot="start">
+            <ion-button onClick={() => this.close()}>
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+
+          <ion-title color="primary">Invite</ion-title>
+
+          <ion-buttons slot="end">
+            <ion-button color="primary" onClick={() => this.share()} fill="clear">
+              <ion-icon name="share-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
         </ion-toolbar>
       </ion-header>,
 
@@ -80,7 +86,7 @@ export class ContactsModal {
                 return (
                   <ion-item>
                     <ion-label>
-                      <mgt-person show-name show-email personDetails={person}></mgt-person>
+                      {person.displayName}
                     </ion-label>
 
                     {this.chosen.includes(person) === false ? <ion-buttons slot="end">
@@ -89,15 +95,15 @@ export class ContactsModal {
 
                         <ion-icon slot="end" name="add"></ion-icon>
                       </ion-button>
-                    </ion-buttons> : 
-                    
-                    <ion-buttons slot="end">
-                      <ion-button shape="round" fill="outline" color="danger">
-                        Remove
+                    </ion-buttons> :
+
+                      <ion-buttons slot="end">
+                        <ion-button shape="round" fill="outline" color="danger" onClick={() => this.removePerson(person)}>
+                          Remove
 
                         <ion-icon slot="end" name="close"></ion-icon>
-                      </ion-button>
-                    </ion-buttons>
+                        </ion-button>
+                      </ion-buttons>
                     }
                   </ion-item>
                 )

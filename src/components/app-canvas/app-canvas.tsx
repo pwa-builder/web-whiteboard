@@ -1,5 +1,5 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
-import { toastController as toastCtrl, alertController as alertCtrl, toastController, alertController } from '@ionic/core';
+import { toastController as toastCtrl, alertController as alertCtrl, toastController, alertController, modalController } from '@ionic/core';
 
 import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
@@ -7,6 +7,8 @@ import { fileSave } from 'browser-nativefs';
 
 import { findLocalImage, doAI, getInkInfo } from '../../canvas.worker';
 import { randoRoom } from '../../helpers/utils';
+import { getAccount } from '../../services/auth';
+import { sendRoomInvite } from '../../services/graph';
 
 
 declare var ClipboardItem;
@@ -445,14 +447,29 @@ export class AppCanvas {
   }
 
   setupLiveEvents() {
-    /*const thirdCanvas: HTMLCanvasElement | null | undefined = this.el.querySelector('#thirdCanvas');
-    const thirdContext = thirdCanvas?.getContext("2d");*/
+    const secondCanvas: HTMLCanvasElement | null | undefined = this.el?.querySelector('#secondCanvas');
+    const secondContext = secondCanvas?.getContext("bitmaprenderer");
+
+    if (secondCanvas) {
+      secondCanvas.width = window.innerWidth;
+      secondCanvas.height = window.innerHeight;
+    }
 
     const thirdContext = this.context;
 
+    let offscreenContext;
+    let offscreen;
+
+    if ('OffscreenCanvas' in window) {
+      offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+      offscreenContext = offscreen.getContext('2d');
+    }
+
+    if (offscreenContext) {
+      offscreenContext.font = '20px sans-serif';
+    }
+
     this.socket.on('drawing', (data: any) => {
-      console.log(data);
-      console.log('thirdContext', thirdContext);
       if (thirdContext) {
         thirdContext.strokeStyle = data.color;
 
@@ -472,6 +489,13 @@ export class AppCanvas {
 
         if (data.globalCompositeOperation === 'destination-out') {
           thirdContext.lineWidth = 18;
+        }
+
+        if (data.user && offscreenContext) {
+          offscreenContext?.fillText(data.user, data.x0 + 14, data.y0);
+
+          let bitmapOne = offscreen.transferToImageBitmap();
+          secondContext?.transferFromImageBitmap(bitmapOne);
         }
 
 
@@ -842,6 +866,8 @@ export class AppCanvas {
     console.log('setting up mouse events');
     this.drawing = false;
 
+    const user = await getAccount();
+
     // this.mousePos = { x: 0, y: 0 };
 
     let points;
@@ -883,6 +909,7 @@ export class AppCanvas {
         // event - The event related to the pointer changes.
 
         if (that.mode === 'pen') {
+          that.context.globalCompositeOperation = 'source-over';
 
           changedPointers.forEach((pointer) => {
             const previous = previousPointers.find(p => p.id === pointer.id);
@@ -922,6 +949,8 @@ export class AppCanvas {
             else if ((pointer.nativePointer as PointerEvent).pointerType === 'touch') {
               that.context.lineWidth = (pointer.nativePointer as PointerEvent).width - 20;
 
+              that.context.globalCompositeOperation = 'source-over';
+
               changedPointers.forEach((pointer) => {
                 that.context.beginPath();
                 that.context.moveTo(previous.clientX, previous.clientY);
@@ -933,6 +962,8 @@ export class AppCanvas {
             }
             else if ((pointer.nativePointer as PointerEvent).pointerType === 'mouse') {
               that.context.lineWidth = 4;
+
+              that.context.globalCompositeOperation = 'source-over';
 
               changedPointers.forEach((pointer) => {
                 that.context.beginPath();
@@ -955,6 +986,7 @@ export class AppCanvas {
                 pressure: (event as PointerEvent).pressure,
                 width: (event as PointerEvent).width,
                 globalCompositeOperation: 'source-over',
+                user: user ? user.username : null
               });
             }
           })
@@ -992,7 +1024,8 @@ export class AppCanvas {
                 pointerType: (event as PointerEvent).pointerType,
                 pressure: (event as PointerEvent).pressure,
                 width: (event as PointerEvent).width,
-                globalCompositeOperation: 'source-over'
+                globalCompositeOperation: 'source-over',
+                user: user ? user.username : null
               });
             }
           });
@@ -1032,7 +1065,8 @@ export class AppCanvas {
               await toast.dismiss();
             }
           }
-        ]
+        ],
+        duration: 1200
       });
       await toast.present();
     }
@@ -1153,77 +1187,6 @@ export class AppCanvas {
     await this.setupMouseEvents();
   }
 
-  /*@Method()
-  async exportToOneNote() {
-    if (this.contextAnimation) {
-      this.contextAnimation.reverse();
-    }
-
-    const alert = await alertCtrl.create({
-      header: "Name",
-      message: "Your board will be uploaded to OneDrive first, what would you like to name it?",
-      inputs: [
-        {
-          placeholder: "My board",
-          name: "name"
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Confirm Cancel')
-          }
-        }, {
-          text: 'Ok',
-          handler: async (data) => {
-            console.log('Confirm Ok', data.name);
-            const name = data.name;
-            console.log(name);
-
-            await this.saveCanvas(name);
-
-            const imageUrl = this.canvasElement.toDataURL();
-
-            const module = await import('../../helpers/utils');
-            const imageBlob = module.b64toBlob(imageUrl.replace("data:image/png;base64,", ""), 'image/jpg');
-
-            console.log(imageBlob);
-
-            let provider = (window as any).mgt.Providers.globalProvider;
-            if (provider) {
-              let graphClient = provider.graph.client;
-              console.log(graphClient);
-
-              try {
-                const driveItem = await graphClient.api('/me/drive/root/children').middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).post({
-                  "name": "webboard",
-                  "folder": {}
-                });
-                console.log(driveItem);
-
-                const fileUpload = await graphClient.api(`/me/drive/items/${driveItem.id}:/${name}.jpg:/content`).middlewareOptions((window as any).mgt.prepScopes('user.read', 'files.readwrite')).put(imageBlob);
-                console.log(fileUpload);
-
-                const module = await import('../../services/graph');
-                await module.exportToOneNote(fileUpload.webUrl, name);
-
-              }
-              catch (err) {
-                console.error(err);
-              }
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
-    const data = await alert.onDidDismiss();
-    console.log(data);
-  }*/
-
   async handleDragEnter() {
     this.dragToast = await toastController.create({
       message: "Drop image to add it to your board..."
@@ -1304,12 +1267,34 @@ export class AppCanvas {
   }
 
   async invite() {
-    if (navigator.share) {
-      await navigator.share({
-        title: 'Webboard',
-        text: "Join me on this board",
-        url: location.href,
-      })
+    const user = await getAccount();
+
+    if (user) {
+      const modal = await modalController.create({
+        component: 'contacts-modal'
+      });
+      await modal.present();
+    }
+    else if ('contacts' in navigator && 'ContactsManager' in window) {
+      const props = ['name', 'email'];
+      const opts = { multiple: true };
+
+      try {
+        const contacts = await (navigator as any).contacts.select(props, opts);
+        sendRoomInvite(contacts);
+      } catch (err) {
+        // Handle any errors here.
+        console.error(err);
+      }
+    }
+    else {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Webboard',
+          text: "Join me on this board",
+          url: location.href,
+        })
+      }
     }
   }
 
@@ -1367,13 +1352,9 @@ export class AppCanvas {
             </ion-button> : null
         }
 
-        {
-          this.room ?
-            <span id="sessionLink">Session ID: {this.room} <ion-button size="small" onClick={() => this.copySession()} fill="outline" shape="round" color="light">Copy</ion-button></span>
-           : null
-        }
-
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
+
+        <canvas id="secondCanvas"></canvas>
 
         <canvas id="regCanvas" onDragEnter={() => this.handleDragEnter()} onDrop={(event) => this.handleDrop(event)} onDragOver={(event) => this.handleDragOver(event)} ref={(el) => this.canvasElement = el as HTMLCanvasElement}></canvas>
       </div >

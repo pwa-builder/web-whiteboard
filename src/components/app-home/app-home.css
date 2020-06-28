@@ -98,10 +98,6 @@ app-canvas {
     display: none;
   }
 
-  #settingsBlock {
-    min-width: 140px;
-  }
-
   pwa-auth {
     display: none;
   }
