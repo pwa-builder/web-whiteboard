@@ -15,8 +15,6 @@ export class AppIntro {
   }
 
   async getStarted() {
-    ga('send', 'event', ['Event'], ['Get Started'], ['Getting started']);
-
     await (this.el.closest('ion-modal') as any).dismiss();
   }
 

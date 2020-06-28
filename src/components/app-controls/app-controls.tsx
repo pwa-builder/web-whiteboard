@@ -45,7 +45,6 @@ export class AppControls {
     this.penMode.emit();
     this.openColors = true;
 
-    ga('send', 'event', ['Button'], ['Change Color'], ['Changing Color']);
   }
 
   handleWidth(event) {
@@ -92,7 +91,6 @@ export class AppControls {
   }
 
   async erase() {
-    ga('send', 'event', ['Button'], ['Erase'], ['Erasing']);
 
     if (!this.erasing) {
       this.eraserMode.emit();

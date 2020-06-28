@@ -130,41 +130,6 @@ export class AppImages {
     ev.preventDefault();
   }
 
-  async showDevices(name: string) {
-    const module = await import('../../services/graph');
-    const devices = await module.getWindowsDevices();
-    console.log(devices);
-
-    let deviceButtons = [];
-
-    devices.forEach((device) => {
-      deviceButtons.push({
-        text: device.Model || device.Name,
-        handler: async () => {
-          const provider = (window as any).mgt.Providers.globalProvider;
-          const user = provider.graph.client.config.middleware.authenticationProvider._userAgentApplication.account;
-
-          await module.sendCommand(device.id, `https://webboard-app.web.app/boards/${name}/${user.name}/board`);
-
-          const toast = await toastCtrl.create({
-            message: `Opened board on ${device.Model || device.Name}`,
-            duration: 1800
-          });
-          await toast.present();
-        }
-      })
-    })
-
-    if (deviceButtons) {
-      const sheet = await alertController.create({
-        header: "Share",
-        subHeader: 'Share to your devices',
-        buttons: deviceButtons
-      });
-      await sheet.present();
-    }
-  }
-
   async chooseCloudItem(id: number, name: string) {
     let provider = (window as any).mgt.Providers.globalProvider;
     let graphClient = provider.graph.client;

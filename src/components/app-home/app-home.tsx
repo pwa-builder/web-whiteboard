@@ -177,7 +177,6 @@ export class AppHome {
   async save() {
     const appCanvas = this.el.querySelector('app-canvas');
 
-    ga('send', 'event', ['Button'], ['Save'], ['Saving Canvas']);
 
     if (this.currentFileHandle) {
       const firstToast = await toastController.create({
@@ -362,6 +361,7 @@ export class AppHome {
     console.log('home inkshape', ev.detail);
     await this.el.querySelector('app-canvas').inkToShape();
   }
+  
 
   componentDidUnload() {
     if (this.wakeLockController) {
@@ -403,10 +403,9 @@ export class AppHome {
 
           <div>
 
-            {/*<div>
-              <mgt-msal-provider scopes="Notes.Create UserActivity.ReadWrite.CreatedByApp Device.Read Device.Command" client-id="ea8ee476-a5c2-4617-b376-a3fb40e46864"></mgt-msal-provider>
-              <mgt-login></mgt-login>
-            </div>*/}
+            <div>
+               <app-login></app-login>
+            </div>
           </div>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
