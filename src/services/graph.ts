@@ -1,29 +1,35 @@
 // import { Providers } from '@microsoft/mgt';
 
-export async function getWindowsDevices() {
-  /*const headers = new Headers();
+import { getToken } from "./auth";
+
+export async function getUserImage() {
+  
+  const token = await getToken();
+
+  const headers = new Headers();
   const bearer = "Bearer " + token;
   headers.append("Authorization", bearer);
   const options = {
     method: "GET",
     headers: headers
   };
-  const graphEndpoint = "https://graph.microsoft.com/beta/me/devices";
+  const graphEndpoint = "https://graph.microsoft.com/beta/me/photo/$value";
 
   const response = await fetch(graphEndpoint, options);
   const data = await response.json();
 
-  return data;*/
+  return data;
 
-  const provider = (window as any).mgt.Providers.globalProvider;
+  /*const provider = (window as any).mgt.Providers.globalProvider;
   let graphClient = provider.graph.client;
   console.log(graphClient);
 
   const data = await graphClient.api(`/me/devices`).version('beta').middlewareOptions((window as any).mgt.prepScopes('user.read', 'Device.Read')).get();
 
   if (data) {
+    console.log(data);
     return data.value;
-  }
+  }*/
 }
 
 export async function getPeople() {

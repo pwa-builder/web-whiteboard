@@ -14,6 +14,7 @@
     "test.watch": "stencil test --spec --e2e --watch"
   },
   "dependencies": {
+    "@azure/msal-browser": "^2.0.0-beta.3",
     "@ionic/core": "^5.2.2",
     "@microsoft/mgt": "^1.1.1",
     "@pwabuilder/pwainstall": "^1.6.4",

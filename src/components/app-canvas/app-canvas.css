@@ -3,6 +3,20 @@
   z-index: 9999;
 }
 
+#devicesButton {
+  position: fixed;
+  z-index: 9999999;
+  left: 16px;
+  top: 293px;
+  height: 53px;
+  width: 53px;
+}
+
+#secondCanvas {
+  pointer-events: none;
+  z-index: 1;
+}
+
 #inkToShapeButton {
   position: fixed;
   top: 2em;
@@ -23,14 +37,14 @@
   z-index: 9999;
   position: fixed;
   top: 14px;
-  right: 6em;
+  left: 15.6em;
 }
 
 #inviteButton {
   z-index: 9999;
   position: fixed;
   top: 14px;
-  right: 19.4em;
+  left: 6em;
 }
 
 @media (max-width: 500px) {
@@ -40,30 +54,6 @@
 
   #inviteButton {
     right: 14.4em;
-  }
-}
-
-#sessionLink {
-  cursor: pointer;
-  position: fixed;
-  z-index: 999;
-  background: #1976d2d1;
-  backdrop-filter: blur(10px);
-  color: white;
-  padding: 8px;
-  border-radius: 6px;
-  top: 16px;
-  left: 6em;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 22.4em;
-}
-
-@media (max-width: 875px) {
-  #sessionLink {
-    display: none;
   }
 }
 
