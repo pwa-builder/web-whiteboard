@@ -4,7 +4,7 @@ import { set } from "idb-keyval";
 const msalConfig = {
   auth: {
     clientId: 'ea8ee476-a5c2-4617-b376-a3fb40e46864',
-    redirectUri: 'http://localhost:3333',
+    redirectUri: 'https://webboard.app',
     scopes: ["User.Read", "People.Read"]
   }
 };
@@ -38,7 +38,7 @@ export async function login() {
   try {
     await msalInstance.loginRedirect({
       scopes: ["User.Read", "People.Read"],
-      redirectUri: 'http://localhost:3333'
+      redirectUri: 'https://webboard.app'
     });
   } catch (err) {
     // handle error
@@ -64,14 +64,14 @@ export async function getToken() {
     const silentRequest = {
       scopes: ["User.Read", "People.Read"],
       account: currentAccount,
-      redirectUri: "http://localhost:3333",
+      redirectUri: "https://webboard.app",
       forceRefresh: false
     };
 
     const request = {
       scopes: ["User.Read", "People.Read"],
       loginHint: currentAccount.username, // For v1 endpoints, use upn from idToken claims
-      redirectUri: "http://localhost:3333"
+      redirectUri: "https://webboard.app"
     };
 
     msalInstance.acquireTokenSilent(silentRequest).then(tokenResponse => {
