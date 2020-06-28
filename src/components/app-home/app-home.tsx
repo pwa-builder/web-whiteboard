@@ -59,30 +59,6 @@ export class AppHome {
     });
 
     (window as any).requestIdleCallback(() => {
-      const pwaAuth = this.el.querySelector("pwa-auth");
-      pwaAuth.addEventListener("signin-completed", async (ev: any) => {
-        const signIn = ev.detail;
-
-        if (signIn.error) {
-          console.error("Sign in failed", signIn.error);
-        } else {
-          console.log("Email: ", signIn.email);
-          console.log("Name: ", signIn.name);
-          console.log("Picture: ", signIn.imageUrl);
-          console.log("Access token", signIn.accessToken);
-          console.log("Access token expiration date", signIn.accessTokenExpiration);
-          console.log("Provider (MS, Google, FB): ", signIn.provider);
-          console.log("Raw data from provider: ", signIn.providerData);
-
-          await set('username', signIn.name);
-          await set('providerData', signIn.providerData);
-          await set('token', signIn.accessToken);
-        }
-      });
-    });
-
-
-    (window as any).requestIdleCallback(() => {
       this.setupWakeLock();
     });
 
@@ -373,7 +349,6 @@ export class AppHome {
     return [
       <div class='app-home'>
         <pwa-install usecustom></pwa-install>
-        <pwa-auth microsoftkey="asdt" menuPlacement="end"></pwa-auth>
 
         {this.canInstall && (window.matchMedia("(min-width: 1200px)").matches) && window.matchMedia('(display-mode: standalone)').matches === false ? <ion-button id="pwaInstallButton" shape="round" size="small" onClick={() => this.openInstall()}>
           <ion-icon slot="start" name="download"></ion-icon>

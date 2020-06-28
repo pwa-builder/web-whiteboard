@@ -1,5 +1,5 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
-import { toastController as toastCtrl, alertController as alertCtrl, toastController, alertController } from '@ionic/core';
+import { toastController as toastCtrl, alertController as alertCtrl, toastController, alertController, modalController } from '@ionic/core';
 
 import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
@@ -1266,12 +1266,30 @@ export class AppCanvas {
   }
 
   async invite() {
-    if (navigator.share) {
+    /*if (navigator.share) {
       await navigator.share({
         title: 'Webboard',
         text: "Join me on this board",
         url: location.href,
       })
+    }*/
+
+    const user = await getAccount();
+
+    if (user) {
+      const modal = await modalController.create({
+        component: 'contacts-modal'
+      });
+      await modal.present();
+    }
+    else {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Webboard',
+          text: "Join me on this board",
+          url: location.href,
+        })
+      }
     }
   }
 

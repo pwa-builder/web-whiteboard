@@ -1,11 +1,11 @@
 import * as msal from "@azure/msal-browser";
-import { set, get } from "idb-keyval";
+import { set } from "idb-keyval";
 
 const msalConfig = {
   auth: {
     clientId: 'ea8ee476-a5c2-4617-b376-a3fb40e46864',
     redirectUri: 'http://localhost:3333',
-    scopes: ["User.Read"]
+    scopes: ["User.Read", "People.Read"]
   }
 };
 
@@ -36,7 +36,10 @@ export function getAccount() {
 
 export async function login() {
   try {
-    await msalInstance.loginRedirect(null);
+    await msalInstance.loginRedirect({
+      scopes: ["User.Read", "People.Read"],
+      redirectUri: 'http://localhost:3333'
+    });
   } catch (err) {
     // handle error
     return err;
@@ -53,6 +56,32 @@ export async function logout() {
 }
 
 export async function getToken() {
-  const token = await get('graphToken');
-  return token;
+  return new Promise(async (resolve) => {
+    const username = await getAccount()?.username;
+
+    const currentAccount = msalInstance.getAccountByUsername(username);
+    console.log('current', currentAccount);
+    const silentRequest = {
+      scopes: ["User.Read", "People.Read"],
+      account: currentAccount,
+      redirectUri: "http://localhost:3333",
+      forceRefresh: false
+    };
+
+    const request = {
+      scopes: ["User.Read", "People.Read"],
+      loginHint: currentAccount.username, // For v1 endpoints, use upn from idToken claims
+      redirectUri: "http://localhost:3333"
+    };
+
+    msalInstance.acquireTokenSilent(silentRequest).then(tokenResponse => {
+      // Do something with the tokenResponse
+      console.log(tokenResponse);
+      resolve(tokenResponse);
+    }).catch(async error => {
+      console.error(error);
+      const tokenResponse = await msalInstance.acquireTokenRedirect(request)
+      resolve(tokenResponse);
+    });
+  });
 }
