@@ -29,6 +29,15 @@
       "fast",
       "useful AI"
     ],
+    "shortcuts": [
+      {
+        "name": "Start Live Session",
+        "short_name": "Start Live",
+        "description": "Jump direction into starting or joining a live session",
+        "url": "/?startLive",
+        "icons": [{ "src": "/assets/icon/256.png", "sizes": "256x256" }]
+      }
+    ],
     "icons": [
         {
             "src": "icons/android/android-launchericon-64-64.png",

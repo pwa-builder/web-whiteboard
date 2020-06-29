@@ -65,6 +65,10 @@ export class AppCanvas {
     });
 
     this.setupEvents();
+
+    if (location.search === "?startLive") {
+      await this.liveConnect();
+    }
   }
 
   setupEvents() {
