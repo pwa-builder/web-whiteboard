@@ -35,7 +35,7 @@
         "short_name": "Start Live",
         "description": "Jump direction into starting or joining a live session",
         "url": "/?startLive",
-        "icons": [{ "src": "/assets/icon/256.png", "sizes": "256x256" }]
+        "icons": [{ "src": "icons/android/maskable_icon_192.png", "sizes": "192x192" }]
       }
     ],
     "icons": [
