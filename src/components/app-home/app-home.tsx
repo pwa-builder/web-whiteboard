@@ -385,9 +385,6 @@ export class AppHome {
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}
         </div>
 
-        <ion-fab id="spanFab" horizontal="start" vertical="bottom"><ion-fab-button onClick={() => this.spanCanvas()} size="small"><ion-icon name="code" size="small"></ion-icon></ion-fab-button></ion-fab>
-
-        {this.spanned ? <div id="spannedImages"><foldable-images></foldable-images></div> : null}
       </div>
     ];
   }
