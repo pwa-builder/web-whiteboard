@@ -1,4 +1,4 @@
-import { Component, h, State, Prop } from '@stencil/core';
+import { Component, h, State } from '@stencil/core';
 
 import { getPeople, sendRoomInvite } from "../../services/graph";
 import { modalController } from '@ionic/core';
@@ -12,8 +12,6 @@ export class ContactsModal {
   @State() people: any;
 
   @State() chosen: any[] = [];
-
-  @Prop({ connect: 'ion-router' }) nav: HTMLIonRouterElement;
 
   async componentDidLoad() {
     const people = await getPeople();

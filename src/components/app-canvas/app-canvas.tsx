@@ -35,8 +35,6 @@ export class AppCanvas {
   @State() inkShape: boolean = false;
   @State() room: string | null = null;
 
-  @Prop({ connect: 'ion-router' }) nav: HTMLIonRouterElement;
-
   canvasElement: HTMLCanvasElement;
   gridCanvas: HTMLCanvasElement;
   gridContext: CanvasRenderingContext2D;
@@ -425,15 +423,16 @@ export class AppCanvas {
         {
           text: "Start",
           handler: async (data) => {
+            const nav = document.querySelector('ion-nav');
 
             if (data.sessionID) {
-              const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
+              const navCtrl: HTMLIonRouterElement = await (nav as any).componentOnReady();
               await navCtrl.push(`/live/${data.sessionID}`);
             }
             else {
               const room = randoRoom();
 
-              const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
+              const navCtrl: HTMLIonRouterElement = await (nav as any).componentOnReady();
               await navCtrl.push(`/live/${room}`);
             }
           }
@@ -622,6 +621,7 @@ export class AppCanvas {
 
       if (images) {
         const handle = await this.saveToFS(fileHandle);
+        console.log('saveToFS in ai', fileHandle);
 
         const desc = data.description.captions[0] ? data.description.captions[0].text : "No Description";
 
@@ -742,6 +742,7 @@ export class AppCanvas {
   }
 
   async saveToFS(fileHandle?): Promise<any> {
+    console.log('saveToFS handle', fileHandle);
 
     return new Promise((resolve, reject) => {
       const options: any = {
@@ -753,7 +754,7 @@ export class AppCanvas {
       try {
         this.canvasElement.toBlob(async (blob) => {
           if (fileHandle) {
-            this.fileHandle = await fileSave(blob, options, fileHandle);
+            await fileSave(blob, options, fileHandle);
           }
           else {
             this.fileHandle = await fileSave(blob, options);
@@ -1259,8 +1260,8 @@ export class AppCanvas {
         }, {
           text: 'End',
           handler: async () => {
-            const navCtrl: HTMLIonRouterElement = await (this.nav as any).componentOnReady();
-            await navCtrl.push(`/`);
+            const nav = document.querySelector('ion-nav');
+            await nav.push(`/`);
 
             this.room = null;
           }

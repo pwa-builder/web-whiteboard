@@ -36,8 +36,6 @@
 
   <link href="/build/app.css" rel="stylesheet">
 
-  <link rel="preconnect" href="https://firebaselogging.googleapis.com" crossorigin>
-
   <script>
     window.requestIdleCallback =
       window.requestIdleCallback ||
@@ -66,25 +64,6 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icon/apple-touch-icon.png">
   <link rel="icon" type="image/x-icon" href="/assets/icon/favicon.ico">
   <link rel="manifest" href="/manifest.json">
-
-  <script>
-        (function (sa, fbc) {
-          function load(f, c) {
-            var a = document.createElement('script');
-            a.async = 1; a.src = f; var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(a, s);
-          } load(sa);
-          window.addEventListener('load', function () { firebase.initializeApp(fbc).performance() });
-        })('https://www.gstatic.com/firebasejs/7.4.0/firebase-performance-standalone.js', {
-          apiKey: "AIzaSyDezUH0T9gm2fBypO2j3rw5YdHvK6oh_gk",
-          authDomain: "webboard-app.firebaseapp.com",
-          databaseURL: "https://webboard-app.firebaseio.com",
-          projectId: "webboard-app",
-          storageBucket: "webboard-app.appspot.com",
-          messagingSenderId: "469386071308",
-          appId: "1:469386071308:web:70f873066614b82de48d29"
-        });
-  </script>
 
 </head>
 

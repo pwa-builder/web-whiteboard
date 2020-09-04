@@ -19,12 +19,6 @@ export const config: Config = {
         },
         {
           src: "mgt.js"
-        },
-        {
-          src: "spanning-polyfill.js"
-        },
-        {
-          src: "segments-polyfill.js"
         }
       ],
     }

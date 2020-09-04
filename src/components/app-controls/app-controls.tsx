@@ -140,32 +140,6 @@ export class AppControls {
     await popover.present();
   }
 
-  async addImagePop() {
-    /*const popover = await popoverCtrl.create({
-      component: 'image-popover',
-      event: ev
-    });
-    await popover.present();*/
-
-    const jumpAni = this.el.querySelector("#imagesIcon").animate(
-      {
-        transform: ['translateY(0px)', 'translateY(-8px)', 'translateY(0px)']
-      },
-      {
-        duration: 200
-      }
-    );
-
-    jumpAni.onfinish = async () => {
-      const modal = await modalCtrl.create({
-        component: 'image-popover',
-        cssClass: 'extImageModal',
-        showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
-      });
-      await modal.present();
-    }
-  }
-
   async turnAI() {
     const modal = await modalCtrl.create({
       component: 'ai-popover',
@@ -304,10 +278,6 @@ export class AppControls {
             <label id="fileLabel" htmlFor="file">
               <ion-icon name="images"></ion-icon>
     </label>*/}
-
-            <button onClick={() => this.addImagePop()}>
-              <ion-icon id="imagesIcon" name="images-outline"></ion-icon>
-            </button>
 
             <button onClick={(event) => this.moreTools(event)}>
               <ion-icon name="ellipsis-vertical-outline"></ion-icon>

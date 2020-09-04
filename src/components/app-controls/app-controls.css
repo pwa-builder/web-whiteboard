@@ -11,7 +11,7 @@
   z-index: -2;
 }
 
-@media (spanning: single-fold-vertical) {
+@media (screen-spanning: single-fold-vertical) {
   #controlsBlock, #colorsBlock {
     bottom: 6px !important;
   }
@@ -95,7 +95,7 @@ ion-fab {
   padding: 10px;
   display: flex;
   justify-content: space-around;
-  width: 20em;
+  width: 16em;
   border-radius: 40px;
 }
 
@@ -274,6 +274,18 @@ ion-fab {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media(screen-spanning: single-fold-vertical) {
+  #allImagesButton {
+    bottom: 10em;
+    top: initial;
+    left: initial;
+  }
+
+  #saveButtonDiv {
+    z-index: 9999;
+  }
 }
 
 #brushIcon {

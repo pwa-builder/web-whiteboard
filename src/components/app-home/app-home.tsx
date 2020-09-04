@@ -2,7 +2,6 @@ import { Component, Element, Prop, Listen, State, h } from '@stencil/core';
 import { alertController as alertCtrl, popoverController as popoverCtrl, toastController, alertController } from '@ionic/core';
 
 import { set, get } from 'idb-keyval';
-import { fileOpen } from 'browser-nativefs';
 
 import '@pwabuilder/pwainstall';
 
@@ -238,14 +237,26 @@ export class AppHome {
       description: 'Image files',
     };
 
-    const openedFile: any = await fileOpen(options);
+    /*const openedFile: any = await fileOpen(options);
     console.log('openedFile', openedFile);
 
-    this.currentFileHandle = openedFile.handle;
-    this.currentFileName = openedFile.name;
-
-    const fileObject = await openedFile.handle.getFile();
+    const fileObject = await openedFile.getFile();
     console.log(fileObject);
+
+    this.currentFileHandle = fileObject.handle;
+    console.log(this.currentFileHandle);
+    this.currentFileName = fileObject.name;
+
+    this.savedImage = URL.createObjectURL(fileObject);*/
+
+    const openFile = await (window as any).showOpenFilePicker(options);
+
+    this.currentFileHandle = openFile[0];
+
+    const fileObject = await this.currentFileHandle.getFile();
+
+    console.log(this.currentFileHandle);
+    this.currentFileName = fileObject.name;
 
     this.savedImage = URL.createObjectURL(fileObject);
   }
@@ -338,7 +349,7 @@ export class AppHome {
   }
 
 
-  componentDidUnload() {
+  disconnectedCallback() {
     if (this.wakeLockController) {
       this.wakeLockController.release();
     }

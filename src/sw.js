@@ -1,4 +1,4 @@
-importScripts("workbox-v4.3.1/workbox-sw.js");
+importScripts("workbox-v5.1.3/workbox-sw.js");
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "skipWaiting") {
@@ -6,17 +6,6 @@ self.addEventListener("message", (event) => {
   }
 });
 
-const bgSyncPlugin = new workbox.backgroundSync.Plugin('postImagesQueue', {
-  maxRetentionTime: 24 * 60 // Retry for max of 24 Hours (specified in minutes)
-});
-
-workbox.routing.registerRoute(
-  'https://webboard-server.azurewebsites.net/images',
-  new workbox.strategies.NetworkOnly({
-    plugins: [bgSyncPlugin]
-  }),
-  'POST'
-);
 
 workbox.routing.registerRoute(
   new RegExp('/build/svg/'),
@@ -33,4 +22,4 @@ workbox.routing.registerRoute(
   new workbox.strategies.StaleWhileRevalidate()
 );
 
-self.workbox.precaching.precacheAndRoute([]);
+self.workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);

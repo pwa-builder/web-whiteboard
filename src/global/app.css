@@ -113,7 +113,7 @@ ion-icon svg {
   --ion-color-light-tint: #f5f6f9;
 }
 
-@media (spanning: single-fold-vertical) { 
+@media (screen-spanning: single-fold-vertical) { 
   #controlsBlock, #colorsBlock {
     bottom: 0;
     top: initial;
@@ -126,15 +126,7 @@ ion-icon svg {
     right: 0;
     position: absolute;
     left: initial;
-    z-index: 9999;
-  }
-  
-  #allImagesButton {
-    display: none;
-  }
-  
-  #saveButtonDiv {
-    top: 10px;
+    z-index: 9998;
   }
   
   #spannedImages {
@@ -174,6 +166,6 @@ ion-icon svg {
     right: 16px;
     bottom: 16px;
     top: initial;
-    z-index: 1;
+    z-index: 9999;
   }
 }

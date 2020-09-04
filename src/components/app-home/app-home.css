@@ -135,7 +135,7 @@ app-canvas {
   }
 }
 
-@media(spanning: single-fold-vertical) {
+@media(screen-spanning: single-fold-vertical) {
   #spanFab {
     display: initial;
   }
