@@ -388,9 +388,6 @@ export class AppHome {
 
           <div>
 
-            {(window.matchMedia("(min-width: 800px)").matches) ? <div>
-              <app-login></app-login>
-            </div> : null}
           </div>
 
           {/*<mgt-tasks data-source="todo"></mgt-tasks>*/}

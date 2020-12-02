@@ -222,11 +222,6 @@ export class AppControls {
             </button> : <button id="deskShareButton" onClick={() => this.deskShare()}>
                 <ion-icon name="copy-outline"></ion-icon>
               </button>}
-
-            <button id="liveButton" onClick={() => this.doLive()}>
-              <ion-icon name="people-outline"></ion-icon>
-            </button>
-
           </div> :
 
             <ion-fab vertical="top" horizontal="start">
@@ -247,9 +242,9 @@ export class AppControls {
                   <ion-icon name="share-outline"></ion-icon>
                 </ion-fab-button> : null}
 
-                <ion-fab-button onClick={() => this.doLive()}>
+                {/*<ion-fab-button onClick={() => this.doLive()}>
                   <ion-icon name="people-outline"></ion-icon>
-                </ion-fab-button>
+        </ion-fab-button>*/}
 
               </ion-fab-list>
 
