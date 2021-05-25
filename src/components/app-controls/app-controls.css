@@ -278,7 +278,7 @@ ion-fab {
 
 @media(screen-spanning: single-fold-vertical) {
   #allImagesButton {
-    bottom: 10em;
+    bottom: 7em;
     top: initial;
     left: initial;
   }

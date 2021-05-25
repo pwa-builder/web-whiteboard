@@ -1,11 +1,7 @@
 import { Component, Element, Prop, Listen, State, h } from '@stencil/core';
-import { alertController as alertCtrl, popoverController as popoverCtrl, toastController, alertController } from '@ionic/core';
-
-import { set, get } from 'idb-keyval';
+import { popoverController as popoverCtrl, toastController, alertController } from '@ionic/core';
 
 import '@pwabuilder/pwainstall';
-
-declare var ga: any;
 
 @Component({
   tag: 'app-home',
@@ -34,61 +30,8 @@ export class AppHome {
   wakeLockController: any;
 
   async componentDidLoad() {
-    (window as any).requestIdleCallback(async () => {
-      const test = await get('firstSeen');
-
-      if (!test) {
-        const toast = await toastController.create({
-          message: "Webboard currently uses analytics to measure usage. No personal or identifiable data is collected. By continuing to use this app you agree to this.",
-          buttons: [
-            {
-              text: "accept",
-              side: "end"
-            }
-          ]
-        });
-
-        await toast.present();
-
-        toast.onDidDismiss().then(async () => {
-          await set('firstSeen', true);
-        });
-      }
-    });
-
     (window as any).requestIdleCallback(() => {
       this.setupWakeLock();
-    });
-
-    (window as any).requestIdleCallback(async () => {
-      if (this.name && this.username) {
-        const alert = await alertCtrl.create({
-          header: "Saved Image",
-          subHeader: "Open a saved image?",
-          buttons: [
-            {
-              text: 'Cancel',
-              role: 'cancel',
-              cssClass: 'secondary',
-              handler: () => {
-                console.log('Confirm Cancel: blah');
-              }
-            }, {
-              text: 'Confirm',
-              handler: async () => {
-                const module = await import('../../services/api');
-
-                const data = await module.getSavedImage(this.name, { username: this.username });
-
-                if (data) {
-                  this.savedImage = data.url;
-                }
-              }
-            }
-          ]
-        });
-        await alert.present();
-      }
     });
 
     if ((window as any).getWindowSegments) {
@@ -203,31 +146,6 @@ export class AppHome {
   }
 
   async allImages() {
-    this.savedImage = null;
-
-    /*const modal = await modalCtrl.create({
-      component: 'app-images',
-      cssClass: 'imagesModal',
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
-    });
-    await modal.present();
-
-    const { data } = await modal.onDidDismiss();
-    console.log(data);
-
-    if (data && data.url && data.handle) {
-      console.log(data);
-      if (data.name) {
-        this.currentFileName = data.name;
-        this.currentFileHandle = data.handle;
-      }
-
-      const fileObject = await data.handle.getFile();
-      const fileBlob = await fileObject.blob();
-
-      this.savedImage = fileBlob;
-    }*/
-
     const options = {
       // List of allowed MIME types, defaults to `*/*`.
       mimeTypes: ['image/*'],
@@ -237,28 +155,17 @@ export class AppHome {
       description: 'Image files',
     };
 
-    /*const openedFile: any = await fileOpen(options);
-    console.log('openedFile', openedFile);
-
-    const fileObject = await openedFile.getFile();
-    console.log(fileObject);
-
-    this.currentFileHandle = fileObject.handle;
-    console.log(this.currentFileHandle);
-    this.currentFileName = fileObject.name;
-
-    this.savedImage = URL.createObjectURL(fileObject);*/
-
     const openFile = await (window as any).showOpenFilePicker(options);
 
     this.currentFileHandle = openFile[0];
 
     const fileObject = await this.currentFileHandle.getFile();
 
-    console.log(this.currentFileHandle);
-    this.currentFileName = fileObject.name;
+    const imageToAdd = URL.createObjectURL(fileObject);
 
-    this.savedImage = URL.createObjectURL(fileObject);
+    const appCanvas = this.el.querySelector('app-canvas');
+    console.log(fileObject, openFile);
+    await appCanvas.addImageToCanvas(imageToAdd);
   }
 
   async doGrid() {

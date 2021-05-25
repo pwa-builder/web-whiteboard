@@ -6,10 +6,8 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface AiPopover {
-    }
     interface AppCanvas {
-        "addImageToCanvas": (imageString: string, width: number, height: number) => Promise<unknown>;
+        "addImageToCanvas": (imageString: string) => Promise<unknown>;
         "clearCanvas": () => Promise<void>;
         "clearGrid": () => Promise<unknown>;
         "color": string;
@@ -29,11 +27,7 @@ export namespace Components {
         "name": string;
         "username": string;
     }
-    interface AppImages {
-    }
     interface AppIntro {
-    }
-    interface AppLogin {
     }
     interface AppProfile {
         "name": string;
@@ -44,12 +38,8 @@ export namespace Components {
     }
     interface ColorModal {
     }
-    interface ContactsModal {
-    }
     interface DrivePreview {
         "imageInfo": any;
-    }
-    interface FoldableImages {
     }
     interface ImagePopover {
     }
@@ -60,12 +50,6 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLAiPopoverElement extends Components.AiPopover, HTMLStencilElement {
-    }
-    var HTMLAiPopoverElement: {
-        prototype: HTMLAiPopoverElement;
-        new (): HTMLAiPopoverElement;
-    };
     interface HTMLAppCanvasElement extends Components.AppCanvas, HTMLStencilElement {
     }
     var HTMLAppCanvasElement: {
@@ -84,23 +68,11 @@ declare global {
         prototype: HTMLAppHomeElement;
         new (): HTMLAppHomeElement;
     };
-    interface HTMLAppImagesElement extends Components.AppImages, HTMLStencilElement {
-    }
-    var HTMLAppImagesElement: {
-        prototype: HTMLAppImagesElement;
-        new (): HTMLAppImagesElement;
-    };
     interface HTMLAppIntroElement extends Components.AppIntro, HTMLStencilElement {
     }
     var HTMLAppIntroElement: {
         prototype: HTMLAppIntroElement;
         new (): HTMLAppIntroElement;
-    };
-    interface HTMLAppLoginElement extends Components.AppLogin, HTMLStencilElement {
-    }
-    var HTMLAppLoginElement: {
-        prototype: HTMLAppLoginElement;
-        new (): HTMLAppLoginElement;
     };
     interface HTMLAppProfileElement extends Components.AppProfile, HTMLStencilElement {
     }
@@ -126,23 +98,11 @@ declare global {
         prototype: HTMLColorModalElement;
         new (): HTMLColorModalElement;
     };
-    interface HTMLContactsModalElement extends Components.ContactsModal, HTMLStencilElement {
-    }
-    var HTMLContactsModalElement: {
-        prototype: HTMLContactsModalElement;
-        new (): HTMLContactsModalElement;
-    };
     interface HTMLDrivePreviewElement extends Components.DrivePreview, HTMLStencilElement {
     }
     var HTMLDrivePreviewElement: {
         prototype: HTMLDrivePreviewElement;
         new (): HTMLDrivePreviewElement;
-    };
-    interface HTMLFoldableImagesElement extends Components.FoldableImages, HTMLStencilElement {
-    }
-    var HTMLFoldableImagesElement: {
-        prototype: HTMLFoldableImagesElement;
-        new (): HTMLFoldableImagesElement;
     };
     interface HTMLImagePopoverElement extends Components.ImagePopover, HTMLStencilElement {
     }
@@ -163,28 +123,21 @@ declare global {
         new (): HTMLMoreToolsElement;
     };
     interface HTMLElementTagNameMap {
-        "ai-popover": HTMLAiPopoverElement;
         "app-canvas": HTMLAppCanvasElement;
         "app-controls": HTMLAppControlsElement;
         "app-home": HTMLAppHomeElement;
-        "app-images": HTMLAppImagesElement;
         "app-intro": HTMLAppIntroElement;
-        "app-login": HTMLAppLoginElement;
         "app-profile": HTMLAppProfileElement;
         "app-root": HTMLAppRootElement;
         "app-settings": HTMLAppSettingsElement;
         "color-modal": HTMLColorModalElement;
-        "contacts-modal": HTMLContactsModalElement;
         "drive-preview": HTMLDrivePreviewElement;
-        "foldable-images": HTMLFoldableImagesElement;
         "image-popover": HTMLImagePopoverElement;
         "install-modal": HTMLInstallModalElement;
         "more-tools": HTMLMoreToolsElement;
     }
 }
 declare namespace LocalJSX {
-    interface AiPopover {
-    }
     interface AppCanvas {
         "color"?: string;
         "dragMode"?: boolean;
@@ -209,11 +162,7 @@ declare namespace LocalJSX {
         "name"?: string;
         "username"?: string;
     }
-    interface AppImages {
-    }
     interface AppIntro {
-    }
-    interface AppLogin {
     }
     interface AppProfile {
         "name"?: string;
@@ -224,12 +173,8 @@ declare namespace LocalJSX {
     }
     interface ColorModal {
     }
-    interface ContactsModal {
-    }
     interface DrivePreview {
         "imageInfo"?: any;
-    }
-    interface FoldableImages {
     }
     interface ImagePopover {
     }
@@ -243,20 +188,15 @@ declare namespace LocalJSX {
         "onShare"?: (event: CustomEvent<any>) => void;
     }
     interface IntrinsicElements {
-        "ai-popover": AiPopover;
         "app-canvas": AppCanvas;
         "app-controls": AppControls;
         "app-home": AppHome;
-        "app-images": AppImages;
         "app-intro": AppIntro;
-        "app-login": AppLogin;
         "app-profile": AppProfile;
         "app-root": AppRoot;
         "app-settings": AppSettings;
         "color-modal": ColorModal;
-        "contacts-modal": ContactsModal;
         "drive-preview": DrivePreview;
-        "foldable-images": FoldableImages;
         "image-popover": ImagePopover;
         "install-modal": InstallModal;
         "more-tools": MoreTools;
@@ -266,20 +206,15 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "ai-popover": LocalJSX.AiPopover & JSXBase.HTMLAttributes<HTMLAiPopoverElement>;
             "app-canvas": LocalJSX.AppCanvas & JSXBase.HTMLAttributes<HTMLAppCanvasElement>;
             "app-controls": LocalJSX.AppControls & JSXBase.HTMLAttributes<HTMLAppControlsElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
-            "app-images": LocalJSX.AppImages & JSXBase.HTMLAttributes<HTMLAppImagesElement>;
             "app-intro": LocalJSX.AppIntro & JSXBase.HTMLAttributes<HTMLAppIntroElement>;
-            "app-login": LocalJSX.AppLogin & JSXBase.HTMLAttributes<HTMLAppLoginElement>;
             "app-profile": LocalJSX.AppProfile & JSXBase.HTMLAttributes<HTMLAppProfileElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-settings": LocalJSX.AppSettings & JSXBase.HTMLAttributes<HTMLAppSettingsElement>;
             "color-modal": LocalJSX.ColorModal & JSXBase.HTMLAttributes<HTMLColorModalElement>;
-            "contacts-modal": LocalJSX.ContactsModal & JSXBase.HTMLAttributes<HTMLContactsModalElement>;
             "drive-preview": LocalJSX.DrivePreview & JSXBase.HTMLAttributes<HTMLDrivePreviewElement>;
-            "foldable-images": LocalJSX.FoldableImages & JSXBase.HTMLAttributes<HTMLFoldableImagesElement>;
             "image-popover": LocalJSX.ImagePopover & JSXBase.HTMLAttributes<HTMLImagePopoverElement>;
             "install-modal": LocalJSX.InstallModal & JSXBase.HTMLAttributes<HTMLInstallModalElement>;
             "more-tools": LocalJSX.MoreTools & JSXBase.HTMLAttributes<HTMLMoreToolsElement>;

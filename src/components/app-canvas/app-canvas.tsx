@@ -1,5 +1,5 @@
 import { Component, Element, Prop, State, Watch, Method, h } from '@stencil/core';
-import { toastController as toastCtrl, alertController as alertCtrl, toastController, alertController, modalController } from '@ionic/core';
+import { toastController as toastCtrl, alertController as alertCtrl, toastController, alertController } from '@ionic/core';
 
 import { debounce } from "typescript-debounce-decorator";
 import { set, get, del } from 'idb-keyval';
@@ -7,8 +7,6 @@ import { fileSave } from 'browser-nativefs';
 
 import { findLocalImage, doAI, getInkInfo } from '../../canvas.worker';
 import { randoRoom } from '../../helpers/utils';
-import { getAccount } from '../../services/auth';
-import { sendRoomInvite } from '../../services/graph';
 
 
 declare var ClipboardItem;
@@ -871,8 +869,6 @@ export class AppCanvas {
     console.log('setting up mouse events');
     this.drawing = false;
 
-    const user = await getAccount();
-
     // this.mousePos = { x: 0, y: 0 };
 
     let points;
@@ -979,21 +975,6 @@ export class AppCanvas {
                 that.context.stroke();
               });
             }
-
-            if (that.socket) {
-              that.socket.emit('drawing', {
-                x0: previous.clientX,
-                y0: previous.clientY,
-                x1: (event as PointerEvent).clientX,
-                y1: (event as PointerEvent).clientY,
-                color: that.color,
-                pointerType: (event as PointerEvent).pointerType,
-                pressure: (event as PointerEvent).pressure,
-                width: (event as PointerEvent).width,
-                globalCompositeOperation: 'source-over',
-                user: user ? user.username : null
-              });
-            }
           })
         }
         else if (that.mode === 'erase') {
@@ -1018,21 +999,6 @@ export class AppCanvas {
               that.context.lineTo(point.clientX, point.clientY);
             }
             that.context.stroke();
-
-            if (that.socket) {
-              that.socket.emit('drawing', {
-                x0: previous.clientX,
-                y0: previous.clientY,
-                x1: (event as PointerEvent).clientX,
-                y1: (event as PointerEvent).clientY,
-                color: that.color,
-                pointerType: (event as PointerEvent).pointerType,
-                pressure: (event as PointerEvent).pressure,
-                width: (event as PointerEvent).width,
-                globalCompositeOperation: 'source-over',
-                user: user ? user.username : null
-              });
-            }
           });
         }
       },
@@ -1147,7 +1113,7 @@ export class AppCanvas {
   }
 
   @Method()
-  addImageToCanvas(imageString: string, width: number, height: number) {
+  addImageToCanvas(imageString: string) {
     this.mode = "something";
 
     return new Promise(() => {
@@ -1170,10 +1136,10 @@ export class AppCanvas {
         this.canvasElement.addEventListener('click', async function handler(ev) {
 
           if (window.matchMedia("(min-width: 1200px)").matches) {
-            context.drawImage(base_image, ev.clientX, ev.clientY, width / 2, height / 2);
+            context.drawImage(base_image, ev.clientX, ev.clientY, base_image.naturalWidth / 8, base_image.naturalHeight / 8);
           }
           else {
-            context.drawImage(base_image, ev.clientX, ev.clientY, width / 4, height / 4);
+            context.drawImage(base_image, ev.clientX, ev.clientY, base_image.naturalWidth / 4, base_image.naturalHeight / 4);
           }
 
           await toast.dismiss();
@@ -1226,7 +1192,7 @@ export class AppCanvas {
             console.log(fr.result);
             console.log(file);
 
-            await this.addImageToCanvas((fr.result as string), 400, 400);
+            await this.addImageToCanvas((fr.result as string));
           }
           fr.readAsDataURL(file);
         }
@@ -1242,76 +1208,6 @@ export class AppCanvas {
           }
         }
       }
-    }
-  }
-
-  async endSession() {
-    const alert = await alertController.create({
-      header: "End Session?",
-      message: "Would you like to end this live session?",
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Confirm Cancel: blah');
-          }
-        }, {
-          text: 'End',
-          handler: async () => {
-            const nav = document.querySelector('ion-nav');
-            await nav.push(`/`);
-
-            this.room = null;
-          }
-        }
-      ]
-    })
-    await alert.present();
-  }
-
-  async invite() {
-    const user = await getAccount();
-
-    if (user) {
-      const modal = await modalController.create({
-        component: 'contacts-modal'
-      });
-      await modal.present();
-    }
-    else if ('contacts' in navigator && 'ContactsManager' in window) {
-      const props = ['name', 'email'];
-      const opts = { multiple: true };
-
-      try {
-        const contacts = await (navigator as any).contacts.select(props, opts);
-        sendRoomInvite(contacts);
-      } catch (err) {
-        // Handle any errors here.
-        console.error(err);
-      }
-    }
-    else {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Webboard',
-          text: "Join me on this board",
-          url: location.href,
-        })
-      }
-    }
-  }
-
-  async copySession() {
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(this.room);
-
-      const toast = await toastController.create({
-        message: "Session ID copied to clipboard",
-        duration: 1300
-      });
-      await toast.present();
     }
   }
 
@@ -1346,16 +1242,6 @@ export class AppCanvas {
         {window.matchMedia("(min-width: 1200px)").matches ? <button id="copyTextButton" onClick={() => this.doTextCopy()}>
           {this.copyingText ? <ion-spinner></ion-spinner> : <span>Copy Text</span>}
         </button> : null}
-
-        {
-          this.room ? <ion-button id="endButton" shape="round" color="danger" onClick={() => this.endSession()}>End Session <ion-icon slot="end" name="close"></ion-icon></ion-button> : null
-        }
-        {
-          this.room ?
-            <ion-button id="inviteButton" shape="round" color="primary" onClick={() => this.invite()}>Invite
-              <ion-icon slot="end" name="share"></ion-icon>
-            </ion-button> : null
-        }
 
         <canvas id="gridCanvas" ref={(el) => this.gridCanvas = el as HTMLCanvasElement}></canvas>
 

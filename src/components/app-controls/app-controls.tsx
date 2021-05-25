@@ -210,7 +210,7 @@ export class AppControls {
         {
           window.matchMedia("(min-width: 800px)").matches ? <div id='saveButtonDiv'>
             <button id='allImagesButton' onClick={() => this.openAllImages()}>
-              <ion-icon name="document-outline"></ion-icon>
+              <ion-icon name="image-outline"></ion-icon>
             </button>
 
             <button onClick={() => this.save()} id='saveButton'>
@@ -231,7 +231,7 @@ export class AppControls {
 
               <ion-fab-list side="bottom">
                 <ion-fab-button onClick={() => this.openAllImages()}>
-                  <ion-icon name="document-outline"></ion-icon>
+                  <ion-icon name="image-outline"></ion-icon>
                 </ion-fab-button>
 
                 <ion-fab-button onClick={() => this.save()}>
