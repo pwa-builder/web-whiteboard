@@ -13,6 +13,10 @@ export class AppSettings {
     return (
       <div>
         <ion-list lines="none">
+          <ion-item href="https://go.microsoft.com/fwlink/?LinkId=521839">
+            Microsoft Privacy Statement
+          </ion-item>
+
           <ion-item href="https://github.com/jgw96/web-whiteboard">
             <ion-icon slot="start" name="information-circle-outline"></ion-icon>
             <ion-label>
