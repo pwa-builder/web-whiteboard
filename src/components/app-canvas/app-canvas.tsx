@@ -294,14 +294,19 @@ export class AppCanvas {
     this.canvasElement.toBlob(async (blob) => {
       console.log(blob);
 
-      const file = new File([blob], "default.jpg");
+      const file = new File([blob], "default.png", { type: blob.type });
 
       if ((navigator as any).canShare && (navigator as any).canShare(file)) {
-        await (navigator as any).share({
-          file: file,
-          title: 'Whiteboard',
-          text: 'Check out this whiteboard from WebBoard https://webboard-app.web.app',
-        })
+        try {
+          await (navigator as any).share({
+            files: [file],
+            title: 'Whiteboard',
+            text: 'Check out this whiteboard from WebBoard https://webboard-app.web.app',
+          })
+        }
+        catch(err) {
+          console.error(err);
+        }
       } else {
         console.log('Your system doesn\'t support sharing files.');
 
