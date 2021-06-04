@@ -1,8 +1,8 @@
 {
-  "name": "vision-help2",
+  "name": "web-whiteboard",
   "private": true,
   "version": "0.0.1",
-  "description": "vision-help2",
+  "description": "web-whiteboard",
   "license": "MIT",
   "files": [
     "dist/"
