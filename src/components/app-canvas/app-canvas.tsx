@@ -760,6 +760,7 @@ export class AppCanvas {
     this.rect = this.canvasElement.getBoundingClientRect();
 
     this.context = (this.canvasElement.getContext('2d', {
+      desynchronized: navigator.userAgent.toLowerCase().includes("android") ? false : true,
     }) as CanvasRenderingContext2D);
 
     this.context.fillStyle = 'white';
