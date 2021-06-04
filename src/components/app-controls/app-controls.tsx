@@ -1,5 +1,5 @@
 import { Component, Element, Event, EventEmitter, State, h } from '@stencil/core';
-import { modalController as modalCtrl, popoverController as popoverCtrl, toastController as toastCtrl } from '@ionic/core';
+import { popoverController as popoverCtrl, toastController as toastCtrl } from '@ionic/core';
 
 declare var ga: any;
 
@@ -140,67 +140,12 @@ export class AppControls {
     await popover.present();
   }
 
-  async turnAI() {
-    const modal = await modalCtrl.create({
-      component: 'ai-popover',
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
-    });
-
-    await modal.present();
-  }
-
-  async openColorVision() {
-    const modal = await modalCtrl.create({
-      component: 'color-modal'
-    });
-    await modal.present();
-
-    const colorData = await modal.onDidDismiss();
-
-    console.log(colorData.data);
-
-    if (colorData.data && colorData.data.length > 0) {
-      this.selectColor(`#${colorData.data}`);
-
-      const toast = await toastCtrl.create({
-        message: `Found this color: #${colorData.data}`,
-        duration: 1200,
-        position: "top",
-      });
-      await toast.present();
-    }
-  }
-
   deskShare() {
     this.doShare.emit();
   }
 
   doLive() {
     this.live.emit();
-  }
-
-  async moreTools(ev) {
-    const popover = await popoverCtrl.create({
-      component: "more-tools",
-      event: ev,
-      showBackdrop: navigator.userAgent.includes('iPad') === false && window.matchMedia("(min-width: 1450px)").matches ? false : true
-    })
-    await popover.present();
-
-    (popover.querySelector('more-tools') as HTMLElement).addEventListener('doInkToShape', (ev: any) => {
-      console.log(ev.detail);
-      this.doInkToShape.emit(ev.detail);
-    });
-
-    (popover.querySelector('more-tools') as HTMLElement).addEventListener('doAi', async (ev: any) => {
-      console.log(ev.detail);
-      await this.turnAI();
-    });
-
-    (popover.querySelector('more-tools') as HTMLElement).addEventListener('share', (ev: any) => {
-      console.log(ev.detail);
-      this.doShare.emit();
-    });
   }
 
   render() {
@@ -265,19 +210,6 @@ export class AppControls {
               <ion-icon name="grid-outline"></ion-icon>
             </button>
 
-            {/*<button onClick={() => this.openDrag()}>
-              <ion-icon name="expand"></ion-icon>
-    </button>*/}
-
-            {/*<input onChange={(ev) => this.handleFileInput(ev)} accept="image/png, image/jpeg" type="file" name="file" id="file" class="inputfile" />
-            <label id="fileLabel" htmlFor="file">
-              <ion-icon name="images"></ion-icon>
-    </label>*/}
-
-            <button onClick={(event) => this.moreTools(event)}>
-              <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-            </button>
-
             <button onClick={() => this.clear()}>
               <ion-icon id="trashIcon" name="trash-outline"></ion-icon>
             </button>
@@ -295,9 +227,6 @@ export class AppControls {
             <button onClick={() => this.selectColor('green')} id='greenButton'></button>
             <input onChange={(event: any) => this.selectColor(event.target.value)} id="customColor" type="color" name="head"
               value="#e66465"></input>
-            <button id="visionColorButton" onClick={() => this.openColorVision()}>
-              <ion-icon name="color-filter-outline"></ion-icon>
-            </button>
           </div>
         </div> : null}
       </div>

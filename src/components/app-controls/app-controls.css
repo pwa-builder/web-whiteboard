@@ -95,7 +95,7 @@ ion-fab {
   padding: 10px;
   display: flex;
   justify-content: space-around;
-  width: 16em;
+  width: 14em;
   border-radius: 40px;
 }
 
@@ -137,7 +137,7 @@ ion-fab {
   padding: 10px;
   display: flex;
   justify-content: space-around;
-  width: 20em;
+  width: 16em;
   align-items: center;
   border-radius: 40px;
 
@@ -300,7 +300,7 @@ ion-fab {
 
 @media (max-width: 600px) {
   #controlsBlock #buttonBlock {
-    width: 18em;
+    width: 16em;
   }
 
   #colorsBlock #colorInternalBlock {

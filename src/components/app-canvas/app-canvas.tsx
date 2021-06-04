@@ -106,7 +106,6 @@ export class AppCanvas {
 
   @Method()
   async resizeCanvas(width?: number, height?: number) {
-    console.log('resizing canvas');
     const canvasState = await (get('canvasState') as any);
 
     this.context.canvas.width = width || window.innerWidth;
@@ -145,26 +144,6 @@ export class AppCanvas {
     console.log(clipboardItems);
 
     if (clipboardItems) {
-
-      /*let blobOutput = null;
-
-      try {
-        blobOutput = await clipboardItems[0].getType('image/png');
-      }
-      catch (err) {
-        console.error(err);
-      }
-
-      if (blobOutput) {
-        const imageURL = window.URL.createObjectURL(blobOutput);
-
-        const tempImage = new Image();
-        tempImage.onload = () => {
-          this.context.drawImage(tempImage, ev.clientX, ev.clientY);
-        }
-        tempImage.src = imageURL;
-
-      }*/
 
       try {
         let blobOutput = null;
