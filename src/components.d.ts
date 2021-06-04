@@ -33,8 +33,6 @@ export namespace Components {
     }
     interface AppSettings {
     }
-    interface ColorModal {
-    }
 }
 declare global {
     interface HTMLAppCanvasElement extends Components.AppCanvas, HTMLStencilElement {
@@ -73,12 +71,6 @@ declare global {
         prototype: HTMLAppSettingsElement;
         new (): HTMLAppSettingsElement;
     };
-    interface HTMLColorModalElement extends Components.ColorModal, HTMLStencilElement {
-    }
-    var HTMLColorModalElement: {
-        prototype: HTMLColorModalElement;
-        new (): HTMLColorModalElement;
-    };
     interface HTMLElementTagNameMap {
         "app-canvas": HTMLAppCanvasElement;
         "app-controls": HTMLAppControlsElement;
@@ -86,7 +78,6 @@ declare global {
         "app-intro": HTMLAppIntroElement;
         "app-root": HTMLAppRootElement;
         "app-settings": HTMLAppSettingsElement;
-        "color-modal": HTMLColorModalElement;
     }
 }
 declare namespace LocalJSX {
@@ -120,8 +111,6 @@ declare namespace LocalJSX {
     }
     interface AppSettings {
     }
-    interface ColorModal {
-    }
     interface IntrinsicElements {
         "app-canvas": AppCanvas;
         "app-controls": AppControls;
@@ -129,7 +118,6 @@ declare namespace LocalJSX {
         "app-intro": AppIntro;
         "app-root": AppRoot;
         "app-settings": AppSettings;
-        "color-modal": ColorModal;
     }
 }
 export { LocalJSX as JSX };
@@ -142,7 +130,6 @@ declare module "@stencil/core" {
             "app-intro": LocalJSX.AppIntro & JSXBase.HTMLAttributes<HTMLAppIntroElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-settings": LocalJSX.AppSettings & JSXBase.HTMLAttributes<HTMLAppSettingsElement>;
-            "color-modal": LocalJSX.ColorModal & JSXBase.HTMLAttributes<HTMLColorModalElement>;
         }
     }
 }
