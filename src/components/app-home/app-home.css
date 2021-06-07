@@ -139,4 +139,8 @@ app-canvas {
   #spanFab {
     display: initial;
   }
+
+   #fileNameDiv {
+    width: 50%;
+  }
 }

@@ -11,12 +11,6 @@
   z-index: -2;
 }
 
-@media (screen-spanning: single-fold-vertical) {
-  #controlsBlock, #colorsBlock {
-    bottom: 6px !important;
-  }
-}
-
 ion-fab {
   z-index: -1;
 }
@@ -276,18 +270,6 @@ ion-fab {
   align-items: center;
 }
 
-@media(screen-spanning: single-fold-vertical) {
-  #allImagesButton {
-    bottom: 7em;
-    top: initial;
-    left: initial;
-  }
-
-  #saveButtonDiv {
-    z-index: 9999;
-  }
-}
-
 #brushIcon {
   animation-name: spin;
   animation-duration: 300ms;
@@ -311,6 +293,38 @@ ion-fab {
 @media (min-width: 1200px) {
   .extImageModal {
     --width: 56em !important;
+  }
+}
+
+@media (screen-spanning: single-fold-vertical) {
+  #controlsBlock, #colorsBlock {
+    bottom: 6px !important;
+
+    top: initial;
+    display: flex;
+    width: 4em;
+    height: 4em;
+    align-items: center;
+  
+    width: 48%;
+    right: 0;
+    position: absolute;
+    left: initial;
+    z-index: 9998;
+  }
+
+  #allImagesButton {
+    bottom: 7em;
+    top: initial;
+    left: initial;
+  }
+
+  #saveButtonDiv {
+    left: initial;
+    right: 16px;
+    bottom: 16px;
+    top: initial;
+    z-index: 9999;
   }
 }
 
