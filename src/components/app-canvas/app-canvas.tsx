@@ -995,9 +995,7 @@ export class AppCanvas {
         // cancelled - True if the event was cancelled.  Actions are cancelled when the OS takes over
         //   pointer events, for actions such as scrolling.
 
-        if (that.inkShape === true) {
-          await that.sendInk(points);
-        }
+        that.quickInkSave();
 
         console.log(pointer, event, cancelled);
       },
