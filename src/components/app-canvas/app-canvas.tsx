@@ -20,7 +20,7 @@ export class AppCanvas {
 
   @Element() el: HTMLElement;
 
-  @Prop() color: string = 'red';
+  @Prop() color: string = '#000000';
   @Prop() mode: string = 'pen';
   @Prop() savedDrawing: string | null = null;
   @Prop({ mutable: true }) dragMode: boolean = false;
@@ -760,7 +760,7 @@ export class AppCanvas {
     this.rect = this.canvasElement.getBoundingClientRect();
 
     this.context = (this.canvasElement.getContext('2d', {
-      desynchronized: navigator.userAgent.toLowerCase().includes("android") ? false : true,
+      // desynchronized: navigator.userAgent.toLowerCase().includes("android") ? false : true,
     }) as CanvasRenderingContext2D);
 
     this.context.fillStyle = 'white';
@@ -862,6 +862,13 @@ export class AppCanvas {
     const PointerTracker = await import('../../helpers/PointerTracker');
 
     let that = this;
+    let presenter = undefined;
+
+    if ((navigator as any).ink) {
+      const options = { presentationArea: this.canvasElement };
+      console.log(options);
+      presenter = await (navigator as any).ink.requestPresenter(options);
+    }
 
     new PointerTracker.default(this.canvasElement, {
       start(pointer, event: PointerEvent) {
@@ -887,7 +894,7 @@ export class AppCanvas {
 
 
       },
-      move(previousPointers, changedPointers, /*event: PointerEvent*/) {
+      move(previousPointers, changedPointers, event: PointerEvent) {
         // Called when pointers have moved.
         // previousPointers - The state of the pointers before this event. This contains the same number
         //   of pointers, in the same order, as this.currentPointers and this.startPointers.
@@ -930,6 +937,12 @@ export class AppCanvas {
                   that.context.lineTo(point.clientX, point.clientY);
                 }
                 that.context.stroke();
+
+                // Update the presenter with the last rendered point and give it a style
+                presenter.updateInkTrailStartPoint(event, {
+                  color: "#1976d2",
+                  diameter: that.context.lineWidth
+                });
               }
             }
             else if ((pointer.nativePointer as PointerEvent).pointerType === 'touch') {

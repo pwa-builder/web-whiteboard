@@ -221,10 +221,10 @@ export class AppControls {
             <button onClick={() => this.close()} id='closeButton'>
               <ion-icon name='close'></ion-icon>
             </button>
-            <button onClick={() => this.selectColor('black')} id='blackButton'></button>
-            <button onClick={() => this.selectColor('red')} id='redButton'></button>
-            <button onClick={() => this.selectColor('blue')} id='blueButton'></button>
-            <button onClick={() => this.selectColor('green')} id='greenButton'></button>
+            <button onClick={() => this.selectColor('#000000')} id='blackButton'></button>
+            <button onClick={() => this.selectColor('#FF0000')} id='redButton'></button>
+            <button onClick={() => this.selectColor('#0000FF')} id='blueButton'></button>
+            <button onClick={() => this.selectColor('#008000')} id='greenButton'></button>
             <input onChange={(event: any) => this.selectColor(event.target.value)} id="customColor" type="color" name="head"
               value="#e66465"></input>
           </div>
