@@ -49,6 +49,7 @@ export class AppCanvas {
   gridWorker = null;
   dragToast: HTMLIonToastElement;
   socket: any = null;
+  presenter: any = null;
 
   async componentDidLoad() {
     window.addEventListener('resize', () => {
@@ -64,6 +65,15 @@ export class AppCanvas {
 
     if (location.search === "?startLive") {
       await this.liveConnect();
+    }
+
+    const canvasState = await (get('canvasState') as any);
+    if (canvasState) {
+      const tempImage = new Image();
+      tempImage.onload = () => {
+        this.context.drawImage(tempImage, 0, 0);
+      }
+      tempImage.src = canvasState;
     }
   }
 
@@ -129,6 +139,21 @@ export class AppCanvas {
       tempImage.src = canvasState;
     }
 
+    await this.getInkPresenter();
+  }
+
+  async getInkPresenter() {
+    if ((navigator as any).ink) {
+      const options = { presentationArea: this.canvasElement };
+      console.log(options);
+
+      try {
+        this.presenter = await (navigator as any).ink.requestPresenter(options);
+      }
+      catch (err) {
+        console.error("You are probably on Edge Stable with the ink flag turned on, this impl is broken");
+      }
+    }
   }
 
   async pasteImage(ev) {
@@ -775,12 +800,6 @@ export class AppCanvas {
 
     this.context.lineWidth = 4;
 
-    if ("getContextAttributes" in this.context && (this.context as any).getContextAttributes().desynchronized) {
-      console.log('Low latency canvas supported. Yay!');
-    } else {
-      console.log('Low latency canvas not supported. Boo!');
-    }
-
     console.log(this.color);
 
     (window as any).requestIdleCallback(async () => {
@@ -862,13 +881,8 @@ export class AppCanvas {
     const PointerTracker = await import('../../helpers/PointerTracker');
 
     let that = this;
-    let presenter = undefined;
 
-    if ((navigator as any).ink) {
-      const options = { presentationArea: this.canvasElement };
-      console.log(options);
-      presenter = await (navigator as any).ink.requestPresenter(options);
-    }
+    await this.getInkPresenter();
 
     new PointerTracker.default(this.canvasElement, {
       start(pointer, event: PointerEvent) {
@@ -927,22 +941,30 @@ export class AppCanvas {
                   that.context.lineTo(point.clientX, point.clientY);
                 }
                 that.context.stroke();
+
+                that.context.closePath();
               }
               else {
                 that.context.globalCompositeOperation = 'source-over';
 
                 that.context.beginPath();
                 that.context.moveTo(previous.clientX, previous.clientY);
+
                 for (const point of pointer.getCoalesced()) {
                   that.context.lineTo(point.clientX, point.clientY);
+                  // that.context.stroke();
                 }
+
                 that.context.stroke();
 
-                // Update the presenter with the last rendered point and give it a style
-                presenter.updateInkTrailStartPoint(event, {
-                  color: "#1976d2",
-                  diameter: that.context.lineWidth
-                });
+                that.context.closePath();
+
+                if (that.presenter) {
+                  that.presenter.updateInkTrailStartPoint(event, {
+                    color: that.color,
+                    diameter: that.context.lineWidth
+                  });
+                }
               }
             }
             else if ((pointer.nativePointer as PointerEvent).pointerType === 'touch') {
@@ -957,6 +979,13 @@ export class AppCanvas {
                   that.context.lineTo(point.clientX, point.clientY);
                 }
                 that.context.stroke();
+
+                if (that.presenter) {
+                  that.presenter.updateInkTrailStartPoint(event, {
+                    color: that.color,
+                    diameter: that.context.lineWidth
+                  });
+                }
               });
             }
             else if ((pointer.nativePointer as PointerEvent).pointerType === 'mouse') {
@@ -971,6 +1000,13 @@ export class AppCanvas {
                   that.context.lineTo(point.clientX, point.clientY);
                 }
                 that.context.stroke();
+
+                if (that.presenter) {
+                  that.presenter.updateInkTrailStartPoint(event, {
+                    color: that.color,
+                    diameter: that.context.lineWidth
+                  });
+                }
               });
             }
           })
