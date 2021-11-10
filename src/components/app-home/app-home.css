@@ -135,6 +135,16 @@ app-canvas {
   }
 }
 
+@media (horizontal-viewport-segments: 2) {
+  #spanFab {
+    display: initial;
+  }
+
+   #fileNameDiv {
+    width: 50%;
+  }
+}
+
 @media(screen-spanning: single-fold-vertical) {
   #spanFab {
     display: initial;

@@ -296,6 +296,38 @@ ion-fab {
   }
 }
 
+@media (horizontal-viewport-segments: 2) {
+  #controlsBlock, #colorsBlock {
+    bottom: 6px !important;
+
+    top: initial;
+    display: flex;
+    width: 4em;
+    height: 4em;
+    align-items: center;
+  
+    width: 48%;
+    right: 0;
+    position: absolute;
+    left: initial;
+    z-index: 9998;
+  }
+
+  #allImagesButton {
+    bottom: 7em;
+    top: initial;
+    left: initial;
+  }
+
+  #saveButtonDiv {
+    left: initial;
+    right: 16px;
+    bottom: 16px;
+    top: initial;
+    z-index: 9999;
+  }
+}
+
 @media (screen-spanning: single-fold-vertical) {
   #controlsBlock, #colorsBlock {
     bottom: 6px !important;
