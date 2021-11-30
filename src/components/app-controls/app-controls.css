@@ -296,7 +296,7 @@ ion-fab {
   }
 }
 
-@media (screen-spanning: single-fold-vertical) {
+@media (horizontal-viewport-segments: 2) { 
   #controlsBlock, #colorsBlock {
     bottom: 6px !important;
 

@@ -113,7 +113,7 @@ ion-icon svg {
   --ion-color-light-tint: #f5f6f9;
 }
 
-@media (screen-spanning: single-fold-vertical) { 
+@media (horizontal-viewport-segments: 2) { 
   #controlsBlock, #colorsBlock {
     bottom: 0;
     top: initial;

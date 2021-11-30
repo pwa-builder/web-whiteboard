@@ -135,7 +135,7 @@ app-canvas {
   }
 }
 
-@media(screen-spanning: single-fold-vertical) {
+@media(horizontal-viewport-segments: 2) {
   #spanFab {
     display: initial;
   }
