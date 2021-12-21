@@ -1,5 +1,7 @@
 # Webboard
 
+Please use our [main repository for any issues/bugs/features suggestion](https://github.com/pwa-builder/PWABuilder/issues/new/choose).
+
 ## Welcome!
 
 This is the repository for Webboard, an open source, multi-platform, intelligent whiteboarding [Progressive Web Application](https://docs.microsoft.com/en-us/microsoft-edge/progressive-web-apps-chromium/)!
