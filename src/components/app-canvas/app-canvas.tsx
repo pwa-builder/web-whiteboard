@@ -471,7 +471,7 @@ export class AppCanvas {
     let offscreen;
 
     if ('OffscreenCanvas' in window) {
-      offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+      offscreen = new (window as any).OffscreenCanvas(window.innerWidth, window.innerHeight);
       offscreenContext = offscreen.getContext('2d');
     }
 
@@ -804,7 +804,11 @@ export class AppCanvas {
 
     (window as any).requestIdleCallback(async () => {
       await this.setupMouseEvents();
-    })
+    });
+
+    (window as any).requestIdleCallback(async () => {
+      await this.setupPenEventHandling();
+    });
     // this.setupMouseEvents();
 
     // this.renderCanvas();
@@ -812,12 +816,12 @@ export class AppCanvas {
 
   @Method()
   drawGrid() {
-    if (window.OffscreenCanvas) {
+    if ((window as any).OffscreenCanvas) {
       if (!this.offscreen) {
         this.gridCanvas.height = window.innerHeight;
         this.gridCanvas.width = window.innerWidth;
 
-        this.offscreen = this.gridCanvas.transferControlToOffscreen();
+        this.offscreen = (this.gridCanvas as any).transferControlToOffscreen();
 
         this.gridWorker = new Worker('/assets/grid-canvas.js');
         this.gridWorker.postMessage({ canvas: this.offscreen, draw: true }, [this.offscreen]);
@@ -867,6 +871,42 @@ export class AppCanvas {
       // this.gridContext.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
       this.gridWorker.postMessage({ draw: false });
     })
+  }
+
+  async setupPenEventHandling() {
+    //@ts-ignore
+    let pet = new PenEventTarget([
+      { 
+          type: "click",
+          // Because a future pen may have multiple buttons with independent system-wide actions 
+          // that can be independently overridden, list buttons the author intends to handle explicitly.
+          buttons: [5]
+      },
+      { 
+          type: "dblclick",
+          buttons: [5]
+      },
+      { 
+          type: "pressandhold",
+          buttons: [5]
+      },
+      { 
+          type: "dockchange"
+      }
+    ])
+
+    await pet.connect();
+    console.log("pet", pet);
+
+    pet.addEventListener("dockchange", (e) => {
+      if (!e.docked) {
+          // handle the pen being undocked
+          console.log('undocked');
+      } else {
+          // handle the pen being docked
+          console.log('docked');
+      }
+  })
   }
 
   async setupMouseEvents() {
