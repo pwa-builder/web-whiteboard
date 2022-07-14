@@ -51,6 +51,26 @@ export class AppCanvas {
   socket: any = null;
   presenter: any = null;
 
+  waveforms = {
+    click: 4099,
+    buzz_continuous: 4100,
+    rumble_continuous: 4101,
+    press: 4102,
+    release: 4103,
+    hover: 4104,
+    success: 4105,
+    error: 4106,
+    ink_continuous: 4107,
+    pencil_continuous: 4108,
+    marker_continuous: 4109,
+    chisel_marker_continuous: 4110,
+    brush_continuous: 4111,
+    eraser_continuous: 4112,
+    first_custom_vendor_defined: 10752,
+    second_custom_vendor_defined: 8479,
+    galaxy_pen_continuous: 4113,
+  };
+
   async componentDidLoad() {
     window.addEventListener('resize', () => {
       console.log('resizing');
@@ -471,6 +491,7 @@ export class AppCanvas {
     let offscreen;
 
     if ('OffscreenCanvas' in window) {
+      // @ts-ignore
       offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
       offscreenContext = offscreen.getContext('2d');
     }
@@ -812,11 +833,13 @@ export class AppCanvas {
 
   @Method()
   drawGrid() {
+    // @ts-ignore
     if (window.OffscreenCanvas) {
       if (!this.offscreen) {
         this.gridCanvas.height = window.innerHeight;
         this.gridCanvas.width = window.innerWidth;
 
+        // @ts-ignore
         this.offscreen = this.gridCanvas.transferControlToOffscreen();
 
         this.gridWorker = new Worker('/assets/grid-canvas.js');
@@ -926,19 +949,21 @@ export class AppCanvas {
             }
 
             if ((pointer.nativePointer as PointerEvent).pointerType === 'pen') {
-              console.log('pen', pointer);
-              
-              // @ts-ignore
-              (pointer.nativePointer as any).haptics.play(new HapticsPredefinedWaveform({
-                waveformId: 4108,
-                intensity: 50
-              }));
 
               let tweakedPressure = (pointer.nativePointer as PointerEvent).pressure * 6;
               that.context.lineWidth = (pointer.nativePointer as PointerEvent).width + tweakedPressure;
 
               if ((pointer.nativePointer as PointerEvent).buttons === 32 && (pointer.nativePointer as PointerEvent).button === -1) {
                 // eraser
+
+                // @ts-ignore
+                (pointer.nativePointer as any).haptics.play(new HapticsPredefinedWaveform({
+                  waveformId: that.waveforms.eraser_continuous,
+                  intensity: 50
+                }));
+
+                let tweakedPressure = (pointer.nativePointer as PointerEvent).pressure * 6;
+                that.context.lineWidth = (pointer.nativePointer as PointerEvent).width + tweakedPressure;
 
                 that.context.lineWidth = 15;
 
@@ -953,6 +978,13 @@ export class AppCanvas {
                 that.context.closePath();
               }
               else {
+
+                // @ts-ignore
+                (pointer.nativePointer as any).haptics.play(new HapticsPredefinedWaveform({
+                  waveformId: that.waveforms.ink_continuous,
+                  intensity: 50
+                }));
+
                 that.context.globalCompositeOperation = 'source-over';
 
                 that.context.beginPath();

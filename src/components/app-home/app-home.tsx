@@ -66,7 +66,13 @@ export class AppHome {
   }
 
   changeColor(ev: CustomEvent) {
+    console.log('changeColor');
     this.color = ev.detail;
+
+    /*(pointer.nativePointer as any).haptics.play(new HapticsPredefinedWaveform({
+      waveformId: that.waveforms.eraser_continuous,
+      intensity: 50
+    }));*/
   }
 
   async clear() {

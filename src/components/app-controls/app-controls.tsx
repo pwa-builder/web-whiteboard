@@ -36,12 +36,13 @@ export class AppControls {
       if (!event.docked) {
         // the pen is un-docked, handle it
 
-        this.changeColor();
+        // this.changeColor();
       }
     });
   }
 
-  changeColor() {
+  changeColor(event) {
+    console.log(event);
     this.penMode.emit();
     this.openColors = true;
 
@@ -198,7 +199,7 @@ export class AppControls {
 
         {!this.openColors ? <div id='controlsBlock'>
           <div id='buttonBlock'>
-            <button onClick={() => this.changeColor()}>
+            <button onClick={($event) => this.changeColor($event)}>
               <ion-icon name="color-palette-outline"></ion-icon>
             </button>
 
