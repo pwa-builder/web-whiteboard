@@ -927,12 +927,13 @@ export class AppCanvas {
 
             if ((pointer.nativePointer as PointerEvent).pointerType === 'pen') {
               console.log('pen', pointer);
+              
               // @ts-ignore
               (pointer.nativePointer as any).haptics.play(new HapticsPredefinedWaveform({
                 waveformId: 4108,
                 intensity: 50
               }));
-              
+
               let tweakedPressure = (pointer.nativePointer as PointerEvent).pressure * 6;
               that.context.lineWidth = (pointer.nativePointer as PointerEvent).width + tweakedPressure;
 
