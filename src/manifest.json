@@ -45,7 +45,8 @@
         },
         {
             "src": "icons/android/android-launchericon-512-512.png",
-            "sizes": "512x512"
+            "sizes": "512x512",
+            "purpose": "any"
         },
         {
             "src": "icons/android/android-launchericon-28-28.png",
