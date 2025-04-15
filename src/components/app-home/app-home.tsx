@@ -11,6 +11,7 @@ export class AppHome {
 
   @Element() el: HTMLElement;
 
+  @State() queryString: string = '';
   @State() color: string = 'black';
   @State() drawingMode: string = 'pen';
   @State() savedImage: string | null = null;
@@ -33,6 +34,14 @@ export class AppHome {
     (window as any).requestIdleCallback(() => {
       this.setupWakeLock();
     });
+
+    // 🌟 Check for the `query` param in the URL
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("query");
+    if (query) {
+      console.log("Received query from protocol handler:", query);
+      this.queryString = query;
+    }
 
     if ((window as any).getWindowSegments) {
       this.handleSegments();

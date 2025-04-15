@@ -16,6 +16,7 @@ export namespace Components {
         "inkToShape": () => Promise<void>;
         "liveConnect": () => Promise<void>;
         "mode": string;
+        "queryString": string;
         "resizeCanvas": (width?: number, height?: number) => Promise<void>;
         "saveCanvas": (name: string, fileHandle?: any) => Promise<any>;
         "savedDrawing": string | null;
@@ -85,6 +86,7 @@ declare namespace LocalJSX {
         "color"?: string;
         "dragMode"?: boolean;
         "mode"?: string;
+        "queryString"?: string;
         "savedDrawing"?: string | null;
     }
     interface AppControls {
