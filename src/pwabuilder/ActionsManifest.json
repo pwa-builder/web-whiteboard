@@ -1,0 +1,27 @@
+{
+    "version": 1,
+    "actions": [
+      {
+        "name": "Whiteboard.ReadMe",
+        "description": "Read the text elsewhere",
+        "kind": "Read",
+        "inputTypes": [
+          {
+            "name": "Text",
+            "type": "Text"
+          }
+        ],
+        "instantiations": [
+          {
+            "input": [ "Text" ],
+            "description": "Read selected text in a better viewer"
+          }
+        ],
+        "outputTypes": [],
+        "invocation": {
+          "type": "Uri",
+          "uri": "web+whiteboard://${Text}"
+        }
+      }
+    ]
+  }
