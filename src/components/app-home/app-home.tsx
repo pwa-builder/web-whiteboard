@@ -35,7 +35,6 @@ export class AppHome {
       this.setupWakeLock();
     });
 
-    // 🌟 Check for the `query` param in the URL
     const params = new URLSearchParams(window.location.search);
     const query = params.get("query");
     if (query) {
