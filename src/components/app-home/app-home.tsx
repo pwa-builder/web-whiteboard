@@ -42,6 +42,14 @@ export class AppHome {
       this.queryString = query;
     }
 
+    const sharedName = params.get("name");
+    const sharedDescription = params.get("description");
+    const sharedLink = params.get("link");
+
+    if(sharedName){
+      console.log("Received shared name from share_target:", sharedName);
+    }
+
     if ((window as any).getWindowSegments) {
       this.handleSegments();
 

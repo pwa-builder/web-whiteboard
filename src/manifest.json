@@ -84,5 +84,14 @@
     "protocol": "web+whiteboard",
     "url": "/?query=%s"
   }
-]
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "url": "link"
+    }
+  }
 }
